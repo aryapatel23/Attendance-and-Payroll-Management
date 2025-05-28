@@ -46,11 +46,16 @@
 
 
 import React, { useState,useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
   const [id, setId] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+
+        const navigate = useNavigate(); 
+
+
 
   const handelLogin = async (e) => {
     e.preventDefault();
@@ -62,12 +67,18 @@ const Login = () => {
         body: JSON.stringify(userData),
       });
         const data = await response.json();
-
+       
       if (!response.ok) {
         alert(data.message || "Login failed");
         return;
       }else{
         alert("Login successful By using Jwt Token");
+        if(data.user.role=="employee"){
+          navigate("/home");
+        }else if(data.user.role=="hr"){
+           navigate("/admin");
+         
+        }
       }
     }
     catch (error) {
@@ -75,6 +86,7 @@ const Login = () => {
       alert("An error occurred while logging in. Please try again.");
     }
   }
+
 
   
   return (
