@@ -45,13 +45,38 @@
 // export default Login;
 
 
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 
 const Login = () => {
   const [id, setId] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
+  const handelLogin = async (e) => {
+    e.preventDefault();
+    const userData = { username, password,id };
+    try{
+          const response = await fetch("http://localhost:4500/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(userData),
+      });
+        const data = await response.json();
+
+      if (!response.ok) {
+        alert(data.message || "Login failed");
+        return;
+      }else{
+        alert("Login successful By using Jwt Token");
+      }
+    }
+    catch (error) {
+      console.error("Error during login:", error);
+      alert("An error occurred while logging in. Please try again.");
+    }
+  }
+
+  
   return (
 <div className="flex flex-col md:flex-row h-screen">
   {/* Left Side (Logo + Form + Footer) */}
@@ -71,7 +96,7 @@ const Login = () => {
     <div className="order-3 md:order-2 flex justify-center items-center flex-1">
       <div className="w-9/12 md:w-3/5">
         <h1 className="text-3xl font-bold">Sign-in</h1>
-        <form className="flex flex-col mt-4">
+        <form className="flex flex-col mt-4" onSubmit={handelLogin}>
           <input
             type="text"
             placeholder="id*"
