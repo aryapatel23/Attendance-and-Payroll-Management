@@ -2,7 +2,7 @@ import React from 'react'
 import { BrowserRouter  , Route , Routes } from 'react-router-dom'
 import Login from './Pages/Login/Login'
 import Home from './Pages/Home/Home'
-import Admin from './Pages/Admin/admin'
+import HRDashboard from './Pages/Admin/HrDashboard'
 
 function App() {
 
@@ -12,7 +12,7 @@ function App() {
     <Routes>
     <Route path='/' element={<Login />} />
     <Route path='/home' element={<Home />} />
-    <Route path='/admin' element={<Admin />} />
+    <Route path='/hr' element={<HRDashboard />} />
     </Routes>
     </BrowserRouter>      
 

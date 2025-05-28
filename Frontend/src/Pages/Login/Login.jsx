@@ -61,7 +61,7 @@ const Login = () => {
     e.preventDefault();
     const userData = { username, password,id };
     try{
-          const response = await fetch("http://localhost:4500/api/login", {
+          const response = await fetch("http://localhost:5500/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(userData),
@@ -76,7 +76,7 @@ const Login = () => {
         if(data.user.role=="employee"){
           navigate("/home");
         }else if(data.user.role=="hr"){
-           navigate("/admin");
+           navigate("/hr");
          
         }
       }
