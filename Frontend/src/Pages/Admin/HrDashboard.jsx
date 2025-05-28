@@ -1,8 +1,19 @@
 import React, { useState } from "react";
 import { Menu, Users, PlusSquare, Calendar, DollarSign, Settings, User } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import {logoutUser} from "../../Redux/Slice"
 
 const Dashboard = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+      const dispatch = useDispatch();
+      const navigate = useNavigate(); 
+         const handleLogout = () => {
+        dispatch(logoutUser());  // Dispatch Redux logout action
+        localStorage.removeItem("token"); // Clear token from storage
+        localStorage.removeItem("role"); // Clear role from storage
+        navigate("/"); // Redirect to Login Page
+      };
 
   const employees = [
     {
@@ -107,6 +118,13 @@ const Dashboard = () => {
           <div className="flex items-center space-x-2 text-gray-700">
             <Settings size={16} /> <span>Setting</span>
           </div>
+                     <button
+                type="submit"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold p-2 rounded transition duration-200"
+                onClick={handleLogout}
+              >
+                Log out
+              </button>
         </nav>
       </div>
 
