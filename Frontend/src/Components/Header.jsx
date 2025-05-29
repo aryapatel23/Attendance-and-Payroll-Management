@@ -6,7 +6,13 @@ const Header = () => {
     <header className="flex items-center justify-between p-4 bg-white shadow-sm">
       {/* Branding */}
       <div className="flex items-center space-x-2 text-2xl font-bold">
-        <img src="https://res.cloudinary.com/doqzxuxb1/image/upload/v1748249798/Attendance%20And%20Payroll%20Managment/eanj5h57izb4wsvgkzhc.png" alt="logo" />
+        <img
+          src="https://res.cloudinary.com/doqzxuxb1/image/upload/v1748249798/Attendance%20And%20Payroll%20Managment/eanj5h57izb4wsvgkzhc.png"
+          alt="logo"
+          className="h-8"
+        />
+        <span className="text-gray-800">Circle</span>
+        <span className="text-black">Soft</span>
       </div>
 
       {/* Search Bar */}

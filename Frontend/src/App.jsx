@@ -6,7 +6,8 @@ import { useSelector } from "react-redux";
 import Login from './Pages/Login/Login'
 import Home from './Pages/Home/Home'
 import HRDashboard from './Pages/Admin/HrDashboard'
-import Deshbord from './Pages/Employe/Home.jsx'
+import Deshbord from './Pages/Employee/Home.jsx'
+import Attendance from './Pages/Employee/Attendance.jsx'
 import Add from './Pages/Add.jsx'
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
     {isAuthenticated && role==='hr' && <Route path='/hr' element={<HRDashboard />} />}
     <Route path='/add' element={<Add />} /> */}
     <Route path='/emhome' element={<Deshbord/>}/>
+    <Route path='/emattendance' element={<Attendance/>}/>
     </Routes>
     </BrowserRouter>      
 
