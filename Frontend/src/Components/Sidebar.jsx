@@ -6,9 +6,10 @@ import {
   Settings,
   User,
 } from "lucide-react";
+import { Navigate, useNavigate } from 'react-router-dom';
 
 const Sidebar = () => {
-
+    const navigate = useNavigate();
     
       const handleLogout = () => {
         dispatch(logoutUser());
@@ -34,25 +35,42 @@ const Sidebar = () => {
             </div>
 
             {/* Navigation Menu */}
-            <nav className="space-y-3">
-              <div className="flex items-center gap-3 p-2 rounded-lg bg-indigo-100 text-indigo-600 font-semibold">
-                <Users size={18} /> <span>Dashboard</span>
-              </div>
-              <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition">
-                <Users size={18} /> <span>Attendance</span>
-              </div>
-              <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition">
-                <DollarSign size={18} /> <span>Salary</span>
-              </div>
-              <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition">
+           <nav className="space-y-3">
+          <button
+            onClick={() => navigate('/emhome')}
+            className="flex items-center gap-3 p-2 rounded-lg bg-indigo-100 text-indigo-600 font-semibold w-full text-left"
+          >
+            <Users size={18} /> <span>Dashboard</span>
+          </button>
+          <button
+            onClick={() => navigate('/emattendance')}
+            className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition w-full text-left"
+          >
+            <Users size={18} /> <span>Attendance</span>
+          </button>
+          <button
+            onClick={() => Navigate('/salary')}
+            className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition w-full text-left"
+          >
+            <DollarSign size={18} /> <span>Salary</span>
+          </button>
+         
+
+              <button 
+              onClick={() => Navigate('/salary')}
+              className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition w-full text-left">
                 <Calendar size={18} /> <span>Calendar</span>
-              </div>
-              <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition">
+              </button>
+              <button 
+              onClick={() => Navigate('/salary')}
+              className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition w-full text-left">
                 <User size={18} /> <span>Profile</span>
-              </div>
-              <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition">
+              </button>
+              <button
+              onClick={() => Navigate('/salary')}
+              className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition w-full text-left">
                 <Settings size={18} /> <span>Settings</span>
-              </div>
+              </button>
             </nav>
           </div>
 
