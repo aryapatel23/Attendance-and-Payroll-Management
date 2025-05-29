@@ -9,6 +9,7 @@ import {
   Tooltip,
   ResponsiveContainer
 } from 'recharts';
+import { Fingerprint } from 'lucide-react';
 
 const data = [
   { name: 'Jan', Attendance: 24 },
@@ -43,12 +44,8 @@ const MainContent = () => {
           <h1 className="text-2xl font-semibold text-gray-800 mb-6">Attendance</h1>
 
           {/* Biometric Card */}
-          <div className="bg-white rounded-2xl shadow-md p-6 flex justify-between items-center mb-8">
-            <img
-              src="https://cdn-icons-png.flaticon.com/512/6840/6840478.png"
-              alt="Biometric"
-              className="w-32 h-32"
-            />
+          <div className="bg-white rounded-2xl shadow-md p-6 flex justify-around items-center mb-8">
+            <Fingerprint size={180}  className="text-purple-600"/>
             <div className="flex flex-col items-start">
               <h2 className="text-xl font-semibold text-gray-800 mb-2">
                 Give me your Biometric for today's attendance
