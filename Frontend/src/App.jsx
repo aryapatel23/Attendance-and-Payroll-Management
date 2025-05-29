@@ -6,7 +6,7 @@ import { useSelector } from "react-redux";
 import Login from './Pages/Login/Login'
 import Home from './Pages/Home/Home'
 import HRDashboard from './Pages/Admin/HrDashboard'
-import Deshbord from './Pages/Employe/Home.jsx'
+import Deshbord from './Pages/Employee/Home.jsx'
 import Add from './Pages/Add.jsx'
 
 function App() {
