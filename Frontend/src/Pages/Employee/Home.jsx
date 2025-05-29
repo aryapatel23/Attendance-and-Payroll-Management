@@ -10,7 +10,6 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { logoutUser } from "../../Redux/Slice";
 import Header from "../../Components/Header";
-import Sidebar from "../../Components/Sidebar";
 
 const Dashboard = () => {
   const [menuOpen, setMenuOpen] = useState(false);
