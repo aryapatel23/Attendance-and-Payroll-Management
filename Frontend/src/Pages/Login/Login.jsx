@@ -47,13 +47,15 @@
 
 import React, { useState,useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from "react-redux";
+import { loginUser } from "../../Redux/Slice";
 
 const Login = () => {
   const [id, setId] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-
-        const navigate = useNavigate(); 
+  const dispatch = useDispatch();
+  const navigate = useNavigate(); 
 
 
 
@@ -61,7 +63,7 @@ const Login = () => {
     e.preventDefault();
     const userData = { username, password,id };
     try{
-          const response = await fetch("http://localhost:4500/api/login", {
+          const response = await fetch("http://localhost:5500/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(userData),
@@ -72,12 +74,18 @@ const Login = () => {
         alert(data.message || "Login failed");
         return;
       }else{
-        alert("Login successful By using Jwt Token");
+
+      const role = (data?.user?.role || "").toLowerCase();
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("role", role);
+
+      dispatch(loginUser(data));
+      alert("Login successful By using Jwt Token");
+    
         if(data.user.role=="employee"){
           navigate("/home");
         }else if(data.user.role=="hr"){
-           navigate("/admin");
-         
+           navigate("/hr");
         }
       }
     }
