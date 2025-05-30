@@ -1,92 +1,101 @@
-import React from 'react'
+import React, { useState } from 'react';
 import {
   Users,
   DollarSign,
   Calendar,
   Settings,
   User,
+  Menu,
+  X,
 } from "lucide-react";
-import { Navigate, useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const Sidebar = () => {
-    const navigate = useNavigate();
-    
-      const handleLogout = () => {
-        dispatch(logoutUser());
-        localStorage.removeItem("token");
-        localStorage.removeItem("role");
-        navigate("/");
-      };
-      
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [isOpen, setIsOpen] = useState(false);
+
+  const isActive = (path) => location.pathname === path;
+
+  const handleLogout = () => {
+    // dispatch(logoutUser()); // Uncomment if using Redux
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    navigate("/");
+  };
+
   return (
-    <div className="w-64 bg-white text-gray-800 flex flex-col justify-between  shadow-sm  md:flex">
-          {/* Profile Section */}
-          <div className="p-6">
-            <div className="flex items-center gap-3 mb-6">
-              <img
-                src="https://i.pravatar.cc/100"
-                alt="Profile"
-                className="w-14 h-14 rounded-full border"
-              />
-              <div>
-                <h2 className="text-sm font-semibold">John</h2>
-                <p className="text-xs text-gray-500">Front-end Developer</p>
-              </div>
+    <div className="flex">
+      {/* Toggle button for mobile */}
+      <button
+        className="md:hidden fixed top-4 left-4 z-50 bg-white p-2 rounded-full shadow"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        {isOpen ? <X size={20} /> : <Menu size={20} />}
+      </button>
+
+      {/* Sidebar */}
+      <div
+        className={`fixed top-0 left-0 h-full bg-white w-64 text-gray-800 shadow-sm z-40 transform transition-transform duration-300 ease-in-out
+        ${isOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0 md:static md:block`}
+      >
+        {/* Profile Section */}
+        <div className="p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <img
+              src="https://i.pravatar.cc/100"
+              alt="Profile"
+              className="w-14 h-14 rounded-full border"
+            />
+            <div>
+              <h2 className="text-sm font-semibold">John</h2>
+              <p className="text-xs text-gray-500">Front-end Developer</p>
             </div>
+          </div>
 
-            {/* Navigation Menu */}
-           <nav className="space-y-3">
-          <button
-            onClick={() => navigate('/emhome')}
-            className="flex items-center gap-3 p-2 rounded-lg bg-indigo-100 text-indigo-600 font-semibold w-full text-left"
-          >
-            <Users size={18} /> <span>Dashboard</span>
-          </button>
-          <button
-            onClick={() => navigate('/emattendance')}
-            className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition w-full text-left"
-          >
-            <Users size={18} /> <span>Attendance</span>
-          </button>
-          <button
-            onClick={() => Navigate('/salary')}
-            className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition w-full text-left"
-          >
-            <DollarSign size={18} /> <span>Salary</span>
-          </button>
-         
-
-              <button 
-              onClick={() => Navigate('/salary')}
-              className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition w-full text-left">
-                <Calendar size={18} /> <span>Calendar</span>
-              </button>
-              <button 
-              onClick={() => Navigate('/salary')}
-              className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition w-full text-left">
-                <User size={18} /> <span>Profile</span>
-              </button>
+          {/* Navigation Menu */}
+          <nav className="space-y-3">
+            {[
+              { label: 'Dashboard', icon: <Users size={18} />, path: '/emhome' },
+              { label: 'Attendance', icon: <Users size={18} />, path: '/emattendance' },
+              { label: 'Salary', icon: <DollarSign size={18} />, path: '/salary' },
+              { label: 'Calendar', icon: <Calendar size={18} />, path: '/calendar' },
+              { label: 'Profile', icon: <User size={18} />, path: '/profile' },
+              { label: 'Settings', icon: <Settings size={18} />, path: '/settings' },
+            ].map(({ label, icon, path }) => (
               <button
-              onClick={() => Navigate('/salary')}
-              className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition w-full text-left">
-                <Settings size={18} /> <span>Settings</span>
+                key={path}
+                onClick={() => {
+                  navigate(path);
+                  setIsOpen(false); // Close sidebar on mobile after click
+                }}
+                className={`flex items-center gap-3 p-2 rounded-lg w-full text-left transition ${
+                  isActive(path)
+                    ? 'bg-indigo-100 text-indigo-600 font-semibold'
+                    : 'hover:bg-gray-100'
+                }`}
+              >
+                {icon} <span>{label}</span>
               </button>
-            </nav>
-          </div>
-
-          {/* Logout Button */}
-          <div className="p-6">
-            <button
-              onClick={handleLogout}
-              className="w-full bg-red-500 hover:bg-red-600 text-white font-medium py-2 rounded-lg"
-            >
-              Log out
-            </button>
-          </div>
+            ))}
+          </nav>
         </div>
 
+        {/* Logout Button */}
+        <div className="p-6">
+          <button
+            onClick={handleLogout}
+            className="w-full bg-red-500 hover:bg-red-600 text-white font-medium py-2 rounded-lg"
+          >
+            Log out
+          </button>
+        </div>
+      </div>
 
-  )
-}
+      {/* Dummy content space to push real content to the right on desktop */}
+      {/* <div className="hidden md:block w-64"></div> */}
+    </div>
+  );
+};
 
-export default Sidebar
+export default Sidebar;
