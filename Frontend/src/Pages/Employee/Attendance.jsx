@@ -46,7 +46,7 @@ const MainContent = () => {
                     </h1>
 
                     {/* Biometric Card */}
-                    <div className="bg-white rounded-2xl shadow-md p-4 sm:p-6 flex flex-col sm:flex-row justify-between sm:items-center gap-6 sm:gap-0 mb-6 sm:mb-8">
+                    <div className="bg-white rounded-2xl shadow-md p-4 sm:p-6 flex flex-col sm:flex-row justify-around sm:items-center gap-6 sm:gap-0 mb-6 sm:mb-8">
                         <div className="flex justify-center">
                             <Fingerprint size={120} className="text-purple-600 sm:size-[180px]" />
                         </div>
