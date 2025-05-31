@@ -6,6 +6,7 @@ import {
   Settings,
   User,
 } from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { logoutUser } from "../../Redux/Slice";
@@ -32,128 +33,135 @@ const Dashboard = () => {
       {/* Content below header */}
       <div className="flex flex-1">
         {/* Sidebar */}
-        <Sidebar/>
-
+        <Sidebar />
 
         {/* Main Content */}
-        <div className="flex-1 p-6">
-          <div className="flex justify-between items-center mb-6">
+        <div className="flex-1 p-6 space-y-6">
+          {/* Page Title */}
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <h1 className="text-xl font-semibold">Dashboard</h1>
-            <div className="flex items-center gap-2">
-              <button className="bg-indigo-600 text-white px-3 py-1 rounded text-sm">
+            <div className="flex gap-2">
+              <button className="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm shadow hover:bg-indigo-700 transition">
                 + Buddy Punching
               </button>
-              <button className="border px-3 py-1 rounded text-sm">
+              <button className="border px-4 py-2 rounded-md text-sm shadow hover:bg-gray-50 transition">
                 Manager POV
               </button>
             </div>
           </div>
 
-          <div className="mb-4 text-sm text-gray-600">
-            <span className="font-medium">Good to see you, John 👋</span>
-            <p>You came 15 minutes early today.</p>
+          {/* Welcome Message */}
+          <div className="text-sm text-gray-700 bg-white p-4 rounded-md shadow">
+            <span className="font-medium text-base">Good to see you, John 👋</span>
+            <p className="mt-1 text-sm">You came 15 minutes early today.</p>
           </div>
 
           {/* Stats Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <div className="bg-white p-4 rounded shadow">
-              <h4 className="text-xs text-gray-500 mb-1">
-                Total leave allowance
-              </h4>
-              <p className="text-xl font-bold">34</p>
-              <p className="text-xs text-gray-400">Paid 11 | Unpaid 4</p>
-            </div>
-            <div className="bg-white p-4 rounded shadow">
-              <h4 className="text-xs text-gray-500 mb-1">
-                Total leave taken
-              </h4>
-              <p className="text-xl font-bold text-red-600">20</p>
-              <p className="text-xs text-gray-400">Paid 62 | Unpaid 76</p>
-            </div>
-            <div className="bg-white p-4 rounded shadow">
-              <h4 className="text-xs text-gray-500 mb-1">
-                Total leave available
-              </h4>
-              <p className="text-xl font-bold text-green-600">87</p>
-              <p className="text-xs text-gray-400">Paid 50 | Unpaid 51</p>
-            </div>
-            <div className="bg-white p-4 rounded shadow">
-              <h4 className="text-xs text-gray-500 mb-1">
-                Leave request pending
-              </h4>
-              <p className="text-xl font-bold text-indigo-600">122</p>
-              <p className="text-xs text-gray-400">Paid 60 | Unpaid 53</p>
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              {
+                title: "Total leave allowance",
+                value: "34",
+                note: "Paid 11 | Unpaid 4",
+              },
+              {
+                title: "Total leave taken",
+                value: "20",
+                valueColor: "text-red-600",
+                note: "Paid 62 | Unpaid 76",
+              },
+              {
+                title: "Total leave available",
+                value: "87",
+                valueColor: "text-green-600",
+                note: "Paid 50 | Unpaid 51",
+              },
+              {
+                title: "Leave request pending",
+                value: "122",
+                valueColor: "text-indigo-600",
+                note: "Paid 60 | Unpaid 53",
+              },
+            ].map((item, idx) => (
+              <div
+                key={idx}
+                className="bg-white p-5 rounded-lg shadow flex flex-col gap-1"
+              >
+                <h4 className="text-xs text-gray-500">{item.title}</h4>
+                <p className={`text-xl font-bold ${item.valueColor || ""}`}>{
+                  item.value
+                }</p>
+                <p className="text-xs text-gray-400">{item.note}</p>
+              </div>
+            ))}
           </div>
 
           {/* Announcements Table */}
-          <div className="bg-white p-4 rounded shadow mb-6">
-            <h3 className="font-semibold mb-2">Announcements</h3>
-            <table className="w-full text-sm">
+          <div className="bg-white p-5 rounded-lg shadow overflow-x-auto">
+            <h3 className="font-semibold mb-3">Announcements</h3>
+            <table className="w-full text-sm border-collapse">
               <thead>
                 <tr className="text-gray-500 border-b">
-                  <th className="text-left py-1">Title</th>
-                  <th className="text-left py-1">Start date</th>
-                  <th className="text-left py-1">End date</th>
-                  <th className="text-left py-1">Description</th>
+                  <th className="text-left py-2 px-2">Title</th>
+                  <th className="text-left py-2 px-2">Start date</th>
+                  <th className="text-left py-2 px-2">End date</th>
+                  <th className="text-left py-2 px-2">Description</th>
                 </tr>
               </thead>
               <tbody>
-                <tr className="border-b">
-                  <td className="py-1">Scrum Master</td>
-                  <td>Dec 4, 2019 21:42</td>
-                  <td>Dec 7, 2019 23:26</td>
-                  <td>Corrected item alignment</td>
-                </tr>
-                <tr className="border-b">
-                  <td className="py-1">Software Tester</td>
-                  <td>Dec 30, 2019 05:18</td>
-                  <td>Feb 2, 2019 19:28</td>
-                  <td>Embedded analytic scripts</td>
-                </tr>
-                <tr>
-                  <td className="py-1">Software Developer</td>
-                  <td>Dec 30, 2019 07:52</td>
-                  <td>Dec 4, 2019 21:42</td>
-                  <td>High resolution imagery option</td>
-                </tr>
+                {[
+                  ["Scrum Master", "Dec 4, 2019 21:42", "Dec 7, 2019 23:26", "Corrected item alignment"],
+                  ["Software Tester", "Dec 30, 2019 05:18", "Feb 2, 2019 19:28", "Embedded analytic scripts"],
+                  ["Software Developer", "Dec 30, 2019 07:52", "Dec 4, 2019 21:42", "High resolution imagery option"],
+                ].map(([title, start, end, desc], idx) => (
+                  <tr key={idx} className="border-b">
+                    <td className="py-2 px-2 whitespace-nowrap">{title}</td>
+                    <td className="py-2 px-2 whitespace-nowrap">{start}</td>
+                    <td className="py-2 px-2 whitespace-nowrap">{end}</td>
+                    <td className="py-2 px-2 whitespace-nowrap">{desc}</td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
 
           {/* Attendance Chart */}
+          {/* Attendance Chart */}
           <div className="bg-white p-4 rounded shadow">
-            <div className="flex justify-between items-center mb-2">
+            <div className="flex justify-between items-center mb-4">
               <h3 className="font-semibold">Attendance Statistics</h3>
               <select className="border text-sm px-2 py-1 rounded">
                 <option>This Year</option>
                 <option>This Month</option>
               </select>
             </div>
-            <div className="grid grid-cols-12 gap-2 text-center text-xs text-gray-600">
-              {[
-                "Jan",
-                "Feb",
-                "Mar",
-                "Apr",
-                "May",
-                "Jun",
-                "Jul",
-                "Aug",
-                "Sep",
-                "Oct",
-                "Nov",
-                "Dec",
-              ].map((month, idx) => (
-                <div key={idx} className="flex flex-col items-center">
-                  <div
-                    className={`h-${idx < 5 ? 24 - idx * 4 : 4} bg-indigo-600 w-4 rounded-t`}
-                  ></div>
-                  <span>{month}</span>
-                </div>
-              ))}
-            </div>
+
+            {/* Chart */}
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart
+                data={[
+                  { name: "Jan", Attendance: 22 },
+                  { name: "Feb", Attendance: 20 },
+                  { name: "Mar", Attendance: 23 },
+                  { name: "Apr", Attendance: 19 },
+                  { name: "May", Attendance: 24 },
+                  { name: "Jun", Attendance: 18 },
+                  { name: "Jul", Attendance: 20 },
+                  { name: "Aug", Attendance: 21 },
+                  { name: "Sep", Attendance: 22 },
+                  { name: "Oct", Attendance: 20 },
+                  { name: "Nov", Attendance: 23 },
+                  { name: "Dec", Attendance: 25 }
+                ]}
+              >
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="Attendance" fill="#4F46E5" radius={[6, 6, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
+
         </div>
       </div>
     </div>
