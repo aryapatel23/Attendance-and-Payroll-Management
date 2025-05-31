@@ -6,6 +6,7 @@ import {
   Settings,
   User,
 } from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { logoutUser } from "../../Redux/Slice";
@@ -125,7 +126,8 @@ const Dashboard = () => {
           </div>
 
           {/* Attendance Chart */}
-          <div className="bg-white p-5 rounded-lg shadow">
+          {/* Attendance Chart */}
+          <div className="bg-white p-4 rounded shadow">
             <div className="flex justify-between items-center mb-4">
               <h3 className="font-semibold">Attendance Statistics</h3>
               <select className="border text-sm px-2 py-1 rounded">
@@ -133,17 +135,33 @@ const Dashboard = () => {
                 <option>This Month</option>
               </select>
             </div>
-            <div className="grid grid-cols-12 gap-3 text-center text-xs text-gray-600">
-              {["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].map((month, idx) => (
-                <div key={idx} className="flex flex-col items-center">
-                  <div
-                    className={`w-4 bg-indigo-600 rounded-t h-[${24 - idx}px]`}
-                  ></div>
-                  <span>{month}</span>
-                </div>
-              ))}
-            </div>
+
+            {/* Chart */}
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart
+                data={[
+                  { name: "Jan", Attendance: 22 },
+                  { name: "Feb", Attendance: 20 },
+                  { name: "Mar", Attendance: 23 },
+                  { name: "Apr", Attendance: 19 },
+                  { name: "May", Attendance: 24 },
+                  { name: "Jun", Attendance: 18 },
+                  { name: "Jul", Attendance: 20 },
+                  { name: "Aug", Attendance: 21 },
+                  { name: "Sep", Attendance: 22 },
+                  { name: "Oct", Attendance: 20 },
+                  { name: "Nov", Attendance: 23 },
+                  { name: "Dec", Attendance: 25 }
+                ]}
+              >
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="Attendance" fill="#4F46E5" radius={[6, 6, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
+
         </div>
       </div>
     </div>
