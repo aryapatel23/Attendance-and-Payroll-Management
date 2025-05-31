@@ -17,6 +17,27 @@ const Dashboard = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [selectedRange, setSelectedRange] = useState("This Year");
+
+  const yearData = [
+    { name: "Jan", Attendance: 24 },
+    { name: "Feb", Attendance: 22 },
+    { name: "Mar", Attendance: 18 },
+    { name: "Apr", Attendance: 27 },
+    { name: "May", Attendance: 30 },
+    { name: "Jun", Attendance: 25 },
+    { name: "Jul", Attendance: 29 },
+    { name: "Aug", Attendance: 24 },
+    { name: "Sep", Attendance: 26 },
+    { name: "Oct", Attendance: 28 },
+    { name: "Nov", Attendance: 23 },
+    { name: "Dec", Attendance: 21 },
+  ];
+
+  const monthData = Array.from({ length: 31 }, (_, i) => ({
+    name: `${i + 1}`,
+    Attendance: Math.random() > 0.15 ? 1 : 0,
+  }));
 
   const handleLogout = () => {
     dispatch(logoutUser());
@@ -26,17 +47,17 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col">
-      {/* Header at the top */}
+    <div className="min-h-screen flex flex-col">
+      {/* Header */}
       <Header />
 
-      {/* Content below header */}
+      {/* Layout */}
       <div className="flex flex-1">
         {/* Sidebar */}
         <Sidebar />
 
-        {/* Main Content */}
-        <div className="flex-1 p-6 space-y-6">
+        {/* Main Content with Scroll */}
+        <div className="flex-1 h-[calc(100vh-64px)] overflow-y-auto p-6 space-y-6 bg-gray-50">
           {/* Page Title */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <h1 className="text-xl font-semibold">Dashboard</h1>
@@ -56,7 +77,7 @@ const Dashboard = () => {
             <p className="mt-1 text-sm">You came 15 minutes early today.</p>
           </div>
 
-          {/* Stats Grid */}
+          {/* Stats */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
               {
@@ -88,80 +109,87 @@ const Dashboard = () => {
                 className="bg-white p-5 rounded-lg shadow flex flex-col gap-1"
               >
                 <h4 className="text-xs text-gray-500">{item.title}</h4>
-                <p className={`text-xl font-bold ${item.valueColor || ""}`}>{
-                  item.value
-                }</p>
+                <p className={`text-xl font-bold ${item.valueColor || ""}`}>
+                  {item.value}
+                </p>
                 <p className="text-xs text-gray-400">{item.note}</p>
               </div>
             ))}
           </div>
 
           {/* Announcements Table */}
-          <div className="bg-white p-5 rounded-lg shadow overflow-x-auto">
-            <h3 className="font-semibold mb-3">Announcements</h3>
-            <table className="w-full text-sm border-collapse">
-              <thead>
-                <tr className="text-gray-500 border-b">
-                  <th className="text-left py-2 px-2">Title</th>
-                  <th className="text-left py-2 px-2">Start date</th>
-                  <th className="text-left py-2 px-2">End date</th>
-                  <th className="text-left py-2 px-2">Description</th>
-                </tr>
-              </thead>
-              <tbody>
-                {[
-                  ["Scrum Master", "Dec 4, 2019 21:42", "Dec 7, 2019 23:26", "Corrected item alignment"],
-                  ["Software Tester", "Dec 30, 2019 05:18", "Feb 2, 2019 19:28", "Embedded analytic scripts"],
-                  ["Software Developer", "Dec 30, 2019 07:52", "Dec 4, 2019 21:42", "High resolution imagery option"],
-                ].map(([title, start, end, desc], idx) => (
-                  <tr key={idx} className="border-b">
-                    <td className="py-2 px-2 whitespace-nowrap">{title}</td>
-                    <td className="py-2 px-2 whitespace-nowrap">{start}</td>
-                    <td className="py-2 px-2 whitespace-nowrap">{end}</td>
-                    <td className="py-2 px-2 whitespace-nowrap">{desc}</td>
+          <div className="bg-white p-4 rounded shadow mb-6">
+            <h3 className="font-semibold text-lg mb-4 text-gray-800">Announcements</h3>
+
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-sm rounded text-left text-gray-600">
+                <thead className="bg-gray-100 text-gray-700 uppercase text-xs">
+                  <tr>
+                    <th className="px-4 py-3">Title</th>
+                    <th className="px-4 py-3">Start Date</th>
+                    <th className="px-4 py-3">End Date</th>
+                    <th className="px-4 py-3">Description</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {[
+                    {
+                      title: "Scrum Master",
+                      start: "Dec 4, 2019 21:42",
+                      end: "Dec 7, 2019 23:26",
+                      description: "Corrected item alignment",
+                    },
+                    {
+                      title: "Software Tester",
+                      start: "Dec 30, 2019 05:18",
+                      end: "Feb 2, 2020 19:28",
+                      description: "Embedded analytic scripts",
+                    },
+                    {
+                      title: "Software Developer",
+                      start: "Dec 30, 2019 07:52",
+                      end: "Dec 4, 2019 21:42",
+                      description: "High resolution imagery option",
+                    },
+                  ].map((item, idx) => (
+                    <tr
+                      key={idx}
+                      className="border-b hover:bg-gray-50 transition duration-200"
+                    >
+                      <td className="px-4 py-3 font-medium text-gray-800">{item.title}</td>
+                      <td className="px-4 py-3">{item.start}</td>
+                      <td className="px-4 py-3">{item.end}</td>
+                      <td className="px-4 py-3">{item.description}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
 
-          {/* Attendance Chart */}
           {/* Attendance Chart */}
           <div className="bg-white p-4 rounded shadow">
             <div className="flex justify-between items-center mb-4">
               <h3 className="font-semibold">Attendance Statistics</h3>
-              <select className="border text-sm px-2 py-1 rounded">
+              <select
+                className="text-sm border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                value={selectedRange}
+                onChange={(e) => setSelectedRange(e.target.value)}
+              >
                 <option>This Year</option>
                 <option>This Month</option>
               </select>
             </div>
 
-            {/* Chart */}
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart
-                data={[
-                  { name: "Jan", Attendance: 22 },
-                  { name: "Feb", Attendance: 20 },
-                  { name: "Mar", Attendance: 23 },
-                  { name: "Apr", Attendance: 19 },
-                  { name: "May", Attendance: 24 },
-                  { name: "Jun", Attendance: 18 },
-                  { name: "Jul", Attendance: 20 },
-                  { name: "Aug", Attendance: 21 },
-                  { name: "Sep", Attendance: 22 },
-                  { name: "Oct", Attendance: 20 },
-                  { name: "Nov", Attendance: 23 },
-                  { name: "Dec", Attendance: 25 }
-                ]}
-              >
+            <ResponsiveContainer width="100%" height={250}>
+              <BarChart data={selectedRange === "This Year" ? yearData : monthData}>
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="Attendance" fill="#4F46E5" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="Attendance" fill="#7c3aed" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
-
         </div>
       </div>
     </div>
