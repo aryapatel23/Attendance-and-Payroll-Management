@@ -10,6 +10,7 @@ import Deshbord from './Pages/Employee/Home.jsx'
 import Attendance from './Pages/Employee/Attendance.jsx'
 import Add from './Pages/Add.jsx'
 import Salary from './Pages/Employee/Salary.jsx';
+import Calendar from './Pages/Employee/Calendar.jsx';
 
 function App() {
 
@@ -32,6 +33,7 @@ function App() {
     <Route path='/emhome' element={<Deshbord/>}/>
     <Route path='/emattendance' element={<Attendance/>}/>
     <Route path='/emsalary' element={<Salary/>}/>
+    <Route path='/emcalendar' element={<Calendar/>}/>
     </Routes>
     </BrowserRouter>      
 
