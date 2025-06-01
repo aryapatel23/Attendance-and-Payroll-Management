@@ -59,7 +59,7 @@ const Sidebar = () => {
               { label: 'Dashboard', icon: <Users size={18} />, path: '/emhome' },
               { label: 'Attendance', icon: <Users size={18} />, path: '/emattendance' },
               { label: 'Salary', icon: <DollarSign size={18} />, path: '/emsalary' },
-              { label: 'Calendar', icon: <Calendar size={18} />, path: '/calendar' },
+              { label: 'Calendar', icon: <Calendar size={18} />, path: '/emcalendar' },
               { label: 'Profile', icon: <User size={18} />, path: '/profile' },
               { label: 'Settings', icon: <Settings size={18} />, path: '/settings' },
             ].map(({ label, icon, path }) => (
