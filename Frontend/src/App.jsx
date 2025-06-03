@@ -26,10 +26,10 @@ function App() {
     <>
     <BrowserRouter>
     <Routes>
-    {/* <Route path='/' element={<Login />} />
+    <Route path='/' element={<Login />} />
     {isAuthenticated && role==='employee' && <Route path='/home' element={<Home />} /> }
-    {isAuthenticated && role==='hr' && <Route path='/hr' element={<HRDashboard />} />}
-    <Route path='/add' element={<Add />} /> */}
+    {isAuthenticated && role==='hr' && <Route path='/hrhome' element={<HRDashboard />} />}
+    <Route path='/add' element={<Add />} />
     <Route path='/emhome' element={<Deshbord/>}/>
     <Route path='/emattendance' element={<Attendance/>}/>
     <Route path='/emsalary' element={<Salary/>}/>
