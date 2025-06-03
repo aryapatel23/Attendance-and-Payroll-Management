@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import {
   Users,
-  DollarSign,
+  LayoutDashboard,
+  UserPlus,
+  Wallet,
   Calendar,
   Settings,
   User,
   Menu,
   X,
-  LayoutDashboard,
 } from "lucide-react";
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -19,7 +20,6 @@ const Sidebar = () => {
   const isActive = (path) => location.pathname === path;
 
   const handleLogout = () => {
-    // dispatch(logoutUser()); // Uncomment if using Redux
     localStorage.removeItem("token");
     localStorage.removeItem("role");
     navigate("/");
@@ -50,17 +50,18 @@ const Sidebar = () => {
             />
             <div>
               <h2 className="text-sm font-semibold">John</h2>
-              <p className="text-xs text-gray-500">Front-end Developer</p>
+              <p className="text-xs text-gray-500">HR Manager</p>
             </div>
           </div>
 
           {/* Navigation Menu */}
           <nav className="space-y-3">
             {[
-              { label: 'Dashboard', icon: <LayoutDashboard size={18} />, path: '/emhome' },
-              { label: 'Attendance', icon: <Users size={18} />, path: '/emattendance' },
-              { label: 'Salary', icon: <DollarSign size={18} />, path: '/emsalary' },
-              { label: 'Calendar', icon: <Calendar size={18} />, path: '/emcalendar' },
+              { label: 'Dashboard', icon: <LayoutDashboard size={18} />, path: '/hrhome' },
+              { label: 'Employees', icon: <Users size={18} />, path: '/' },
+              { label: 'Add Employee', icon: <UserPlus size={18} />, path: '/' },
+              { label: 'Payroll System', icon: <Wallet size={18} />, path: '/' },
+              { label: 'Calendar', icon: <Calendar size={18} />, path: '/' },
               { label: 'Profile', icon: <User size={18} />, path: '/profile' },
               { label: 'Settings', icon: <Settings size={18} />, path: '/settings' },
             ].map(({ label, icon, path }) => (
@@ -92,9 +93,6 @@ const Sidebar = () => {
           </button>
         </div>
       </div>
-
-      {/* Dummy content space to push real content to the right on desktop */}
-      {/* <div className="hidden md:block w-64"></div> */}
     </div>
   );
 };
