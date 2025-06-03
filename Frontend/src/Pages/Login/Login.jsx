@@ -85,7 +85,7 @@ const Login = () => {
         if(data.user.role=="employee"){
           navigate("/emhome");
         }else if(data.user.role=="hr"){
-           navigate("/hr");
+           navigate("/hrhome");
         }
       }
     }

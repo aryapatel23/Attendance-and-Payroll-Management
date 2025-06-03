@@ -58,7 +58,7 @@ const Sidebar = () => {
           <nav className="space-y-3">
             {[
               { label: 'Dashboard', icon: <LayoutDashboard size={18} />, path: '/hrhome' },
-              { label: 'Employees', icon: <Users size={18} />, path: '/' },
+              { label: 'Employees', icon: <Users size={18} />, path: '/hremployees' },
               { label: 'Add Employee', icon: <UserPlus size={18} />, path: '/' },
               { label: 'Payroll System', icon: <Wallet size={18} />, path: '/' },
               { label: 'Calendar', icon: <Calendar size={18} />, path: '/' },
