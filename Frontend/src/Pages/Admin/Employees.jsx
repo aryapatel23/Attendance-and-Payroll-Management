@@ -1,0 +1,121 @@
+import React from "react";
+import Header from "../../Components/Header"; // Adjust if needed
+import Sidebar from "../../Components/HRSidebar"; // Adjust if needed
+
+const Employees = () => {
+  const employees = [
+    {
+      id: "HR001",
+      name: "Aisha Doe",
+      jobTitle: "HR Manager",
+      status: "Full Time Employee",
+    },
+    {
+      id: "HR002",
+      name: "Chukwuemeka",
+      jobTitle: "Software Engineer",
+      status: "Part Time Employee",
+    },
+    {
+      id: "HR003",
+      name: "Suleiman",
+      jobTitle: "Marketing Executive",
+      status: "Full Time Employee",
+    },
+    {
+      id: "HR004",
+      name: "Olamide",
+      jobTitle: "Financial Analyst",
+      status: "Full Time Employee",
+    },
+    {
+      id: "HR005",
+      name: "Jide",
+      jobTitle: "Project Manager",
+      status: "Full Time Employee",
+    },
+    {
+      id: "HR006",
+      name: "Femi",
+      jobTitle: "Sales Manager",
+      status: "Full Time Employee",
+    },
+  ];
+
+  return (
+    <div className="min-h-screen flex flex-col">
+      {/* Header */}
+      <Header />
+
+      {/* Main */}
+      <div className="flex flex-1">
+        {/* Sidebar */}
+        <Sidebar />
+
+        {/* Content */}
+        <div className="flex-1 p-6 bg-gray-50">
+          <h2 className="text-2xl font-semibold mb-4">Employees List</h2>
+
+          {/* Search Bar */}
+          <div className="mb-4">
+            <input
+              type="text"
+              placeholder="Search The Employee By id or Name"
+              className="w-full md:w-1/2 border border-gray-300 rounded px-4 py-2 focus:outline-none"
+            />
+          </div>
+
+          {/* Table */}
+          <div className="bg-white rounded shadow overflow-x-auto">
+            <table className="min-w-full text-sm">
+              <thead className="bg-gray-100 text-gray-600">
+                <tr>
+                  <th className="text-left px-6 py-3">Sr.no</th>
+                  <th className="text-left px-6 py-3">Employee Id</th>
+                  <th className="text-left px-6 py-3">Employee Name</th>
+                  <th className="text-left px-6 py-3">Job Title</th>
+                  <th className="text-left px-6 py-3">Employment Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {employees.map((emp, index) => (
+                  <tr
+                    key={index}
+                    className="border-t border-gray-200 hover:bg-gray-50"
+                  >
+                    <td className="px-6 py-4">{String(index + 1).padStart(2, "0")}</td>
+                    <td className="px-6 py-4">{emp.id}</td>
+                    <td className="px-6 py-4 flex items-center gap-3">
+                      {/* Avatar Circle with Icon */}
+                      <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="w-5 h-5 text-red-500"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M5.121 17.804A7.975 7.975 0 0112 15c2.21 0 4.21.896 5.879 2.345M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                          />
+                        </svg>
+                      </div>
+                      <span>{emp.name}</span>
+                    </td>
+                    <td className="px-6 py-4">{emp.jobTitle}</td>
+                    <td className="px-6 py-4">{emp.status}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Employees;

@@ -83,9 +83,9 @@ const Login = () => {
       alert("Login successful By using Jwt Token");
     
         if(data.user.role=="employee"){
-          navigate("/home");
+          navigate("/emhome");
         }else if(data.user.role=="hr"){
-           navigate("/hr");
+           navigate("/hrhome");
         }
       }
     }
