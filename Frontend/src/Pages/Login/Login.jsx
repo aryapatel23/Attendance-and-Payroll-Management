@@ -59,41 +59,47 @@ const Login = () => {
 
 
 
-  const handelLogin = async (e) => {
-    e.preventDefault();
-    const userData = { username, password,id };
-    try{
-          const response = await fetch("http://localhost:5500/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(userData),
-      });
-        const data = await response.json();
-       
-      if (!response.ok) {
-        alert(data.message || "Login failed");
-        return;
-      }else{
+const handelLogin = async (e) => {
+  e.preventDefault();
+  const userData = { username, password, id };
 
-      const role = (data?.user?.role || "").toLowerCase();
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("role", role);
+  try {
+    const response = await fetch("http://localhost:5500/api/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(userData),
+    });
 
-      dispatch(loginUser(data));
-      alert("Login successful By using Jwt Token");
-    
-        if(data.user.role=="employee"){
-          navigate("/emhome");
-        }else if(data.user.role=="hr"){
-           navigate("/hrhome");
-        }
-      }
+    const data = await response.json();
+
+    if (!response.ok) {
+      alert(data.message || "Login failed");
+      return;
     }
-    catch (error) {
-      console.error("Error during login:", error);
-      alert("An error occurred while logging in. Please try again.");
+
+    const role = (data?.user?.role || "").toLowerCase();
+
+    // ✅ Update Redux FIRST
+    dispatch(loginUser({ user: data.user, token: data.token }));
+
+    // ✅ Save to localStorage (can also be handled in Redux if you prefer)
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("role", role);
+
+    alert("Login successful by using JWT Token");
+
+    // ✅ THEN navigate
+    if (role === "employee") {
+      navigate("/emhome");
+    } else if (role === "hr") {
+      navigate("/hrhome");
     }
+
+  } catch (error) {
+    console.error("Error during login:", error);
+    alert("An error occurred while logging in. Please try again.");
   }
+};
 
 
   

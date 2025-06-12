@@ -116,6 +116,55 @@ console.log("JWT Secret Key is new:", JWT_SECRET);
     }
   });
 
+  
+
+  const authenticateToken = (req, res, next) => {
+    // Get token from cookies or Authorization header
+    const token = req.cookies.jwt || req.headers.authorization?.split(' ')[1];
+    
+    if (!token) {
+      return res.status(401).json({ message: 'Authentication required' });
+    }
+    
+    try {
+      // Verify token
+      const decoded = jwt.verify(token, JWT_SECRET);
+      req.user = decoded; // Add user data to request
+      next();
+    } catch (error) {
+      return res.status(403).json({ message: 'Invalid or expired token' });
+    }
+  };
+
+    app.get('/api/profile', authenticateToken, async (req, res) => {
+    try {
+        if (!req.user || !req.user.userId) {
+            return res.status(400).json({ message: 'Invalid request. No user ID found.' });
+        }
+
+        console.log('🔍 Extracted User ID:', req.user.userId);
+
+        // Convert userId to ObjectId
+        const userId = new ObjectId(req.user.userId);
+
+        // Find user in the database, excluding password
+        const user = await db.collection('users').findOne(
+            { _id: userId },
+            { projection: { password: 0 } }
+        );
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        res.json({ user });
+    } catch (error) {
+        console.error('❌ Profile error:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+});
+
+
     const PORT = process.env.PORT || 4500;
   app.listen(PORT,()=>{
     console.log(`server is running on http://localhost:${PORT}`)

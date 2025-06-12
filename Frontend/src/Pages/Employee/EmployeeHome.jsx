@@ -8,16 +8,19 @@ import {
 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch,useSelector } from "react-redux";
 import { logoutUser } from "../../Redux/Slice";
 import Header from "../../Components/Header";
 import Sidebar from "../../Components/Sidebar";
+
+
 
 const Dashboard = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [selectedRange, setSelectedRange] = useState("This Year");
+  const user = useSelector((state) => state.auth.user);
 
   const yearData = [
     { name: "Jan", Attendance: 24 },
@@ -46,6 +49,7 @@ const Dashboard = () => {
     navigate("/");
   };
 
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
@@ -73,7 +77,7 @@ const Dashboard = () => {
 
           {/* Welcome Message */}
           <div className="text-sm text-gray-700 bg-white p-4 rounded-md shadow">
-            <span className="font-medium text-base">Good to see you, John 👋</span>
+            <span className="font-medium text-base">Good to see you, {user?.username}👋</span>
             <p className="mt-1 text-sm">You came 15 minutes early today.</p>
           </div>
 
