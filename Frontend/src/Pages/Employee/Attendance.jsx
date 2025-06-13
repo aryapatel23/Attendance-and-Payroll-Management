@@ -96,6 +96,7 @@
 import React, { useState } from 'react';
 import Header from '../../Components/Header';
 import Sidebar from '../../Components/Sidebar';
+import { useSelector } from 'react-redux';
 import {
   BarChart,
   Bar,
@@ -126,13 +127,16 @@ const MainContent = () => {
   const [username, setUsername] = useState('');
   const [id, setid] = useState('');
   const [toast, setToast] = useState({ message: '', type: '' }); // success | error | loading
-
+  const user = useSelector((state) => state.auth.user);
   const handleAttendance = () => {
     if (!username.trim()) {
       showToast("❗ Please enter your username.", "error");
       return;
     }else if(!id.trim()) {
              showToast("❗ Please enter your id.", "error");
+      return;
+    }else if(username !== user.username || id !== user.id) {
+      showToast("❗ User ID or Username does not match to the logged in user.", "error");
       return;
     }
 
@@ -244,7 +248,7 @@ const MainContent = () => {
         onChange={(e) => setid(e.target.value)}
         className="w-full px-4 py-2 border border-gray-300 rounded-md"
       />
-      {console.log("id:",id)}
+      {/* {console.log("id:",id)} */}
       <input
         type="text"
         placeholder="Enter your username"

@@ -13,9 +13,8 @@ app.post("/mark-attendance", async (req, res) => {
 const db = getDB();
 
 const {  username, location, id } = req.body;
-console.log("Received data:", req.body);
-const user = await db.collection("users").findOne({ username,id });
-
+const user = await db.collection("users").findOne({ user_id:id,username});
+console.log("User:", user);
 if (!user) {
   return res.status(404).json({ message: "User not found in db"  });
 }
