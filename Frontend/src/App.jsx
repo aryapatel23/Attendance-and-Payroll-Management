@@ -15,6 +15,7 @@ import Calendar from './Pages/Employee/Calendar.jsx';
 import AddEmployee from './Pages/Admin/AddEmployee.jsx';
 import PayrollSystem from './Pages/Admin/Payrollsystem.jsx';
 import HRCalendar from './Pages/Admin/HRCalendar.jsx';
+import AttendanceNew from './Components/attendance.jsx';
 
 function App() {
   const dispatch = useDispatch();
@@ -45,6 +46,7 @@ function App() {
             <Route path='/emattendance' element={<Attendance />} />
             <Route path='/emsalary' element={<Salary />} />
             <Route path='/emcalendar' element={<Calendar />} />
+            <Route path='/attendance' element={<AttendanceNew />} />
           </>
         )}
         {isAuthenticated && role === 'hr' && (

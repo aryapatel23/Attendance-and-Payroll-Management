@@ -12,16 +12,16 @@ app.use(bodyParser.json());
 app.post("/mark-attendance", async (req, res) => {
 const db = getDB();
 
-const {  username, location } = req.body;
-
-const user = await db.collection("users").findOne({ username });
+const {  username, location, id } = req.body;
+console.log("Received data:", req.body);
+const user = await db.collection("users").findOne({ username,id });
 
 if (!user) {
   return res.status(404).json({ message: "User not found in db"  });
 }
 
   // Example fixed office location
-  const officeLocation = { lat: 23.0225, lng: 72.5714 };
+  const officeLocation = { lat: 23.022505, lng: 72.5713621};
 
   // Distance function (in km)
   function distance(loc1, loc2) {
@@ -44,6 +44,7 @@ if (!user) {
   const dateIST = new Date(dateUTC.getTime() + 5.5 * 60 * 60 * 1000); // Convert to IST
 
   await db.collection("Attendance").insertOne({
+    user_id:id,
     username,
     location,
     time: dateIST,
