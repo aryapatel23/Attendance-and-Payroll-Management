@@ -7,6 +7,41 @@ require("dotenv").config();
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
+app.use(express.json());
+
+app.use((req, res, next) => {
+  console.log(`[📥 ${new Date().toLocaleString()}] ${req.method} ${req.url}`);
+  next();
+});
+
+// GET /api/attendance/:user_id
+app.get('/attendance/:userId', async (req, res) => {
+  const db = getDB();
+  const user_id = String(req.params.userId);
+  const today = new Date().toISOString().split('T')[0]; 
+
+  console.log("🔍 Looking for:", { user_id, date: today });
+
+  try {
+    const data=await db.collection("Attendance").findOne({
+      user_id: user_id,
+      date: today
+    });
+
+    console.log("📄 Found Record:", data);
+
+    if (!data) {
+      return res.status(200).json({ status: 'Absent' });
+    }
+
+    return res.status(200).json({ status: data.status });
+  } catch (error) {
+    console.error("❌ DB Error:", error);
+    res.status(500).json({ error: 'Error fetching today’s attendance' });
+  }
+});
+
+
 
 // ✅ Simple attendance route
 app.post("/mark-attendance", async (req, res) => {
@@ -14,7 +49,6 @@ const db = getDB();
 
 const {  username, location, id } = req.body;
 const user = await db.collection("users").findOne({ user_id:id,username});
-console.log("User:", user);
 if (!user) {
   return res.status(404).json({ message: "User not found in db"  });
 }
@@ -42,13 +76,15 @@ if (!user) {
   const dateUTC=new Date()
   const dateIST = new Date(dateUTC.getTime() + 5.5 * 60 * 60 * 1000); // Convert to IST
 
-  await db.collection("Attendance").insertOne({
-    user_id:id,
-    username,
-    location,
-    time: dateIST,
-    status: "Present"
-  });
+ await db.collection("Attendance").insertOne({
+  user_id: id,
+  username,
+  location,
+  time: dateIST,
+  date: dateIST.toISOString().split('T')[0], // Add this line
+  status: "Present"
+});
+
 
   res.json({ message: "✅ Attendance marked!" });
 });
@@ -62,8 +98,8 @@ app.get("/all-attendance", async (req, res) => {
 
 // 🔌 Connect and Start
 connectDB().then(() => {
-  app.listen(process.env.PORT || 5000, () => {
-    console.log("🚀 Server running on port", process.env.PORT || 5000);
+  app.listen(process.env.PORT || 6500, () => {
+    console.log("🚀 Server running on port", process.env.PORT || 6500);
   });
 }).catch(err => {
   console.error("❌ Failed to connect to MongoDB", err);
