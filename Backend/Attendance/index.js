@@ -18,6 +18,7 @@ app.use((req, res, next) => {
 app.get('/attendance/:userId', async (req, res) => {
   const db = getDB();
   const user_id = String(req.params.userId);
+  console.log("🔍 Fetching attendance for user:", user_id);
   const today = new Date().toISOString().split('T')[0]; 
 
   console.log("🔍 Looking for:", { user_id, date: today });

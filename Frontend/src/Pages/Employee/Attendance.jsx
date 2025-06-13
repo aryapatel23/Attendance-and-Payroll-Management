@@ -128,6 +128,7 @@ const MainContent = () => {
   const [id, setid] = useState('');
   const [toast, setToast] = useState({ message: '', type: '' }); // success | error | loading
   const user = useSelector((state) => state.auth.user);
+    const attendanceStatus = useSelector((state) => state.auth.status);
   const handleAttendance = () => {
     if (!username.trim()) {
       showToast("❗ Please enter your username.", "error");
