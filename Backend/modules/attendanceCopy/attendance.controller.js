@@ -19,6 +19,7 @@ exports.getTodayAttendance = async (req, res) => {
 exports.markAttendance = async (req, res) => {
   const db = getDB();
   const { username, location, id } = req.body;
+  console.log("Request body:", req.body);
   const user = await db.collection("users").findOne({ user_id: id, username });
   if (!user) return res.status(404).json({ message: "User not found" });
 
@@ -38,16 +39,49 @@ exports.markAttendance = async (req, res) => {
   if (distance(location, office) > 0.5)
     return res.status(403).json({ message: "⛔ Not at office!" });
 
-  const now = new Date(new Date().getTime() + 5.5 * 3600 * 1000);
+const now = new Date(new Date().getTime() + 5.5 * 3600 * 1000);
+const timeforhours =new Date(new Date().getTime() );
+console.log("Current time:", now.toISOString());
+const hours = timeforhours.getHours();
+console.log("Current hours:", hours);
+const minutes = timeforhours.getMinutes();
+console.log("Current minutes:", minutes);
+
+if (hours < 9 || hours >= 18) {
+  return res.status(403).json({ message: "⏰ Not within office hours!" });
+}
+
+const totalMinutes = hours * 60 + minutes;
+
+const timeData = {
+  user_id: id,
+  username,
+  location,
+  time: now,
+  date: now.toISOString().split("T")[0],
+};
+if (totalMinutes <= 615) {
+  // before or at 10:15 (9:00 = 540, 10:15 = 615)
   await db.collection("Attendance").insertOne({
-    user_id: id,
-    username,
-    location,
-    time: now,
-    date: now.toISOString().split("T")[0],
+    ...timeData,
     status: "Present",
   });
+} else if (totalMinutes > 615 && totalMinutes <= 645) {
+  // 10:15 to 10:45 (615 < time <= 645)
+  await db.collection("Attendance").insertOne({
+    ...timeData,
+    status: "Late",
+  });
+} else {
+  // after 10:45
+  await db.collection("Attendance").insertOne({
+    ...timeData,
+    status: "Late Absent",
+  });
+}
+    
 
+//  console.log("current time is",now.toISOString().split("T")[1])
   res.json({ message: "✅ Attendance marked!" });
 };
 

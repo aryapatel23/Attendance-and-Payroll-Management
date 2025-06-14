@@ -75,6 +75,18 @@ useEffect(() => {
   }));
 
 
+  const statusmanager =()=>{
+    if(attendanceStatus === "Present") {
+      return "✅ Present";
+    } else if(attendanceStatus === "Late") {
+      return "❗ Late";
+    } else if(attendanceStatus === "Late Absent"){
+      return "❗ Late Absent";
+    } else {
+      return "❌ Absent";
+    }
+  }
+
 
 
 
@@ -105,12 +117,12 @@ useEffect(() => {
     {/* Today's Attendance Status */}
     <div
       className={`px-4 py-2 rounded-md text-sm font-medium shadow transition ${
-        status === 'Present'
+        (attendanceStatus === 'Present' || attendanceStatus === 'Late')
           ? 'bg-green-500 text-white'
           : 'bg-red-500 text-white'
       }`}
     >
-      {status === 'Present' ? '✅ Present' : '❌ Absent'}
+      {statusmanager()}
     </div>
   </div>
 </div>
