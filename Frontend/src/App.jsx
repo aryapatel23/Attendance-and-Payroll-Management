@@ -34,7 +34,8 @@ function App() {
   }, [dispatch]);
 
   // Optional: loading fallback
-  if (token === undefined) return <div>Loading...</div>;
+  // if (token === undefined) return <div>Loading...</div>;
+  // console.log(token, "token in app.jsx");
 
   return (
     <BrowserRouter>

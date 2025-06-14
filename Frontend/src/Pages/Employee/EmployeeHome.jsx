@@ -32,14 +32,13 @@ useEffect(() => {
   }
 }, [user]);
 
-
 // ✅ Fetch status when `id` is set
 useEffect(() => {
   if (!userId) return;
 
   const fetchTodayStatus = async () => {
     try {
-      const res = await axios.get(`http://localhost:6500/attendance/${userId}`);
+      const res = await axios.get(`http://localhost:5500/api/attendance/${userId}`);
       console.log("id sent to api is ", userId);
       setStatus(res.data.status);
        dispatch(setAttendanceStatus(res.data.status));
