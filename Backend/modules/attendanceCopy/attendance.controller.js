@@ -87,7 +87,16 @@ if (totalMinutes <= 615) {
 
 // ✅ GET /all-attendance
 exports.getAllAttendance = async (req, res) => {
-  const db = getDB();
-  const records = await db.collection("Attendance").find().toArray();
-  res.json(records);
+  try {
+    const attendance = await req.db
+      .collection('attendance')
+      .find({})
+      .sort({ time: -1 })
+      .toArray();
+
+    res.status(200).json({ attendance });
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching attendance', error });
+  }
 };
+  
