@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
+import axios from "axios";
 import {
   Users,
   DollarSign,
@@ -8,16 +9,51 @@ import {
 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { logoutUser } from "../../Redux/Slice";
+import { useDispatch,useSelector } from "react-redux";
+import { setAttendanceStatus } from "../../Redux/Slice.jsx";
 import Header from "../../Components/Header";
 import Sidebar from "../../Components/Sidebar";
 
+
+
 const Dashboard = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [userId, setUserId] = useState("");
+  const [status, setStatus] = useState(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [selectedRange, setSelectedRange] = useState("This Year");
+
+  const user = useSelector((state) => state.auth.user);
+  const attendanceStatus = useSelector((state) => state.auth.status);
+useEffect(() => {
+  if (user?.id) {
+    setUserId(user.id);
+  }
+}, [user]);
+
+
+// ✅ Fetch status when `id` is set
+useEffect(() => {
+  if (!userId) return;
+
+  const fetchTodayStatus = async () => {
+    try {
+      const res = await axios.get(`http://localhost:6500/attendance/${userId}`);
+      console.log("id sent to api is ", userId);
+      setStatus(res.data.status);
+       dispatch(setAttendanceStatus(res.data.status));
+       console.log("Attendance status updated in Redux:", res.data.status);
+      console.log("Today's attendance status:", res.data.status);
+    } catch (err) {
+      console.error("Error fetching today's attendance", err);
+    }
+  };
+
+  fetchTodayStatus();
+}, [userId]);
+
+
 
   const yearData = [
     { name: "Jan", Attendance: 24 },
@@ -39,12 +75,9 @@ const Dashboard = () => {
     Attendance: Math.random() > 0.15 ? 1 : 0,
   }));
 
-  const handleLogout = () => {
-    dispatch(logoutUser());
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
-    navigate("/");
-  };
+
+
+
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -59,21 +92,34 @@ const Dashboard = () => {
         {/* Main Content with Scroll */}
         <div className="flex-1 h-[calc(100vh-64px)] overflow-y-auto p-6 space-y-6 bg-gray-50">
           {/* Page Title */}
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <h1 className="text-xl font-semibold">Dashboard</h1>
-            <div className="flex gap-2">
-              <button className="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm shadow hover:bg-indigo-700 transition">
-                + Buddy Punching
-              </button>
-              <button className="border px-4 py-2 rounded-md text-sm shadow hover:bg-gray-50 transition">
-                Manager POV
-              </button>
-            </div>
-          </div>
+<div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+  <h1 className="text-xl font-semibold">Dashboard</h1>
+
+  <div className="flex flex-wrap gap-2 items-center">
+    <button className="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm shadow hover:bg-indigo-700 transition">
+      + Buddy Punching
+    </button>
+    <button className="border px-4 py-2 rounded-md text-sm shadow hover:bg-gray-50 transition">
+      Manager POV
+    </button>
+
+    {/* Today's Attendance Status */}
+    <div
+      className={`px-4 py-2 rounded-md text-sm font-medium shadow transition ${
+        status === 'Present'
+          ? 'bg-green-500 text-white'
+          : 'bg-red-500 text-white'
+      }`}
+    >
+      {status === 'Present' ? '✅ Present' : '❌ Absent'}
+    </div>
+  </div>
+</div>
+
 
           {/* Welcome Message */}
           <div className="text-sm text-gray-700 bg-white p-4 rounded-md shadow">
-            <span className="font-medium text-base">Good to see you, John 👋</span>
+            <span className="font-medium text-base">Good to see you, {user?.username}👋</span>
             <p className="mt-1 text-sm">You came 15 minutes early today.</p>
           </div>
 

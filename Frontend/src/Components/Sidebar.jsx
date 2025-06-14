@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { logoutUser } from '../Redux/Slice';
 import {
   Users,
   DollarSign,
@@ -11,17 +13,19 @@ import {
 } from "lucide-react";
 import { useNavigate, useLocation } from 'react-router-dom';
 
+
 const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useDispatch();
   const [isOpen, setIsOpen] = useState(false);
+  const user = useSelector((state) => state.auth.user);
+
 
   const isActive = (path) => location.pathname === path;
 
   const handleLogout = () => {
-    // dispatch(logoutUser()); // Uncomment if using Redux
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
+   dispatch(logoutUser());
     navigate("/");
   };
 
@@ -49,8 +53,8 @@ const Sidebar = () => {
               className="w-14 h-14 rounded-full border"
             />
             <div>
-              <h2 className="text-sm font-semibold">John</h2>
-              <p className="text-xs text-gray-500">Front-end Developer</p>
+              <h2 className="text-sm font-semibold">{user?.username}</h2>
+              <p className="text-xs text-gray-500">{user?.role}</p>
             </div>
           </div>
 

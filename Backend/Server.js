@@ -77,14 +77,14 @@ console.log("JWT Secret Key is new:", JWT_SECRET);
       if (password !== user.password) {
         return res.status(401).json({ message: 'Invalid credentials password ' });
       }
-      if (user.id !== id) {
+      if (user.user_id !== id) {
         return res.status(401).json({ message: 'Invalid credentials id'});
       }
   
       // Create JWT token
       const token = jwt.sign(
         {
-          userId: user._id.toString(),
+          userId: user.user_id.toString(),
           username: user.username,
           email: user.email,
           role: user.role
@@ -102,7 +102,7 @@ console.log("JWT Secret Key is new:", JWT_SECRET);
         message: '✅ Login successful',
         token,
         user: {
-          id: user._id,
+          id: user.user_id,
           username: user.username,
           email: user.email,
           role: user.role.toLowerCase(),          
