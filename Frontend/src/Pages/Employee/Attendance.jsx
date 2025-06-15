@@ -149,6 +149,7 @@ const MainContent = () => {
           lat: position.coords.latitude,
           lng: position.coords.longitude,
         };
+        console.log("Location:", location);
 
         try {
           const res = await fetch("https://attendance-and-payroll-management.onrender.com/api/mark-attendance", {
@@ -156,7 +157,7 @@ const MainContent = () => {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username, location, id}),
           });
-
+          
           const data = await res.json();
 
           if (res.ok) {

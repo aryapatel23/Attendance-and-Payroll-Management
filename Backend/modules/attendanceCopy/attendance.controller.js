@@ -23,7 +23,7 @@ exports.markAttendance = async (req, res) => {
   const user = await db.collection("users").findOne({ user_id: id, username });
   if (!user) return res.status(404).json({ message: "User not found" });
 
-  const office = { lat: 23.022505, lng: 72.5713621 };
+  const office = { lat: 24.161678, lng: 72.435226 };
   const distance = (loc1, loc2) => {
     const R = 6371, toRad = deg => (deg * Math.PI) / 180;
     const dLat = toRad(loc1.lat - loc2.lat);
