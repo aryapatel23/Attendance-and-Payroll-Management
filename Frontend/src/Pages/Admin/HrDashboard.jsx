@@ -168,7 +168,7 @@ const Dashboard = () => {
     const fetchAttendance = async () => {
       try {
 
-        const response = await fetch("http://localhost:5500/api/all-attendance");
+        const response = await fetch("https://attendance-and-payroll-management.onrender.com/api/all-attendance");
         const data = await response.json();
         setEmployees(data.attendance || []);
         console.log("📊 Attendance data fetched successfully:", data);

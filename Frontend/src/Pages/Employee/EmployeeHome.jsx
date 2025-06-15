@@ -38,7 +38,7 @@ useEffect(() => {
 
   const fetchTodayStatus = async () => {
     try {
-      const res = await axios.get(`http://localhost:5500/api/attendance/${userId}`);
+      const res = await axios.get(`https://attendance-and-payroll-management.onrender.com/api/attendance/${userId}`);
       console.log("id sent to api is ", userId);
       setStatus(res.data.status);
        dispatch(setAttendanceStatus(res.data.status));
