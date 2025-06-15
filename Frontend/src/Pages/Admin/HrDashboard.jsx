@@ -167,7 +167,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchAttendance = async () => {
       try {
-        
+
         const response = await fetch("http://localhost:5500/api/all-attendance");
         const data = await response.json();
         setEmployees(data.attendance || []);
@@ -179,6 +179,8 @@ const Dashboard = () => {
 
     fetchAttendance();
   }, []);
+console.log("📊 Attendance data:", employees[0]?.username);
+
 
   const getStatusColor = (status) => {
     if (!status) return "bg-gray-100 text-gray-600";
@@ -247,14 +249,15 @@ const Dashboard = () => {
                             {emp.status}
                           </span>
                         </td>
-                        <td className="p-2">
-                          {emp.time
-                            ? new Date(emp.time).toLocaleTimeString([], {
-                                hour: '2-digit',
-                                minute: '2-digit'
-                              })
-                            : "N/A"}
-                        </td>
+             <td className="p-2">
+  {new Date(emp.time).toLocaleTimeString("en-US", {
+    timeZone: "UTC",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  })}
+</td>
+
                       </tr>
                     ))}
                   </tbody>

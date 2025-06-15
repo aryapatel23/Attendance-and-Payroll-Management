@@ -89,9 +89,20 @@ if (totalMinutes <= 615) {
 exports.getAllAttendance = async (req, res) => {
   try {
     const db = getDB();
+
+    const today = new Date().toISOString().split("T")[0]; // "2025-06-15"
+    const todayDate = new Date(today); // midnight
+    const tomorrowDate = new Date(today);
+
+    tomorrowDate.setDate(todayDate.getDate() + 1); // next day;
     const attendance = await db
       .collection("Attendance")
-      .find({})
+      .find({
+        date: {
+          $gte: today, // greater than or equal to today
+          $lt: tomorrowDate.toISOString().split("T")[0], // less than tomorrow
+        },
+      })
       .sort({ time: -1 })
       .toArray();
 
