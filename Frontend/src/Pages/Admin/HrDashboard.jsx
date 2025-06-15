@@ -167,9 +167,11 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchAttendance = async () => {
       try {
+        
         const response = await fetch("http://localhost:5500/api/all-attendance");
         const data = await response.json();
-        setEmployees(data);
+        setEmployees(data.attendance || []);
+        console.log("📊 Attendance data fetched successfully:", data);
       } catch (error) {
         console.error("❌ Error fetching attendance data:", error);
       }
@@ -180,11 +182,9 @@ const Dashboard = () => {
 
   const getStatusColor = (status) => {
     if (!status) return "bg-gray-100 text-gray-600";
-
     if (status.toLowerCase().includes("present")) return "bg-green-100 text-green-600";
     if (status.toLowerCase().includes("late")) return "bg-yellow-100 text-yellow-600";
     if (status.toLowerCase().includes("absent")) return "bg-red-100 text-red-600";
-
     return "bg-gray-100 text-gray-600";
   };
 
@@ -204,20 +204,23 @@ const Dashboard = () => {
             <div className="bg-white shadow rounded p-4">
               <h3 className="text-sm text-gray-500">Present Employees</h3>
               <p className="text-2xl font-semibold text-green-600">
-                {employees.filter((e) => e.status.toLowerCase().includes("present")).length}
+                {employees.filter((e) => e.status?.toLowerCase().includes("present")).length}
               </p>
             </div>
             <div className="bg-white shadow rounded p-4">
               <h3 className="text-sm text-gray-500">Late / Absent Entries</h3>
               <p className="text-2xl font-semibold text-red-600">
-                {employees.filter((e) => e.status.toLowerCase().includes("late") || e.status.toLowerCase().includes("absent")).length}
+                {employees.filter((e) =>
+                  e.status?.toLowerCase().includes("late") ||
+                  e.status?.toLowerCase().includes("absent")
+                ).length}
               </p>
             </div>
           </div>
 
           {/* Attendance Table */}
           <div className="bg-white shadow rounded p-4">
-            <h2 className="text-lg font-semibold mb-4">Employees Attendance</h2>
+            <h2 className="text-lg font-semibold mb-4">Today's Employees Attendance</h2>
 
             {employees.length === 0 ? (
               <p className="text-sm text-gray-500">No attendance records found.</p>
@@ -236,7 +239,7 @@ const Dashboard = () => {
                   <tbody>
                     {employees.map((emp, idx) => (
                       <tr key={idx} className="border-b hover:bg-gray-50">
-                        <td className="p-2">{emp.date}</td>
+                        <td className="p-2">{new Date(emp.date).toLocaleDateString()}</td>
                         <td className="p-2">{emp.username}</td>
                         <td className="p-2">{emp.user_id}</td>
                         <td className="p-2">
@@ -245,10 +248,12 @@ const Dashboard = () => {
                           </span>
                         </td>
                         <td className="p-2">
-                          {new Date(emp.time).toLocaleTimeString([], {
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}
+                          {emp.time
+                            ? new Date(emp.time).toLocaleTimeString([], {
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })
+                            : "N/A"}
                         </td>
                       </tr>
                     ))}
