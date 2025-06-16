@@ -4,11 +4,17 @@ const { getDB } = require("../../config/db");
 exports.getTodayAttendance = async (req, res) => {
   const db = getDB();
   const user_id = String(req.params.userId);
-  const today = new Date().toISOString().split("T")[0];
+  const nowIST = new Date(new Date().getTime() + 5.5 * 60 * 60 * 1000);
+  const today = nowIST.toISOString().split("T")[0];
 
   try {
     const data = await db.collection("Attendance").findOne({ user_id, date: today });
+    if(!data){
+      console.log("No attendance data found for user:", user_id);
+      return res.status(404).json({ status: "Absent" });
+    } else if(data.date === today && data){
     return res.status(200).json({ status: data ? data.status : "Absent" });
+    }
   } catch (err) {
     console.error("❌ Error:", err);
     res.status(500).json({ error: "DB error" });
@@ -89,8 +95,8 @@ if (totalMinutes <= 615) {
 exports.getAllAttendance = async (req, res) => {
   try {
     const db = getDB();
-
-    const today = new Date().toISOString().split("T")[0]; // "2025-06-15"
+    const nowIST = new Date(new Date().getTime() + 5.5 * 60 * 60 * 1000);
+    const today = nowIST.toISOString().split("T")[0]; // "2025-06-15"
     const todayDate = new Date(today); // midnight
     const tomorrowDate = new Date(today);
 
