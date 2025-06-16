@@ -36,7 +36,7 @@ exports.markAttendance = async (req, res) => {
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   };
 
-  if (distance(location, office) > 0.5)
+  if (distance(location, office) > 3)
     return res.status(403).json({ message: "⛔ Not at office!" });
 
 const now = new Date(new Date().getTime() + 5.5 * 3600 * 1000);
