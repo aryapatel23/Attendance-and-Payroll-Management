@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import Header from "../../Components/Header";
 import Sidebar from "../../Components/HRSidebar";
 
 const AddEmployee = () => {
   const [formData, setFormData] = useState({
     name: "",
+    id:"",
     address: "",
     bankAccount: "",
     mobile: "",
@@ -21,22 +22,48 @@ const AddEmployee = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+ const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Employee Data:", formData);
-    alert("Employee added successfully!");
-    setFormData({
-      name: "",
-      address: "",
-      bankAccount: "",
-      mobile: "",
-      email: "",
-      password: "",
-      role: "",
-      salary: "",
-      employmentType: "",
-      attendanceType: "",
-    });
+
+    try {
+      const response = await fetch(
+        "https://attendance-and-payroll-management.onrender.com/api/add",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify(formData),
+        }
+      );
+
+      const data = await response.json();
+      console.log("Request Payload:", formData);
+      console.log("Response Status:", response.status);
+      if (response.ok) {
+        alert("✅ Employee added successfully!");
+        console.log("Server Response:", data);
+        setFormData({
+          name: "",
+          id: "",
+          address: "",
+          bankAccount: "",
+          mobile: "",
+          email: "",
+          password: "",
+          role: "",
+          salary: "",
+          employmentType: "",
+          attendanceType: "",
+        });
+      } else {
+        alert(`❌ Error: ${data.message || "Failed to add employee."}`);
+      }
+    } catch (error) {
+      console.error("❌ Network error:", error);
+      alert("❌ Network error while adding employee.");
+    }
   };
 
   return (
@@ -60,6 +87,20 @@ const AddEmployee = () => {
                 name="name"
                 placeholder="ex. John Doe"
                 value={formData.name}
+                onChange={handleChange}
+                className="w-full border px-4 py-2 rounded"
+                required
+              />
+            </div>
+              <div>
+              <label className="block text-sm font-medium mb-1">
+                Employee id:
+              </label>
+              <input
+                type="text"
+                name="id"
+                placeholder="ex. CS001"
+                value={formData.id}
                 onChange={handleChange}
                 className="w-full border px-4 py-2 rounded"
                 required
