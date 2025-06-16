@@ -156,10 +156,10 @@
 
 
 
-
 import React, { useEffect, useState } from "react";
 import Header from "../../Components/Header";
 import Sidebar from "../../Components/HRSidebar";
+import dayjs from "dayjs";
 
 const Dashboard = () => {
   const [employees, setEmployees] = useState([]);
@@ -169,7 +169,17 @@ const Dashboard = () => {
       try {
         const response = await fetch("http://localhost:5500/api/all-attendance");
         const data = await response.json();
-        setEmployees(data);
+
+        // Get the last two days
+        const today = dayjs();
+        const yesterday = today.subtract(1, "day");
+
+        const filtered = data.filter((item) => {
+          const recordDate = dayjs(item.date);
+          return recordDate.isSame(today, 'day') || recordDate.isSame(yesterday, 'day');
+        });
+
+        setEmployees(filtered);
       } catch (error) {
         console.error("❌ Error fetching attendance data:", error);
       }
@@ -180,11 +190,9 @@ const Dashboard = () => {
 
   const getStatusColor = (status) => {
     if (!status) return "bg-gray-100 text-gray-600";
-
     if (status.toLowerCase().includes("present")) return "bg-green-100 text-green-600";
     if (status.toLowerCase().includes("late")) return "bg-yellow-100 text-yellow-600";
     if (status.toLowerCase().includes("absent")) return "bg-red-100 text-red-600";
-
     return "bg-gray-100 text-gray-600";
   };
 
@@ -195,20 +203,19 @@ const Dashboard = () => {
         <Sidebar />
 
         <main className="flex-1 h-[calc(100vh-64px)] overflow-y-auto p-6 space-y-6 bg-gray-50">
-          {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <div className="bg-white shadow rounded p-4">
-              <h3 className="text-sm text-gray-500">Total Attendance Entries</h3>
+              <h3 className="text-sm text-gray-500">Last 2 Days Attendance</h3>
               <p className="text-2xl font-semibold">{employees.length}</p>
             </div>
             <div className="bg-white shadow rounded p-4">
-              <h3 className="text-sm text-gray-500">Present Employees</h3>
+              <h3 className="text-sm text-gray-500">Present</h3>
               <p className="text-2xl font-semibold text-green-600">
                 {employees.filter((e) => e.status.toLowerCase().includes("present")).length}
               </p>
             </div>
             <div className="bg-white shadow rounded p-4">
-              <h3 className="text-sm text-gray-500">Late / Absent Entries</h3>
+              <h3 className="text-sm text-gray-500">Late / Absent</h3>
               <p className="text-2xl font-semibold text-red-600">
                 {employees.filter((e) => e.status.toLowerCase().includes("late") || e.status.toLowerCase().includes("absent")).length}
               </p>
@@ -217,45 +224,40 @@ const Dashboard = () => {
 
           {/* Attendance Table */}
           <div className="bg-white shadow rounded p-4">
-            <h2 className="text-lg font-semibold mb-4">Employees Attendance</h2>
-
-            {employees.length === 0 ? (
-              <p className="text-sm text-gray-500">No attendance records found.</p>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="min-w-full text-sm">
-                  <thead>
-                    <tr className="text-left text-gray-500 border-b">
-                      <th className="p-2">Date</th>
-                      <th className="p-2">Employee</th>
-                      <th className="p-2">User ID</th>
-                      <th className="p-2">Status</th>
-                      <th className="p-2">Time</th>
+            <h2 className="text-lg font-semibold mb-4">Attendance</h2>
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-sm">
+                <thead>
+                  <tr className="text-left text-gray-500 border-b">
+                    <th className="p-2">Date</th>
+                    <th className="p-2">Employee</th>
+                    <th className="p-2">User ID</th>
+                    <th className="p-2">Status</th>
+                    <th className="p-2">Time</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {employees.map((emp, idx) => (
+                    <tr key={idx} className="border-b hover:bg-gray-50">
+                      <td className="p-2">{emp.date}</td>
+                      <td className="p-2">{emp.username}</td>
+                      <td className="p-2">{emp.user_id}</td>
+                      <td className="p-2">
+                        <span className={`px-2 py-1 text-xs rounded ${getStatusColor(emp.status)}`}>
+                          {emp.status}
+                        </span>
+                      </td>
+                      <td className="p-2">
+                        {new Date(emp.time).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {employees.map((emp, idx) => (
-                      <tr key={idx} className="border-b hover:bg-gray-50">
-                        <td className="p-2">{emp.date}</td>
-                        <td className="p-2">{emp.username}</td>
-                        <td className="p-2">{emp.user_id}</td>
-                        <td className="p-2">
-                          <span className={`px-2 py-1 text-xs rounded ${getStatusColor(emp.status)}`}>
-                            {emp.status}
-                          </span>
-                        </td>
-                        <td className="p-2">
-                          {new Date(emp.time).toLocaleTimeString([], {
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </main>
       </div>
