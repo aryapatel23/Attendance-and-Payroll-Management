@@ -115,4 +115,31 @@ exports.getAllAttendance = async (req, res) => {
     res.status(500).json({ message: 'Error fetching attendance in db', error });
   }
 };
+
+exports.getAllusersAttendanceByMonth = async (req, res) => {
+  const db = getDB();
+  const { userId, month } = req.params;
+
+  const startDate = `${month}-01`; // e.g., 2025-06-01
+  console.log("Start date:", startDate);
+  const endDate = new Date(`${month}-01`);
   
+  endDate.setMonth(endDate.getMonth() + 1);
+  console.log("End date before increment:", endDate);
+  const endStr = endDate.toISOString().split("T")[0]; // e.g., 2025-07-01
+
+   try {
+    const attendance = await db.collection("Attendance").find({
+      user_id: userId,
+      date: {
+        $gte: startDate,
+        $lt: endStr
+      }
+    }).toArray();
+
+    res.json(attendance);
+  } catch (err) {
+    console.error("❌ Error fetching attendance:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+}
