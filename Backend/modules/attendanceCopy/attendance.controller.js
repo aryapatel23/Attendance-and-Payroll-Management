@@ -25,13 +25,17 @@ exports.getTodayAttendance = async (req, res) => {
 exports.markAttendance = async (req, res) => {
   const db = getDB();
   const { username, location, id } = req.body;
-  console.log("Request body:", req.body);
-  const user = await db.collection("users").findOne({ user_id: id, username });
-  if (!user) return res.status(404).json({ message: "User not found" });
+  console.log("📥 Request body:", req.body);
 
+  // 1. Find user
+  const user = await db.collection("users").findOne({ user_id: id, username });
+  if (!user) return res.status(404).json({ message: "❌ User not found" });
+
+  // 2. Check location
   const office = { lat: 24.161678, lng: 72.435226 };
   const distance = (loc1, loc2) => {
-    const R = 6371, toRad = deg => (deg * Math.PI) / 180;
+    const R = 6371;
+    const toRad = deg => (deg * Math.PI) / 180;
     const dLat = toRad(loc1.lat - loc2.lat);
     const dLon = toRad(loc1.lng - loc2.lng);
     const a =
@@ -42,53 +46,47 @@ exports.markAttendance = async (req, res) => {
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   };
 
-  if (distance(location, office) > 3)
-    return res.status(403).json({ message: "⛔ Not at office!" });
+  const dist = distance(location, office);
+  console.log("📍 Distance from office:", dist.toFixed(2), "km");
+  if (dist > 3)
+    return res.status(403).json({ message: "⛔ Not at office location!" });
 
-const now = new Date(new Date().getTime() + 5.5 * 3600 * 1000);
-const timeforhours =new Date(new Date().getTime() );
-console.log("Current time:", now.toISOString());
-const hours = timeforhours.getHours();
-console.log("Current hours:", hours);
-const minutes = timeforhours.getMinutes();
-console.log("Current minutes:", minutes);
+  // ✅ Safe way to get IST time using UTC offset
+  const utcNow = new Date();
+  const istOffset = 5.5 * 60 * 60 * 1000; // IST offset in milliseconds
+  const istNow = new Date(utcNow.getTime() + istOffset);
 
-if (hours < 9 || hours >= 18) {
-  return res.status(403).json({ message: "⏰ Not within office hours!" });
-}
+  const hours = istNow.getUTCHours(); // Already IST adjusted
+  const minutes = istNow.getUTCMinutes();
+  const totalMinutes = hours * 60 + minutes;
 
-const totalMinutes = hours * 60 + minutes;
+  console.log("🕒 Current IST time (ISO):", istNow.toISOString());
+  console.log("🕘 IST Hours:", hours, "| Minutes:", minutes);
 
-const timeData = {
-  user_id: id,
-  username,
-  location,
-  time: now,
-  date: now.toISOString().split("T")[0],
-};
-if (totalMinutes <= 615) {
-  // before or at 10:15 (9:00 = 540, 10:15 = 615)
-  await db.collection("Attendance").insertOne({
-    ...timeData,
-    status: "Present",
-  });
-} else if (totalMinutes > 615 && totalMinutes <= 645) {
-  // 10:15 to 10:45 (615 < time <= 645)
-  await db.collection("Attendance").insertOne({
-    ...timeData,
-    status: "Late",
-  });
-} else {
-  // after 10:45
-  await db.collection("Attendance").insertOne({
-    ...timeData,
-    status: "Late Absent",
-  });
-}
-    
+  // 3. Time validation
+  if (hours < 9 || hours >= 19) {
+    return res.status(403).json({ message: `⏰ Not within office hours (9:00–18:59 IST) and hours of attendance is ${hours}:${minutes < 10 ? '0' : ''}${minutes}`, });
+  }
 
-//  console.log("current time is",now.toISOString().split("T")[1])
-  res.json({ message: "✅ Attendance marked!" });
+  // 4. Prepare data
+  const timeData = {
+    user_id: id,
+    username,
+    location,
+    time: istNow, // Date object (MongoDB stores in UTC)
+    date: istNow.toISOString().split("T")[0],
+  };
+
+  // 5. Status logic
+  let status = "Late Absent";
+  if (totalMinutes <= 615) {
+    status = "Present";
+  } else if (totalMinutes <= 645) {
+    status = "Late";
+  }
+
+  await db.collection("Attendance").insertOne({ ...timeData, status });
+  res.json({ message: `✅ Attendance marked as '${status}'`, });
 };
 
 // ✅ GET /all-attendance
