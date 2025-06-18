@@ -1,4 +1,4 @@
-const { getDB } = require("../../config/db");
+const { getDB } = require("../../config/db.js");
 
 // ✅ GET /attendance/:userId
 exports.getTodayAttendance = async (req, res) => {
@@ -88,33 +88,26 @@ exports.markAttendance = async (req, res) => {
   await db.collection("Attendance").insertOne({ ...timeData, status });
   res.json({ message: `✅ Attendance marked as '${status}'`, });
 };
-
 // ✅ GET /all-attendance
 exports.getAllAttendance = async (req, res) => {
   try {
     const db = getDB();
-    const nowIST = new Date(new Date().getTime() + 5.5 * 60 * 60 * 1000);
-    const today = nowIST.toISOString().split("T")[0]; // "2025-06-15"
-    const todayDate = new Date(today); // midnight
-    const tomorrowDate = new Date(today);
 
-    tomorrowDate.setDate(todayDate.getDate() + 1); // next day;
+    // No date filter — fetch all attendance records
     const attendance = await db
       .collection("Attendance")
-      .find({
-        date: {
-          $gte: today, // greater than or equal to today
-          $lt: tomorrowDate.toISOString().split("T")[0], // less than tomorrow
-        },
-      })
-      .sort({ time: -1 })
+      .find({})
+      .sort({ time: -1 }) // Optional: latest entries first
       .toArray();
 
-    res.status(200).json({ attendance });
+    res.status(200).json(attendance); // ✅ Return plain array
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching attendance in db', error });
+    console.error("❌ Error fetching attendance:", error);
+    res.status(500).json({ message: 'Error fetching attendance in DB', error });
   }
 };
+
+
 
 exports.getAllusersAttendanceByMonth = async (req, res) => {
   const db = getDB();
