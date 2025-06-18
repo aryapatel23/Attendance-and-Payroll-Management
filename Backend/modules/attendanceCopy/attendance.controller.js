@@ -1,4 +1,4 @@
-const { getDB } = require("../../config/db.js");
+const { getDB } = require("../../config/db");
 
 // ✅ GET /attendance/:userId
 exports.getTodayAttendance = async (req, res) => {
@@ -6,13 +6,14 @@ exports.getTodayAttendance = async (req, res) => {
   const user_id = String(req.params.userId);
   const nowIST = new Date(new Date().getTime() + 5.5 * 60 * 60 * 1000);
   const today = nowIST.toISOString().split("T")[0];
+  // console.log("Todays date:", today);
 
   try {
     const data = await db.collection("Attendance").findOne({ user_id, date: today });
     if(!data){
       console.log("No attendance data found for user:", user_id);
       return res.status(404).json({ status: "Absent" });
-    } else if(data.date === today && data){
+    }else if(data.date === today && data){
     return res.status(200).json({ status: data ? data.status : "Absent" });
     }
   } catch (err) {
@@ -53,9 +54,10 @@ exports.markAttendance = async (req, res) => {
 
   // ✅ Safe way to get IST time using UTC offset
   const utcNow = new Date();
+  console.log("utcNow is:", utcNow.toISOString());
   const istOffset = 5.5 * 60 * 60 * 1000; // IST offset in milliseconds
   const istNow = new Date(utcNow.getTime() + istOffset);
-
+  console.log("Total seconds is After", istNow.getTime() );
   const hours = istNow.getUTCHours(); // Already IST adjusted
   const minutes = istNow.getUTCMinutes();
   const totalMinutes = hours * 60 + minutes;
@@ -88,28 +90,37 @@ exports.markAttendance = async (req, res) => {
   await db.collection("Attendance").insertOne({ ...timeData, status });
   res.json({ message: `✅ Attendance marked as '${status}'`, });
 };
+
 // ✅ GET /all-attendance
 exports.getAllAttendance = async (req, res) => {
   try {
     const db = getDB();
+    const nowIST = new Date(new Date().getTime() + 5.5 * 60 * 60 * 1000);
+    const today = nowIST.toISOString().split("T")[0]; // "2025-06-15"
+    console.log("Today's date:", today);
+    const todayDate = new Date(today); // midnight
+    const tomorrowDate = new Date(today);
 
-    // No date filter — fetch all attendance records
+    tomorrowDate.setDate(todayDate.getDate() + 1); // next day;
+    console.log("Tomorrow's date:", tomorrowDate);
     const attendance = await db
       .collection("Attendance")
-      .find({})
-      .sort({ time: -1 }) // Optional: latest entries first
+      .find({
+        date: {
+          $gte: today, // greater than or equal to today
+          $lt: tomorrowDate.toISOString().split("T")[0], // less than tomorrow
+        },
+      })
+      .sort({ time: -1 })
       .toArray();
 
-    res.status(200).json(attendance); // ✅ Return plain array
+    res.status(200).json({ attendance });
   } catch (error) {
-    console.error("❌ Error fetching attendance:", error);
-    res.status(500).json({ message: 'Error fetching attendance in DB', error });
+    res.status(500).json({ message: 'Error fetching attendance in db', error });
   }
 };
-
-
-
-exports.getAllusersAttendanceByMonth = async (req, res) => {
+  
+exports.getAllAttendanceByMonthofuser= async (req, res) => {
   const db = getDB();
   const { userId, month } = req.params;
 
