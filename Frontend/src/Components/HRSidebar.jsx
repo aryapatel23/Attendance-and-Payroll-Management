@@ -11,7 +11,7 @@ import {
   X,
 } from "lucide-react";
 import { useNavigate, useLocation } from 'react-router-dom';
-
+import { useSelector } from 'react-redux';
 const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -24,7 +24,7 @@ const Sidebar = () => {
     localStorage.removeItem("role");
     navigate("/");
   };
-
+  const user = useSelector((state) => state.auth.user);
   return (
     <div className="flex">
       {/* Toggle button for mobile */}
@@ -49,8 +49,8 @@ const Sidebar = () => {
               className="w-14 h-14 rounded-full border"
             />
             <div>
-              <h2 className="text-sm font-semibold">John</h2>
-              <p className="text-xs text-gray-500">HR Manager</p>
+              <h2 className="text-sm font-semibold">{user?.username}</h2>
+              <p className="text-xs text-gray-500">{user?.role}</p>
             </div>
           </div>
 
