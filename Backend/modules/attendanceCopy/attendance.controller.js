@@ -33,7 +33,7 @@ exports.markAttendance = async (req, res) => {
   if (!user) return res.status(404).json({ message: "❌ User not found" });
 
   // 2. Check location
-  const office = { lat: 24.161678, lng: 72.435226 };
+  const office = { lat: 23.81316329003863, lng: 72.38415649295264 };
   const distance = (loc1, loc2) => {
     const R = 6371;
     const toRad = deg => (deg * Math.PI) / 180;
@@ -146,4 +146,4 @@ exports.getAllAttendanceByMonthofuser= async (req, res) => {
     console.error("❌ Error fetching attendance:", err);
     res.status(500).json({ error: "Internal Server Error" });
   }
-}
+};
