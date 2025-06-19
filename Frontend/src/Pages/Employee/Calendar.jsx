@@ -7,29 +7,23 @@ import Header from '../../Components/Header';
 const Calendar = () => {
   const [currentDate, setCurrentDate] = useState(dayjs());
   const [holidays, setHolidays] = useState({});
+  const [selectedDate, setSelectedDate] = useState(null);
 
   useEffect(() => {
-    const fetchHolidays = async () => {
-      try {
-        const response = await fetch('https://attendance-and-payroll-management.onrender.com/api/holidays');
-        const data = await response.json();
-
-        const holidayMap = {};
+    fetch("https://attendance-and-payroll-management.onrender.com/api/holidays")
+      .then(res => res.json())
+      .then(data => {
+        const map = {};
         data.forEach(h => {
-          holidayMap[h.date] = h.reason;
+          map[h.date] = h.reason;
         });
-
-        setHolidays(holidayMap);
-      } catch (error) {
-        console.error('Error fetching holidays:', error);
-      }
-    };
-
-    fetchHolidays();
+        setHolidays(map);
+      })
+      .catch(err => console.error("Error loading holidays:", err));
   }, []);
 
   const startOfMonth = currentDate.startOf('month');
-  const startDay = startOfMonth.day();
+  const startDay = startOfMonth.day(); // Sunday = 0
   const daysInMonth = currentDate.daysInMonth();
 
   const prevMonth = () => setCurrentDate(currentDate.subtract(1, 'month'));
@@ -38,6 +32,15 @@ const Calendar = () => {
   const days = [];
   for (let i = 0; i < startDay; i++) days.push(null);
   for (let i = 1; i <= daysInMonth; i++) days.push(i);
+
+  const handleDayClick = (day) => {
+    const fullDate = currentDate.date(day).format('YYYY-MM-DD');
+    if (holidays[fullDate]) {
+      setSelectedDate({ date: fullDate, reason: holidays[fullDate] });
+    } else {
+      setSelectedDate(null);
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#f4f7fc] to-[#e9eff8]">
@@ -82,7 +85,7 @@ const Calendar = () => {
               ))}
             </div>
 
-            {/* Calendar Days */}
+            {/* Calendar Grid */}
             <div className="grid grid-cols-7 gap-3 text-center text-sm">
               {days.map((day, idx) => {
                 if (!day) return <div key={idx}></div>;
@@ -100,7 +103,8 @@ const Calendar = () => {
                 return (
                   <div
                     key={idx}
-                    className={`rounded-lg p-2 h-20 flex flex-col items-center justify-center transition 
+                    onClick={() => handleDayClick(day)}
+                    className={`cursor-pointer rounded-lg p-2 h-20 flex flex-col items-center justify-center transition 
                       ${isToday ? 'ring-2 ring-blue-500' : ''}
                       ${
                         isHoliday
@@ -112,13 +116,26 @@ const Calendar = () => {
                     title={isHoliday ? holidays[fullDate] : isSunday ? 'Sunday' : ''}
                   >
                     <div className="text-base">{day}</div>
-                    {isHoliday && <div className="text-xs mt-1">{holidays[fullDate]}</div>}
-                    {isSunday && !isHoliday && <div className="text-xs mt-1">Holiday</div>}
+                    {isHoliday && (
+                      <div className="text-xs mt-1">{holidays[fullDate]}</div>
+                    )}
+                    {isSunday && !isHoliday && (
+                      <div className="text-xs mt-1">Holiday</div>
+                    )}
                   </div>
                 );
               })}
             </div>
           </div>
+
+          {/* Selected Holiday Info Below Calendar */}
+          {selectedDate && (
+            <div className="mt-6 bg-white p-4 rounded-lg shadow-md border-l-4 border-purple-500">
+              <h4 className="text-lg font-semibold text-purple-700 mb-2">Holiday Information</h4>
+              <p className="text-sm"><strong>Date:</strong> {selectedDate.date}</p>
+              <p className="text-sm"><strong>Reason:</strong> {selectedDate.reason}</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
