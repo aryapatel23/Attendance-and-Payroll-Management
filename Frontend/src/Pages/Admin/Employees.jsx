@@ -119,7 +119,7 @@ useEffect(() => {
                           />
                         </svg>
                       </div>
-                      <span>{emp.name}</span>
+                      <span>{emp.username}</span>
                     </td>
                     <td className="px-6 py-4">{emp.employee_role}</td>
                     <td className="px-6 py-4">{emp.employmentType}</td>
