@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 const authRoutes = require('./modules/auth/authRoutes');
 const userRoutes = require('./modules/user/userRoutes');
 const attendanceRoutes = require("./modules/attendanceCopy/attendance.routes");
+const holidayRoutes = require('./modules/calendar/holidayRoutes');
 
 const app = express();
 
@@ -20,5 +21,6 @@ app.use((req, res, next) => {
 app.use('/api', authRoutes);
 app.use('/api', userRoutes);
 app.use('/api', attendanceRoutes);
+app.use("/api/holidays", holidayRoutes);
 
 module.exports = app;
