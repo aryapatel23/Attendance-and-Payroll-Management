@@ -143,7 +143,7 @@ const MainContent = () => {
         };
 
         try {
-          const res = await fetch("http://localhost:5500/api/mark-attendance", {
+          const res = await fetch("https://attendance-and-payroll-management.onrender.com/api/mark-attendance", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username, location, id }),
@@ -171,7 +171,7 @@ const MainContent = () => {
     const fetchAttendanceData = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`http://localhost:5500/api/getAllAttendanceByMonthofuser/${user.id}/${selectedMonth}`);
+        const res = await fetch(`https://attendance-and-payroll-management.onrender.com/api/getAllAttendanceByMonthofuser/${user.id}/${selectedMonth}`);
         const attendanceRecords = await res.json();
 
         const presentDates = new Set(attendanceRecords.map(att => att.date));
