@@ -93,48 +93,44 @@
 
 // export default MainContent;
 
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '../../Components/Header';
 import Sidebar from '../../Components/Sidebar';
 import { useSelector } from 'react-redux';
 import {
+  ResponsiveContainer,
   BarChart,
   Bar,
   XAxis,
   YAxis,
   Tooltip,
-  ResponsiveContainer
+  CartesianGrid,
+  Legend,
+  Cell,
 } from 'recharts';
 import { Fingerprint } from 'lucide-react';
 
 const MainContent = () => {
   const [showModal, setShowModal] = useState(false);
   const [username, setUsername] = useState('');
-  const [id, setid] = useState('');
-  const [toast, setToast] = useState({ message: '', type: '' }); // success | error | loading
-    const [selectedMonth, setSelectedMonth] = useState('2025-06');
+  const [id, setId] = useState('');
+  const [toast, setToast] = useState({ message: '', type: '' });
+  const [selectedMonth, setSelectedMonth] = useState('2025-06');
   const [chartData, setChartData] = useState([]);
   const [loading, setLoading] = useState(false);
-
-  const attendanceStatus = useSelector((state) => state.auth.status);
 
   const user = useSelector((state) => state.auth.user);
 
   const showToast = (message, type) => {
-  setToast({ message, type });
-  setTimeout(() => setToast({ message: '', type: '' }), 4000);
+    setToast({ message, type });
+    setTimeout(() => setToast({ message: '', type: '' }), 4000);
   };
 
   const handleAttendance = () => {
-    if (!username.trim()) {
-      showToast("❗ Please enter your username.", "error");
-      return;
-    }else if(!id.trim()) {
-             showToast("❗ Please enter your id.", "error");
-      return;
-    }else if(username !== user.username || id !== user.id) {
-      showToast("❗ User ID or Username does not match to the logged in user.", "error");
-      return;
+    if (!username.trim()) return showToast("❗ Please enter your username.", "error");
+    if (!id.trim()) return showToast("❗ Please enter your id.", "error");
+    if (username !== user.username || id !== user.id) {
+      return showToast("❗ User ID or Username does not match the logged in user.", "error");
     }
 
     showToast("📍 Getting your location...", "loading");
@@ -145,15 +141,14 @@ const MainContent = () => {
           lat: position.coords.latitude,
           lng: position.coords.longitude,
         };
-        console.log("Location:", location);
 
         try {
-          const res = await fetch("https://attendance-and-payroll-management.onrender.com/api/mark-attendance", {
+          const res = await fetch("http://localhost:5500/api/mark-attendance", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username, location, id}),
+            body: JSON.stringify({ username, location, id }),
           });
-          
+
           const data = await res.json();
 
           if (res.ok) {
@@ -168,10 +163,7 @@ const MainContent = () => {
           showToast("❌ Server error. Please try again later.", "error");
         }
       },
-      (err) => {
-        console.error(err);
-        showToast("❌ Location access denied. Please allow location access.", "error");
-      }
+      () => showToast("❌ Location access denied.", "error")
     );
   };
 
@@ -179,7 +171,7 @@ const MainContent = () => {
     const fetchAttendanceData = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`https://attendance-and-payroll-management.onrender.com/api/getAllAttendanceByMonthofuser/${user.id}/${selectedMonth}`);
+        const res = await fetch(`http://localhost:5500/api/getAllAttendanceByMonthofuser/${user.id}/${selectedMonth}`);
         const attendanceRecords = await res.json();
 
         const presentDates = new Set(attendanceRecords.map(att => att.date));
@@ -207,18 +199,13 @@ const MainContent = () => {
     if (user?.id) fetchAttendanceData();
   }, [selectedMonth, user?.id]);
 
-
-  
-
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col relative">
       <Header />
       <div className="flex flex-1">
         <Sidebar />
         <main className="flex-1 p-4 sm:p-6 overflow-y-auto">
-          <h1 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-6">
-            Attendance
-          </h1>
+          <h1 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-6">Attendance</h1>
 
           {/* Biometric Card */}
           <div className="bg-white rounded-2xl shadow-md p-6 flex flex-col sm:flex-row justify-around sm:items-center gap-6 mb-8">
@@ -239,80 +226,105 @@ const MainContent = () => {
           </div>
 
           {/* Attendance Statistics */}
-          <div className="bg-white rounded-2xl shadow-md p-6">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
-              <h2 className="text-md sm:text-lg font-semibold text-gray-800">Attendance Statistics</h2>
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-purple-600 font-semibold">Month</span>
-                <select
-                  className="text-sm border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
-                  value={selectedMonth}
-                  onChange={(e) => setSelectedMonth(e.target.value)}
-                >
-                  <option value="2025-06">June 2025</option>
-                  <option value="2025-05">May 2025</option>
-                  <option value="2025-04">April 2025</option>
-                </select>
-              </div>
-            </div>
-            {loading ? (
-              <p className="text-center text-gray-500">Loading chart...</p>
-            ) : (
-              <ResponsiveContainer width="100%" height={250}>
-                <BarChart data={chartData}>
-                  <XAxis dataKey="name" />
-                  <YAxis ticks={[0, 1]} domain={[0, 1]} />
-                  <Tooltip formatter={(value) => value === 1 ? 'Present' : 'Absent'} />
-                  <Bar dataKey="Attendance" fill="#7c3aed" radius={[6, 6, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            )}
+<div className="bg-white rounded-2xl shadow-md p-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+          <h2 className="text-md sm:text-lg font-semibold text-gray-800">
+            Attendance Statistics
+          </h2>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-purple-600 font-semibold">Month</span>
+            <select
+              className="text-sm border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(e.target.value)}
+            >
+              <option value="2025-06">June 2025</option>
+              <option value="2025-05">May 2025</option>
+              <option value="2025-04">April 2025</option>
+            </select>
           </div>
+        </div>
+
+        {loading ? (
+          <p className="text-center text-gray-500">Loading chart...</p>
+        ) : (
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} />
+              <XAxis
+                dataKey="name"
+                interval={0}
+                angle={0}
+                height={70}
+                tick={{ fontSize: 10 }}
+              />
+              <YAxis ticks={[0, 1]} domain={[0, 1]} />
+              <Tooltip
+                formatter={(value) => (value === 1 ? "Present" : "Absent")}
+                labelFormatter={(label) => `Date: ${label}`}
+              />
+              <Legend
+                payload={[
+                  { value: "Present", type: "square", color: "#10b981", id: "present" },
+                  { value: "Absent", type: "square", color: "#ef4444", id: "absent" },
+                ]}
+              />
+              <Bar dataKey="Attendance" radius={[8, 8, 0, 0]} barSize={20}>
+                {chartData.map((entry, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={entry.Attendance === 1 ? "#10b981" : "#ef4444"}
+                  />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        )}
+      </div>
         </main>
       </div>
 
       {/* Modal */}
-   {showModal && (
-  <div className="fixed inset-0  bg-opacity-20 backdrop-blur-sm flex items-center justify-center z-50">
-    <div className="bg-white p-6 w-96 rounded-xl shadow-lg text-center space-y-4 relative transition-transform duration-300 transform scale-100">
-      <h2 className="text-xl font-semibold text-gray-800">📅 Mark Your Attendance</h2>
-           <input
-        type="text"
-        placeholder="Enter your id"
-        value={id}
-        onChange={(e) => setid(e.target.value)}
-        className="w-full px-4 py-2 border border-gray-300 rounded-md"
-      />
-      {/* {console.log("id:",id)} */}
-      <input
-        type="text"
-        placeholder="Enter your username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        className="w-full px-4 py-2 border border-gray-300 rounded-md"
-      />
-      <button
-        onClick={handleAttendance}
-        className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-      >
-        ✅ Mark Attendance
-      </button>
-      <button
-        onClick={() => setShowModal(false)}
-        className="absolute top-2 right-3 text-gray-500 hover:text-red-500 text-xl"
-      >
-        ✕
-      </button>
-    </div>
-  </div>
-)}
+      {showModal && (
+        <div className="fixed inset-0 bg-opacity-20 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white p-6 w-96 rounded-xl shadow-lg text-center space-y-4 relative">
+            <h2 className="text-xl font-semibold text-gray-800">📅 Mark Your Attendance</h2>
+            <input
+              type="text"
+              placeholder="Enter your id"
+              value={id}
+              onChange={(e) => setId(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md"
+            />
+            <input
+              type="text"
+              placeholder="Enter your username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md"
+            />
+            <button
+              onClick={handleAttendance}
+              className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+            >
+              ✅ Mark Attendance
+            </button>
+            <button
+              onClick={() => setShowModal(false)}
+              className="absolute top-2 right-3 text-gray-500 hover:text-red-500 text-xl"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
 
-      {/* Toast Notification */}
+      {/* Toast */}
       {toast.message && (
         <div className={`fixed top-6 right-3 px-4 py-3 rounded-md shadow-lg text-white z-50
           ${toast.type === 'success' ? 'bg-green-500' :
-            toast.type === 'error' ? 'bg-red-500' : 'bg-yellow-500'}
-        `}>
+            toast.type === 'error' ? 'bg-red-500' : 'bg-yellow-500'}`}
+        >
           {toast.message}
         </div>
       )}
@@ -320,4 +332,4 @@ const MainContent = () => {
   );
 };
 
-export default MainContent; 
+export default MainContent;
