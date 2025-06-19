@@ -100,7 +100,7 @@ useEffect(() => {
                     className="border-t border-gray-200 hover:bg-gray-50"
                   >
                     <td className="px-6 py-4">{String(index + 1).padStart(2, "0")}</td>
-                    <td className="px-6 py-4">{emp.id}</td>
+                    <td className="px-6 py-4">{emp.user_id}</td>
                     <td className="px-6 py-4 flex items-center gap-3">
                       {/* Avatar Circle with Icon */}
                       <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center">
