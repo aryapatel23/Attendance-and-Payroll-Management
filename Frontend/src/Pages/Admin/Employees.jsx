@@ -1,47 +1,63 @@
-import React from "react";
+import {React,useState,useEffect} from "react";
 import Header from "../../Components/Header"; // Adjust if needed
 import Sidebar from "../../Components/HRSidebar"; // Adjust if needed
 
 const Employees = () => {
-  const employees = [
-    {
-      id: "HR001",
-      name: "Aisha Doe",
-      jobTitle: "HR Manager",
-      status: "Full Time Employee",
-    },
-    {
-      id: "HR002",
-      name: "Chukwuemeka",
-      jobTitle: "Software Engineer",
-      status: "Part Time Employee",
-    },
-    {
-      id: "HR003",
-      name: "Suleiman",
-      jobTitle: "Marketing Executive",
-      status: "Full Time Employee",
-    },
-    {
-      id: "HR004",
-      name: "Olamide",
-      jobTitle: "Financial Analyst",
-      status: "Full Time Employee",
-    },
-    {
-      id: "HR005",
-      name: "Jide",
-      jobTitle: "Project Manager",
-      status: "Full Time Employee",
-    },
-    {
-      id: "HR006",
-      name: "Femi",
-      jobTitle: "Sales Manager",
-      status: "Full Time Employee",
-    },
-  ];
+  // const employees = [
+  //   {
+  //     id: "HR001",
+  //     name: "Aisha Doe",
+  //     jobTitle: "HR Manager",
+  //     status: "Full Time Employee",
+  //   },
+  //   {
+  //     id: "HR002",
+  //     name: "Chukwuemeka",
+  //     jobTitle: "Software Engineer",
+  //     status: "Part Time Employee",
+  //   },
+  //   {
+  //     id: "HR003",
+  //     name: "Suleiman",
+  //     jobTitle: "Marketing Executive",
+  //     status: "Full Time Employee",
+  //   },
+  //   {
+  //     id: "HR004",
+  //     name: "Olamide",
+  //     jobTitle: "Financial Analyst",
+  //     status: "Full Time Employee",
+  //   },
+  //   {
+  //     id: "HR005",
+  //     name: "Jide",
+  //     jobTitle: "Project Manager",
+  //     status: "Full Time Employee",
+  //   },
+  //   {
+  //     id: "HR006",
+  //     name: "Femi",
+  //     jobTitle: "Sales Manager",
+  //     status: "Full Time Employee",
+  //   },
+  // ];
+  const [employees, setEmployees] = useState([]);
 
+useEffect(() => {
+    const fetchEmployees = async () => {
+      try {
+        const response = await fetch("https://attendance-and-payroll-management.onrender.com/api/all");
+        if (!response.ok) {
+          throw new Error("Failed to fetch employees");
+        }
+        const data = await response.json();
+        setEmployees(data.users);
+      } catch (error) {
+        console.error("Error fetching employees:", error);
+      }
+    };
+    fetchEmployees();
+  }, []);
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
@@ -105,8 +121,8 @@ const Employees = () => {
                       </div>
                       <span>{emp.name}</span>
                     </td>
-                    <td className="px-6 py-4">{emp.jobTitle}</td>
-                    <td className="px-6 py-4">{emp.status}</td>
+                    <td className="px-6 py-4">{emp.employee_role}</td>
+                    <td className="px-6 py-4">{emp.employmentType}</td>
                   </tr>
                 ))}
               </tbody>
