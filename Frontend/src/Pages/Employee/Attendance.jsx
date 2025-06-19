@@ -93,7 +93,7 @@
 
 // export default MainContent;
 
-import React, { use, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from '../../Components/Header';
 import Sidebar from '../../Components/Sidebar';
 import { useSelector } from 'react-redux';
