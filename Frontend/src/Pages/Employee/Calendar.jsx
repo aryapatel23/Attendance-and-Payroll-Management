@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import dayjs from 'dayjs';
 import Sidebar from '../../Components/Sidebar';
@@ -6,12 +6,27 @@ import Header from '../../Components/Header';
 
 const Calendar = () => {
   const [currentDate, setCurrentDate] = useState(dayjs());
+  const [holidays, setHolidays] = useState({});
 
-  const holidays = {
-    '2025-06-14': 'Company Picnic',
-    '2025-06-20': 'Festival Holiday',
-    '2025-06-30': 'Founders Day',
-  };
+  useEffect(() => {
+    const fetchHolidays = async () => {
+      try {
+        const response = await fetch('https://attendance-and-payroll-management.onrender.com/api/holidays');
+        const data = await response.json();
+
+        const holidayMap = {};
+        data.forEach(h => {
+          holidayMap[h.date] = h.reason;
+        });
+
+        setHolidays(holidayMap);
+      } catch (error) {
+        console.error('Error fetching holidays:', error);
+      }
+    };
+
+    fetchHolidays();
+  }, []);
 
   const startOfMonth = currentDate.startOf('month');
   const startDay = startOfMonth.day();
@@ -45,6 +60,7 @@ const Calendar = () => {
             </div>
           </div>
 
+          {/* Calendar Box */}
           <div className="bg-white rounded-2xl shadow-lg p-6">
             {/* Month Header */}
             <div className="flex justify-between items-center mb-6">
@@ -66,7 +82,7 @@ const Calendar = () => {
               ))}
             </div>
 
-            {/* Calendar Grid */}
+            {/* Calendar Days */}
             <div className="grid grid-cols-7 gap-3 text-center text-sm">
               {days.map((day, idx) => {
                 if (!day) return <div key={idx}></div>;
@@ -96,12 +112,8 @@ const Calendar = () => {
                     title={isHoliday ? holidays[fullDate] : isSunday ? 'Sunday' : ''}
                   >
                     <div className="text-base">{day}</div>
-                    {isHoliday && (
-                      <div className="text-xs mt-1">{holidays[fullDate]}</div>
-                    )}
-                    {isSunday && !isHoliday && (
-                      <div className="text-xs mt-1">Holiday</div>
-                    )}
+                    {isHoliday && <div className="text-xs mt-1">{holidays[fullDate]}</div>}
+                    {isSunday && !isHoliday && <div className="text-xs mt-1">Holiday</div>}
                   </div>
                 );
               })}
