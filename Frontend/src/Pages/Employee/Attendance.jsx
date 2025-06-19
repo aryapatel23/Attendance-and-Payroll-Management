@@ -93,7 +93,7 @@
 
 // export default MainContent;
 
-import React, { useState } from 'react';
+import React, { use, useState } from 'react';
 import Header from '../../Components/Header';
 import Sidebar from '../../Components/Sidebar';
 import { useSelector } from 'react-redux';
@@ -107,28 +107,24 @@ import {
 } from 'recharts';
 import { Fingerprint } from 'lucide-react';
 
-const data = [
-  { name: 'Jan', Attendance: 24 },
-  { name: 'Feb', Attendance: 27 },
-  { name: 'Mar', Attendance: 17 },
-  { name: 'Apr', Attendance: 20 },
-  { name: 'May', Attendance: 23 },
-  { name: 'Jun', Attendance: 0 },
-  { name: 'Jul', Attendance: 0 },
-  { name: 'Aug', Attendance: 0 },
-  { name: 'Sep', Attendance: 0 },
-  { name: 'Oct', Attendance: 0 },
-  { name: 'Nov', Attendance: 0 },
-  { name: 'Dec', Attendance: 0 },
-];
-
 const MainContent = () => {
   const [showModal, setShowModal] = useState(false);
   const [username, setUsername] = useState('');
   const [id, setid] = useState('');
   const [toast, setToast] = useState({ message: '', type: '' }); // success | error | loading
+    const [selectedMonth, setSelectedMonth] = useState('2025-06');
+  const [chartData, setChartData] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const attendanceStatus = useSelector((state) => state.auth.status);
+
   const user = useSelector((state) => state.auth.user);
-    const attendanceStatus = useSelector((state) => state.auth.status);
+
+  const showToast = (message, type) => {
+  setToast({ message, type });
+  setTimeout(() => setToast({ message: '', type: '' }), 4000);
+  };
+
   const handleAttendance = () => {
     if (!username.trim()) {
       showToast("❗ Please enter your username.", "error");
@@ -179,10 +175,40 @@ const MainContent = () => {
     );
   };
 
-  const showToast = (message, type) => {
-    setToast({ message, type });
-    setTimeout(() => setToast({ message: '', type: '' }), 4000);
-  };
+  useEffect(() => {
+    const fetchAttendanceData = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch(`http://localhost:5500/api/getAllAttendanceByMonthofuser/${user.id}/${selectedMonth}`);
+        const attendanceRecords = await res.json();
+
+        const presentDates = new Set(attendanceRecords.map(att => att.date));
+        console.log("Present Dates:", presentDates);
+        const [year, month] = selectedMonth.split("-");
+        const daysInMonth = new Date(Number(year), Number(month), 0).getDate();
+
+        const data = Array.from({ length: daysInMonth }, (_, i) => {
+          const day = String(i + 1).padStart(2, '0');
+          const dateKey = `${selectedMonth}-${day}`;
+          return {
+            name: `Day ${i + 1}`,
+            Attendance: presentDates.has(dateKey) ? 1 : 0,
+          };
+        });
+
+        setChartData(data);
+      } catch (error) {
+        console.error("Error loading chart data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (user?.id) fetchAttendanceData();
+  }, [selectedMonth, user?.id]);
+
+
+  
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col relative">
@@ -215,25 +241,32 @@ const MainContent = () => {
           {/* Attendance Statistics */}
           <div className="bg-white rounded-2xl shadow-md p-6">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
-              <h2 className="text-md sm:text-lg font-semibold text-gray-800">
-                Attendance Statistics
-              </h2>
+              <h2 className="text-md sm:text-lg font-semibold text-gray-800">Attendance Statistics</h2>
               <div className="flex items-center gap-2">
-                <span className="text-sm text-purple-600 font-semibold">Attendance</span>
-                <select className="text-sm border border-gray-300 rounded-md px-2 py-1 focus:outline-none">
-                  <option>This Year</option>
-                  <option>This Month</option>
+                <span className="text-sm text-purple-600 font-semibold">Month</span>
+                <select
+                  className="text-sm border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                  value={selectedMonth}
+                  onChange={(e) => setSelectedMonth(e.target.value)}
+                >
+                  <option value="2025-06">June 2025</option>
+                  <option value="2025-05">May 2025</option>
+                  <option value="2025-04">April 2025</option>
                 </select>
               </div>
             </div>
-            <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={data}>
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="Attendance" fill="#7c3aed" radius={[6, 6, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            {loading ? (
+              <p className="text-center text-gray-500">Loading chart...</p>
+            ) : (
+              <ResponsiveContainer width="100%" height={250}>
+                <BarChart data={chartData}>
+                  <XAxis dataKey="name" />
+                  <YAxis ticks={[0, 1]} domain={[0, 1]} />
+                  <Tooltip formatter={(value) => value === 1 ? 'Present' : 'Absent'} />
+                  <Bar dataKey="Attendance" fill="#7c3aed" radius={[6, 6, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </main>
       </div>
