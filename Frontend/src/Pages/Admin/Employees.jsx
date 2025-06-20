@@ -42,6 +42,7 @@ const Employees = () => {
   //   },
   // ];
   const [employees, setEmployees] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
 useEffect(() => {
     const fetchEmployees = async () => {
@@ -58,6 +59,12 @@ useEffect(() => {
     };
     fetchEmployees();
   }, []);
+
+  const filteredEmployees = employees.filter(emp =>
+  emp.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    emp.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    emp.user_id?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
@@ -77,6 +84,8 @@ useEffect(() => {
             <input
               type="text"
               placeholder="Search The Employee By id or Name"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full md:w-1/2 border border-gray-300 rounded px-4 py-2 focus:outline-none"
             />
           </div>
@@ -94,7 +103,8 @@ useEffect(() => {
                 </tr>
               </thead>
               <tbody>
-                {employees.map((emp, index) => (
+                {filteredEmployees.length > 0 ? (
+                filteredEmployees.map((emp, index) => (
                   <tr
                     key={index}
                     className="border-t border-gray-200 hover:bg-gray-50"
@@ -124,7 +134,15 @@ useEffect(() => {
                     <td className="px-6 py-4">{emp.employee_role}</td>
                     <td className="px-6 py-4">{emp.employmentType}</td>
                   </tr>
-                ))}
+                ))
+        ) : (
+            <tr>
+        <td colSpan="5" className="text-center text-gray-500 h-16">
+          No users found.
+        </td>
+      </tr>
+        )}
+      
               </tbody>
             </table>
           </div>
