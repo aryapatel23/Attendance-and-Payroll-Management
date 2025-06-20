@@ -95,10 +95,10 @@ const alluser = async (req,res)=>{
 
 const userByid = async (req,res) => {
   const db = getDB();
-  const userid=req.password
+  const {userId}=req.params;
 try{
     const user = await db.collection('users').findOne(
-    {user_id: userid},
+    {user_id: userId},
     { projection: { password: 0 } }
   )
   if (!user) {
