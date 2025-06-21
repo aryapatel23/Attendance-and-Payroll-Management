@@ -48,7 +48,7 @@ const Calendar = () => {
       <div className="flex flex-1">
         <Sidebar />
 
-        <div className="flex-1 p-6">
+        <div className="flex-1 h-[calc(100vh-64px)] overflow-y-auto p-6 space-y-6 bg-gray-50">
           <h2 className="text-3xl font-bold text-gray-800 mb-6">Company Holiday Calendar</h2>
 
           {/* Legend */}
