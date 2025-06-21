@@ -1,6 +1,7 @@
 const { getDB } = require('../../config/db');
 const { ObjectId } = require('mongodb');
 const bcrypt = require('bcrypt');
+
 const getProfile = async (req, res) => {
   const db = getDB();
 
@@ -16,8 +17,6 @@ const getProfile = async (req, res) => {
 
   res.json({ user });
 };
-
-
 
 const addUser = async (req, res) => {
   try {
@@ -111,7 +110,6 @@ const userByitsId = async (req,res)=>{
     res.status(500).json({ message: 'Internal Server Error' });
   }
 }
-
 
 
 module.exports = { getProfile, addUser, alluser,userByitsId};
