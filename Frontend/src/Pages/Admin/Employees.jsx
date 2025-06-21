@@ -1,6 +1,7 @@
 import {React,useState,useEffect} from "react";
 import Header from "../../Components/Header"; // Adjust if needed
 import Sidebar from "../../Components/HRSidebar"; // Adjust if needed
+import { useNavigate } from "react-router-dom";
 
 const Employees = () => {
   // const employees = [
@@ -43,6 +44,7 @@ const Employees = () => {
   // ];
   const [employees, setEmployees] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+ const navigate =useNavigate();
 
 useEffect(() => {
     const fetchEmployees = async () => {
