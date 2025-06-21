@@ -184,25 +184,25 @@ const HRCalendar = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#f7f9fc]">
-      <Header />
-      <div className="flex flex-1">
-        <Sidebar />
         <div className="flex-1 p-6">
           <h2 className="text-2xl font-semibold mb-6">Calendar</h2>
 
           <div className="bg-white shadow-md rounded-xl p-6">
+            {/* Calendar Header */}
             <div className="flex justify-between items-center mb-4">
               <button onClick={prevMonth}><ChevronLeft className="text-gray-600" /></button>
               <h3 className="text-lg font-semibold">{currentDate.format('MMMM YYYY')}</h3>
               <button onClick={nextMonth}><ChevronRight className="text-gray-600" /></button>
             </div>
 
+            {/* Week Days */}
             <div className="grid grid-cols-7 text-center text-sm font-semibold text-gray-500 mb-2">
               {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
                 <div key={day}>{day}</div>
               ))}
             </div>
 
+            {/* Calendar Grid */}
             <div className="grid grid-cols-7 gap-1 text-center text-sm">
               {days.map((day, idx) => {
                 if (!day) return <div key={idx}></div>;
@@ -215,7 +215,8 @@ const HRCalendar = () => {
                     key={idx}
                     className={`h-20 flex flex-col justify-center items-center rounded-lg 
                       ${isHoliday ? 'text-purple-600 font-semibold' : ''}
-                      ${isSunday ? 'text-red-600 font-medium' : ''}`}
+                      ${isSunday ? 'text-red-600 font-medium' : ''}
+                    `}
                   >
                     <div className="text-base">{day}</div>
                     {(isHoliday || isSunday) && (
@@ -229,20 +230,36 @@ const HRCalendar = () => {
             </div>
           </div>
 
+          {/* Add Holiday Form */}
           <div className="mt-8 bg-white rounded-xl shadow-md p-6 w-full md:w-[700px]">
             <h4 className="text-lg font-semibold mb-4">Add Holiday</h4>
             <div className="grid grid-cols-4 gap-4 mb-4">
-              <input type="text" name="dd" value={formData.dd} onChange={handleInputChange} placeholder="DD" className="border px-3 py-2 rounded-lg focus:outline-none" />
-              <input type="text" name="mm" value={formData.mm} onChange={handleInputChange} placeholder="MM" className="border px-3 py-2 rounded-lg focus:outline-none" />
-              <input type="text" name="yy" value={formData.yy} onChange={handleInputChange} placeholder="YYYY" className="border px-3 py-2 rounded-lg focus:outline-none" />
-              <input type="text" name="reason" value={formData.reason} onChange={handleInputChange} placeholder="Reason Behind Giving Holiday" className="col-span-4 border px-3 py-2 rounded-lg focus:outline-none" />
+              <input
+                type="text"
+                placeholder="DD"
+                className="border px-3 py-2 rounded-lg focus:outline-none"
+              />
+              <input
+                type="text"
+                placeholder="MM"
+                className="border px-3 py-2 rounded-lg focus:outline-none"
+              />
+              <input
+                type="text"
+                placeholder="YY"
+                className="border px-3 py-2 rounded-lg focus:outline-none"
+              />
+              <input
+                type="text"
+                placeholder="Reason Behind Giving Holiday"
+                className="col-span-4 border px-3 py-2 rounded-lg focus:outline-none"
+              />
             </div>
-            <button onClick={handleAddHoliday} className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700">
+            <button className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700">
               Set
             </button>
           </div>
         </div>
-      </div>
     </div>
   );
 };
