@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { FaDownload, FaEnvelope, FaPhone, FaGlobe, FaCalendarAlt,FaRupeeSign,FaRegClock } from "react-icons/fa";
 import { CgProfile } from "react-icons/cg";
 import { Bar } from "react-chartjs-2";
 import "chart.js/auto";
+import { useParams } from "react-router-dom";
 
 const months = ["April 2025", "May 2025"];
 
@@ -156,7 +157,31 @@ const Profile = () => (
 
 );
 
-function InfoTab() {
+function InfoTab() {      
+const {id}=useParams();
+console.log(id)
+  const [employee,setEmployee]=useState({})
+
+useEffect(()=>{
+ const FetchEmployee= async()=>{
+  try{
+  
+    
+    const response= await fetch(`http://localhost:5500/api/users/${id}`);
+      if(!response.ok){
+            throw new Error("Failed to fetch employees");
+      }
+       const data=await response.json()
+       setEmployee(data.user)
+         
+  }catch(error){
+  console.error("Error fetching employees:", error);
+  }
+ };
+FetchEmployee();
+  
+},[id])
+console.log(employee)
   return (
 <div className="space-y-6 text-gray-700">
   <h3 className="text-xl font-semibold border-b pb-2">Personal & Official Information</h3>
@@ -165,7 +190,7 @@ function InfoTab() {
   <div>
     <h4 className="text-md font-semibold mb-2 text-indigo-600">👤 Personal Details</h4>
     <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
-      <p><span className="font-medium">Full Name:</span> Jhon Doe</p>
+      <p><span className="font-medium">Full Name:</span> {employee.username}</p>
       <p><span className="font-medium">Date of Birth:</span> 20 May 1997</p>
       <p><span className="font-medium">Gender:</span> Male</p>
       <p><span className="font-medium">Blood Group:</span> B+</p>
@@ -178,9 +203,9 @@ function InfoTab() {
   <div>
     <h4 className="text-md font-semibold mb-2 text-indigo-600">📞 Contact Information</h4>
     <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
-      <p><span className="font-medium">Phone:</span> +91 9854658741</p>
-      <p><span className="font-medium">Email:</span> j.doe@company.com</p>
-      <p className="col-span-2"><span className="font-medium">Address:</span> 123 Main Street, Sector 22, New Delhi</p>
+      <p><span className="font-medium">Phone:</span> {employee.mobile}</p>
+      <p><span className="font-medium">Email:</span> {employee.email}</p>
+      <p className="col-span-2"><span className="font-medium">Address:</span>{employee.address}</p>
       
     </div>
   </div>
@@ -189,9 +214,9 @@ function InfoTab() {
   <div>
     <h4 className="text-md font-semibold mb-2 text-indigo-600">💼 Job Details</h4>
     <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
-      <p><span className="font-medium">Employee ID:</span> HR12345</p>
+      <p><span className="font-medium">Employee ID:</span>{employee.user_id}</p>
       <p><span className="font-medium">Department:</span> Frontend</p>
-      <p><span className="font-medium">Designation:</span> UX Designer</p>
+      <p><span className="font-medium">Designation:</span> {employee.employee_role}</p>
       <p><span className="font-medium">Joining Date:</span> 12 Feb 2023</p>
     </div>
   </div>
