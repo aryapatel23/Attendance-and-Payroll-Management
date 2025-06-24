@@ -74,10 +74,11 @@ const Profile = () =>{
   const usersdata = useSelector((state) => state.auth.usersdata);
   console.log(usersdata)
   const [employee,setEmployee]=useState(null)
-
+console.log("1. Profile rendered");
 useEffect(()=>{
 if (usersdata[id]){
   console.log("Loaded from cache",usersdata)
+    console.log("2. Profile useEffect triggered");
   setEmployee(usersdata[id])
 }else{
 const FetchEmployee= async()=>{
@@ -200,11 +201,12 @@ function InfoTab() {
   const { id } = useParams();
   const userFromStore = useSelector((state) => state.auth.usersdata[id]);
   const [employee, setEmployee] = useState(null);
-
+console.log("3. InfoTab rendered");
   useEffect(() => {
     if (userFromStore) {
       setEmployee(userFromStore);
       console.log("Fatching data from cach in info tab")
+        console.log("4. InfoTab useEffect triggered (cache check)");
     }
   }, [userFromStore]);
 
