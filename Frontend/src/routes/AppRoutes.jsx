@@ -63,7 +63,7 @@ const AppRoutes = () => {
       {/* Common/Fallback Route */}
       <Route path="/add" element={<Add />} />
       {/* Optional 404 Page */}
-      {/* <Route path="*" element={<NotFound />} /> */}
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 };
