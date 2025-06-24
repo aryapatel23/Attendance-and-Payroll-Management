@@ -67,12 +67,49 @@ const EmployeeDashboard = () => {
   );
 };
 
-const Profile = () => (
+const Profile = () =>{
+  const {id}=useParams();      
+  console.log(id)
+  const dispatch = useDispatch();
+  const usersdata = useSelector((state) => state.auth.usersdata);
+  console.log(usersdata)
+  const [employee,setEmployee]=useState(null)
+
+useEffect(()=>{
+if (usersdata[id]){
+  console.log("Loaded from cache",usersdata)
+  setEmployee(usersdata[id])
+}else{
+const FetchEmployee= async()=>{
+  try{
+  
+    
+    const response= await fetch(`http://localhost:5500/api/users/${id}`);
+      if(!response.ok){
+            throw new Error("Failed to fetch employees");
+      }
+       const data=await response.json()
+       setEmployee(data.user)
+       dispatch(cacheUser({ id, userData: data.user }));
+       console.log('Fetching the data from api')
+         
+  }catch(error){
+  console.error("Error fetching employees:", error);
+  }
+}
+FetchEmployee();
+};
+},[id,dispatch,cacheUser])
+
+ if (!employee) return <p>Loading...</p>;
+console.log(employee)
+
+  return (
  <div className="bg-white w-full lg:w-1/5 rounded-2xl shadow-md p-6 text-sm text-gray-700 space-y-6">
   {/* Profile Header */}
   <div className="flex flex-col items-center text-center">
       <img src="https://i.pravatar.cc/100?img=56" alt="Employee" className="w-24 h-24 rounded-full mb-4 shadow" />
-      <h3 className="text-lg font-semibold">Jhon Doe</h3>
+      <h3 className="text-lg font-semibold">{employee.username}</h3>
       <p className="text-sm text-gray-500">UX Designer</p>
     </div>
 
@@ -157,93 +194,68 @@ const Profile = () => (
   </div>
 </div>
 
-);
+)};
 
 function InfoTab() {
-    const {id}=useParams();      
-  console.log(id)
-  const dispatch = useDispatch();
-  const usersdata = useSelector((state) => state.auth.usersdata);
-  console.log(usersdata)
-  const [employee,setEmployee]=useState(null)
+  const { id } = useParams();
+  const userFromStore = useSelector((state) => state.auth.usersdata[id]);
+  const [employee, setEmployee] = useState(null);
 
-useEffect(()=>{
-if (usersdata[id]){
-  console.log("Loaded from cache",usersdata)
-  setEmployee(usersdata[id])
-}else{
-const FetchEmployee= async()=>{
-  try{
-  
-    
-    const response= await fetch(`http://localhost:5500/api/users/${id}`);
-      if(!response.ok){
-            throw new Error("Failed to fetch employees");
-      }
-       const data=await response.json()
-       setEmployee(data.user)
-       dispatch(cacheUser({ id, userData: data.user }));
-       console.log('Fetching the data from api')
-         
-  }catch(error){
-  console.error("Error fetching employees:", error);
-  }
-}
-FetchEmployee();
-};
-},[id,dispatch,cacheUser])
+  useEffect(() => {
+    if (userFromStore) {
+      setEmployee(userFromStore);
+      console.log("Fatching data from cach in info tab")
+    }
+  }, [userFromStore]);
 
- if (!employee) return <p>Loading...</p>;
-console.log(employee)
+  if (!employee) return <p>Loading...</p>;
+
   return (
-<div className="space-y-6 text-gray-700">
-  <h3 className="text-xl font-semibold border-b pb-2">Personal & Official Information</h3>
+    <div className="space-y-6 text-gray-700">
+      <h3 className="text-xl font-semibold border-b pb-2">Personal & Official Information</h3>
 
-  {/* Personal Info */}
-  <div>
-    <h4 className="text-md font-semibold mb-2 text-indigo-600">👤 Personal Details</h4>
-    <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
-      <p><span className="font-medium">Full Name:</span> {employee.username}</p>
-      <p><span className="font-medium">Date of Birth:</span> 20 May 1997</p>
-      <p><span className="font-medium">Gender:</span> Male</p>
-      <p><span className="font-medium">Blood Group:</span> B+</p>
-      <p><span className="font-medium">Marital Status:</span> Single</p>
-      
+      {/* Personal Info */}
+      <div>
+        <h4 className="text-md font-semibold mb-2 text-indigo-600">👤 Personal Details</h4>
+        <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
+          <p><span className="font-medium">Full Name:</span> {employee.username}</p>
+          <p><span className="font-medium">Date of Birth:</span> 20 May 1997</p>
+          <p><span className="font-medium">Gender:</span> Male</p>
+          <p><span className="font-medium">Blood Group:</span> B+</p>
+          <p><span className="font-medium">Marital Status:</span> Single</p>
+        </div>
+      </div>
+
+      {/* Contact Info */}
+      <div>
+        <h4 className="text-md font-semibold mb-2 text-indigo-600">📞 Contact Information</h4>
+        <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
+          <p><span className="font-medium">Phone:</span> {employee.phone || 'N/A'}</p>
+          <p><span className="font-medium">Email:</span> {employee.email || 'N/A'}</p>
+          <p className="col-span-2"><span className="font-medium">Address:</span> {employee.address || 'N/A'}</p>
+        </div>
+      </div>
+
+      {/* Job Info */}
+      <div>
+        <h4 className="text-md font-semibold mb-2 text-indigo-600">💼 Job Details</h4>
+        <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
+          <p><span className="font-medium">Employee ID:</span> {employee.user_id}</p>
+          <p><span className="font-medium">Department:</span> Frontend</p>
+          <p><span className="font-medium">Designation:</span> {employee.employee_role}</p>
+          <p><span className="font-medium">Joining Date:</span> 12 Feb 2023</p>
+        </div>
+      </div>
+
+      {/* Emergency Info */}
+      <div>
+        <h4 className="text-md font-semibold mb-2 text-indigo-600">🚨 Emergency Contact</h4>
+        <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
+          <p><span className="font-medium">Name:</span> Rahul Doe</p>
+          <p><span className="font-medium">Contact:</span> +91 9999999999</p>
+        </div>
+      </div>
     </div>
-  </div>
-
-  {/* Contact Info */}
-  <div>
-    <h4 className="text-md font-semibold mb-2 text-indigo-600">📞 Contact Information</h4>
-    <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
-      <p><span className="font-medium">Phone:</span> {employee.mobile}</p>
-      <p><span className="font-medium">Email:</span> {employee.email}</p>
-      <p className="col-span-2"><span className="font-medium">Address:</span>{employee.address}</p>
-      
-    </div>
-  </div>
-
-  {/* Job Info */}
-  <div>
-    <h4 className="text-md font-semibold mb-2 text-indigo-600">💼 Job Details</h4>
-    <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
-      <p><span className="font-medium">Employee ID:</span>{employee.user_id}</p>
-      <p><span className="font-medium">Department:</span> Frontend</p>
-      <p><span className="font-medium">Designation:</span> {employee.employee_role}</p>
-      <p><span className="font-medium">Joining Date:</span> 12 Feb 2023</p>
-    </div>
-  </div>
-
-  {/* Emergency Info */}
-  <div>
-    <h4 className="text-md font-semibold mb-2 text-indigo-600">🚨 Emergency Contact</h4>
-    <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
-      <p><span className="font-medium">Name:</span> Rahul Doe</p>
-      <p><span className="font-medium">Contact:</span> +91 9999999999</p>
-    </div>
-  </div>
-</div>
-
   );
 }
 
