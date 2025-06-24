@@ -4,13 +4,13 @@ const initialState = {
   user: JSON.parse(localStorage.getItem("user")) || null,
   token: localStorage.getItem("token") || null,
   isAuthenticated: !!localStorage.getItem("token"),
+  status: null,
+  usersdata: {},
 };
 
 const authSlice = createSlice({
   name: "auth",
-   initialState: {
-    status: null, // 'Present' | 'Absent' | null
-  },
+  initialState,
   reducers: {
     loginUser: (state, action) => {
       state.user = action.payload.user;
@@ -25,7 +25,7 @@ const authSlice = createSlice({
       state.user = null;
       state.token = null;
       state.isAuthenticated = false;
-
+      state.usersdata = {}; // ✅ Clear cache
       localStorage.removeItem("user");
       localStorage.removeItem("token");
     },
@@ -34,11 +34,29 @@ const authSlice = createSlice({
       state.user = action.payload;
       localStorage.setItem("user", JSON.stringify(action.payload));
     },
-      setAttendanceStatus: (state, action) => {
+
+    setAttendanceStatus: (state, action) => {
       state.status = action.payload;
-    }
+    },
+
+    cacheUser: (state, action) => {
+      const { id, userData } = action.payload;
+      state.usersdata[id] = userData;
+    },
+
+    clearUserCache: (state) => {
+      state.usersdata = {};
+    },
   },
 });
 
-export const { loginUser, logoutUser, setUser, setAttendanceStatus } = authSlice.actions;
+export const {
+  loginUser,
+  logoutUser,
+  setUser,
+  setAttendanceStatus,
+  cacheUser,
+  clearUserCache,
+} = authSlice.actions;
+
 export default authSlice.reducer;

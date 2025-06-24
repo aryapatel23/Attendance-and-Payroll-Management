@@ -4,6 +4,8 @@ import { CgProfile } from "react-icons/cg";
 import { Bar } from "react-chartjs-2";
 import "chart.js/auto";
 import { useParams } from "react-router-dom";
+import { useSelector, useDispatch } from 'react-redux';
+import {cacheUser} from '../../Redux/Slice'
 
 const months = ["April 2025", "May 2025"];
 
@@ -157,13 +159,20 @@ const Profile = () => (
 
 );
 
-function InfoTab() {      
-const {id}=useParams();
-console.log(id)
-  const [employee,setEmployee]=useState({})
+function InfoTab() {
+    const {id}=useParams();      
+  console.log(id)
+  const dispatch = useDispatch();
+  const usersdata = useSelector((state) => state.auth.usersdata);
+  console.log(usersdata)
+  const [employee,setEmployee]=useState(null)
 
 useEffect(()=>{
- const FetchEmployee= async()=>{
+if (usersdata[id]){
+  console.log("Loaded from cache",usersdata)
+  setEmployee(usersdata[id])
+}else{
+const FetchEmployee= async()=>{
   try{
   
     
@@ -173,14 +182,18 @@ useEffect(()=>{
       }
        const data=await response.json()
        setEmployee(data.user)
+       dispatch(cacheUser({ id, userData: data.user }));
+       console.log('Fetching the data from api')
          
   }catch(error){
   console.error("Error fetching employees:", error);
   }
- };
+}
 FetchEmployee();
-  
-},[id])
+};
+},[id,dispatch,cacheUser])
+
+ if (!employee) return <p>Loading...</p>;
 console.log(employee)
   return (
 <div className="space-y-6 text-gray-700">

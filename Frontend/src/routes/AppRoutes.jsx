@@ -27,6 +27,9 @@ import AttendanceNew from "../Components/attendance";
 // Common / Temp
 import Add from "../Pages/Add";
 
+//Not Found Page
+import NotFound from '../Components/NotFound'
+
 const AppRoutes = () => {
   const token = useSelector((state) => state.auth.token);
   const user = useSelector((state) => state.auth.user);
@@ -63,7 +66,7 @@ const AppRoutes = () => {
       {/* Common/Fallback Route */}
       <Route path="/add" element={<Add />} />
       {/* Optional 404 Page */}
-      <Route path="*" element={<NotFound />} />
+      <Route path="*" element={<NotFound/>} />
     </Routes>
   );
 };
