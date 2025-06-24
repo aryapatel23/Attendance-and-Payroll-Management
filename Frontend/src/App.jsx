@@ -62,7 +62,6 @@ function App() {
         )}
         <Route path='/add' element={<Add />} />
         <Route path="*" element={<NotFound />} />
-        {/* <Route path="*" element={<NotFound />} /> */}
       </Routes>
     </BrowserRouter>
   );
