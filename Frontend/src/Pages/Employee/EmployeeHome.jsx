@@ -93,38 +93,31 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
-      <Header />
-
-      {/* Layout */}
-      <div className="flex flex-1">
-        {/* Sidebar */}
-        <Sidebar />
-
-        {/* Main Content with Scroll */}
-        <div className="flex-1 h-[calc(100vh-64px)] overflow-y-auto p-6 space-y-6 bg-gray-50">
+      <div className="flex-1 h-[calc(100vh-64px)] overflow-y-auto p-6 space-y-6 bg-gray-50">
           {/* Page Title */}
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <h1 className="text-xl font-semibold">Dashboard</h1>
+<div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+  <h1 className="text-xl font-semibold">Dashboard</h1>
 
-            <div className="flex flex-wrap gap-2 items-center">
-              <button className="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm shadow hover:bg-indigo-700 transition">
-                + Buddy Punching
-              </button>
-              <button className="border px-4 py-2 rounded-md text-sm shadow hover:bg-gray-50 transition">
-                Manager POV
-              </button>
+  <div className="flex flex-wrap gap-2 items-center">
+    <button className="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm shadow hover:bg-indigo-700 transition">
+      + Buddy Punching
+    </button>
+    <button className="border px-4 py-2 rounded-md text-sm shadow hover:bg-gray-50 transition">
+      Manager POV
+    </button>
 
-              {/* Today's Attendance Status */}
-              <div
-                className={`px-4 py-2 rounded-md text-sm font-medium shadow transition ${(attendanceStatus === 'Present' || attendanceStatus === 'Late')
-                    ? 'bg-green-500 text-white'
-                    : 'bg-red-500 text-white'
-                  }`}
-              >
-                {statusmanager()}
-              </div>
-            </div>
-          </div>
+    {/* Today's Attendance Status */}
+    <div
+      className={`px-4 py-2 rounded-md text-sm font-medium shadow transition ${
+        (attendanceStatus === 'Present' || attendanceStatus === 'Late')
+          ? 'bg-green-500 text-white'
+          : 'bg-red-500 text-white'
+      }`}
+    >
+      {statusmanager()}
+    </div>
+  </div>
+</div>
 
 
           {/* Welcome Message */}
@@ -247,7 +240,6 @@ const Dashboard = () => {
             </ResponsiveContainer>
           </div>
         </div>
-      </div>
     </div>
   );
 };

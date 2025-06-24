@@ -1,6 +1,7 @@
 import {React,useState,useEffect} from "react";
 import Header from "../../Components/Header"; // Adjust if needed
 import Sidebar from "../../Components/HRSidebar"; // Adjust if needed
+import { useNavigate } from "react-router-dom";
 
 const Employees = () => {
   // const employees = [
@@ -43,6 +44,7 @@ const Employees = () => {
   // ];
   const [employees, setEmployees] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+ const navigate =useNavigate();
 
 useEffect(() => {
     const fetchEmployees = async () => {
@@ -67,15 +69,6 @@ useEffect(() => {
   );
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Header */}
-      <Header />
-
-      {/* Main */}
-      <div className="flex flex-1">
-        {/* Sidebar */}
-        <Sidebar />
-
-        {/* Content */}
         <div className="flex-1 p-6 bg-gray-50">
           <h2 className="text-2xl font-semibold mb-4">Employees List</h2>
 
@@ -85,7 +78,7 @@ useEffect(() => {
               type="text"
               placeholder="Search The Employee By id or Name"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e)=>setSearchTerm(e.target.value)}
               className="w-full md:w-1/2 border border-gray-300 rounded px-4 py-2 focus:outline-none"
             />
           </div>
@@ -104,10 +97,11 @@ useEffect(() => {
               </thead>
               <tbody>
                 {filteredEmployees.length > 0 ? (
-                filteredEmployees.map((emp, index) => (
+             filteredEmployees.map((emp, index) => (
                   <tr
                     key={index}
                     className="border-t border-gray-200 hover:bg-gray-50"
+                    onClick={()=>navigate(`/hremployees/profile/${emp.user_id}`)}
                   >
                     <td className="px-6 py-4">{String(index + 1).padStart(2, "0")}</td>
                     <td className="px-6 py-4">{emp.user_id}</td>
@@ -147,7 +141,6 @@ useEffect(() => {
             </table>
           </div>
         </div>
-      </div>
     </div>
   );
 };

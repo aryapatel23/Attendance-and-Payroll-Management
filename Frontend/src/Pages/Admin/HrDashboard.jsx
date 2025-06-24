@@ -192,10 +192,6 @@ console.log("📊 Attendance data:", employees[0]?.username);
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-100">
-      <Header />
-      <div className="flex flex-1">
-        <Sidebar />
-
         <main className="flex-1 h-[calc(100vh-64px)] overflow-y-auto p-6 space-y-6 bg-gray-50">
           {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -266,7 +262,7 @@ console.log("📊 Attendance data:", employees[0]?.username);
             )}
           </div>
         </main>
-      </div>
+
     </div>
   );
 };

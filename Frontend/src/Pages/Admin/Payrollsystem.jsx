@@ -6,16 +6,7 @@ import { FaDownload, FaEnvelope, FaPhone, FaGlobe } from "react-icons/fa";
 const PayrollSystem = () => {
   return (
     <div className="min-h-screen flex flex-col bg-gray-100">
-      {/* Header */}
-      <Header />
-
-      {/* Body */}
-      <div className="flex flex-1">
-        {/* Sidebar */}
-        <Sidebar />
-
-        {/* Content */}
-        <div className="flex-1 h-[calc(100vh-64px)] overflow-y-auto p-6 space-y-6 bg-gray-50">
+              <div className="flex-1 h-[calc(100vh-64px)] overflow-y-auto p-6 space-y-6 bg-gray-50">
           <h2 className="text-2xl font-semibold mb-6">Payroll System</h2>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -144,7 +135,6 @@ const PayrollSystem = () => {
             </div>
           </div>
         </div>
-      </div>
     </div>
   );
 };
