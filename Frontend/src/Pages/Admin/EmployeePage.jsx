@@ -85,7 +85,8 @@ const FetchEmployee= async()=>{
   try{
   
     
-    const response= await fetch(`http://localhost:5500/api/users/${id}`);
+    const response= await fetch(`https://attendance-and-payroll-management.onrender.com/api/users/${id}`);
+    
       if(!response.ok){
             throw new Error("Failed to fetch employees");
       }
