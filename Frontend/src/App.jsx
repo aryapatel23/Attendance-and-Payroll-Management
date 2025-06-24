@@ -16,6 +16,7 @@ import AddEmployee from './Pages/Admin/AddEmployee.jsx';
 import PayrollSystem from './Pages/Admin/Payrollsystem.jsx';
 import HRCalendar from './Pages/Admin/HRCalendar.jsx';
 import AttendanceNew from './Components/attendance.jsx';
+import NotFound from './Components/Notfound.jsx';
 
 function App() {
   const dispatch = useDispatch();
@@ -60,6 +61,7 @@ function App() {
           </>
         )}
         <Route path='/add' element={<Add />} />
+        <Route path="*" element={<NotFound />} />
         {/* <Route path="*" element={<NotFound />} /> */}
       </Routes>
     </BrowserRouter>
