@@ -14,9 +14,26 @@ const GenerateSlip = async (req, res) =>{
 
     const PresentDays=attendance.filter((a)=>(a.
      status==='Present')).length
-    res.json({message:"Total Present days is",PresentDays})    
- 
+   
+  console.log('Presnt day',PresentDays)
+    const basicsalary=45000;
+    const workingDays=26;
+    const absentdays=workingDays-PresentDays
+    console.log('Absent day is',absentdays)
+    const paidleaves=2;
+    let givensalary;
+    if(absentdays>paidleaves){
+    const leavededuction=(absentdays-paidleaves)*(basicsalary/workingDays);  
+    console.log('Leavededuction is',leavededuction)
+    givensalary=basicsalary-leavededuction;
+    }else if(absentdays<paidleaves){
+    givensalary=basicsalary
+   
+    }
+    res.json({message:"Given salary is",givensalary}) 
 
+
+    
 }
 
 module.exports= {GenerateSlip};
