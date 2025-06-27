@@ -1,48 +1,79 @@
 const { getDB } = require("../../config/db");
 
-const GenerateSlip = async (req, res) =>{
+const GenerateSlip = async (req, res) => {
+  const db = getDB();
+  const { user_id, month } = req.body;
 
-      const db = getDB();
-      console.log(db)
-      const { user_id, month } = req.body;
-      const user = await db.collection('users').findOne({ user_id });
-      if (!user) return res.status(404).json({ message: 'User not found' });
+  const user = await db.collection('users').findOne({ user_id });
+  if (!user) return res.status(404).json({ message: 'User not found' });
 
-    const attendance = await db.collection('Attendance').find({
+  const attendance = await db.collection('Attendance').find({
     user_id,
     date: { $regex: `^${month}` }
-    }).toArray();
+  }).toArray();
 
-    const PresentDays=attendance.filter((a)=>(a.
-     status==='Present')).length
-   
-  console.log('Presnt day',PresentDays)
-    const basicsalary=45000;
-    const workingDays=26;
-    const absentdays=workingDays-PresentDays
-    console.log('Absent day is',absentdays)
-    const paidleaves=2;
-    const tax=basicsalary*0.1
-    const pf=basicsalary*0.05
-    let givensalary;
-    let totaldeduction;
-    let leavededuction;
-    if(absentdays>paidleaves){
-    leavededuction=(absentdays-paidleaves)*(basicsalary/workingDays);  
-    totaldeduction=tax+pf+leavededuction
-    console.log('Leavededuction is',leavededuction)
-    givensalary=basicsalary-totaldeduction;
-    }else if(absentdays<paidleaves){
-    givensalary=basicsalary-totaldeduction;
-    }
-    res.json({message:"Generated slip is",
-      "Total working days":workingDays,
-    "Total your work day is":workingDays-absentdays,
-  "tax is":tax,
-"pf is":pf,
-"leave deduction is":leavededuction,
-'total deduction is':totaldeduction,
-'given salary is':givensalary}) 
-}
+  const PresentDays = attendance.filter(a => a.status === 'Present').length;
+
+  const basicsalary = 45000;
+  const workingDays = 26;
+  const absentdays = workingDays - PresentDays;
+  const paidleaves = 2;
+
+  const tax = basicsalary * 0.1;
+  const pf = basicsalary * 0.05;
+  let givensalary, totaldeduction, leavededuction;
+
+  if (absentdays > paidleaves) {
+    leavededuction = (absentdays - paidleaves) * (basicsalary / workingDays);
+    totaldeduction = tax + pf + leavededuction;
+  } else {
+    leavededuction = 0;
+    totaldeduction = tax + pf;
+  }
+
+  givensalary = basicsalary - totaldeduction;
+
+
+    const Payrolldoc= {
+    employee_id:user_id,
+    employee_name:user.username,
+    month:month,
+
+    basic_salary:basicsalary,
+
+    attendance_summary:{
+      total_working_days:workingDays,
+      present_days:PresentDays,
+      absent_days: absentdays,
+      paid_leave_allowance: paidleaves,
+      unpaid_leave_days: Math.max(0, absentdays - paidleaves)
+    },
+
+    deductions: {
+    tax_amount: tax,
+    pf_amount: pf,
+    leave_deduction: leavededuction.toFixed(2) || 0,
+    total_deduction: totaldeduction.toFixed(2)
+  },
+
+    salary_breakdown: {
+    gross_salary: basicsalary,
+    net_salary: givensalary.toFixed(2)
+  },
+
+  status: "Processed",                  // "Draft", "Processed", "Paid"
+  generated_on: new Date().toISOString().slice(0, 10) // e.g. "2025-06-26"
+  }
+
+ await db.collection('Payrolls').insertOne(Payrolldoc)
+
+  return res.json({
+    message: "Slip generated sucessfully and added into the DB",
+    Payrolldoc
+  });
+
+
+};
+
 
 module.exports= {GenerateSlip};
