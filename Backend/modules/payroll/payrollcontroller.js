@@ -7,13 +7,16 @@ const GenerateSlip = async (req, res) =>{
       const user = await db.collection('users').findOne({ user_id });
       if (!user) return res.status(404).json({ message: 'User not found' });
 
-    const attendance = await db.collection('attendance').find({
-    employee_id,
+    const attendance = await db.collection('Attendance').find({
+    user_id,
     date: { $regex: `^${month}` }
     }).toArray();
-    
-    console.log('Fetched data is',attendance)
+
+    const PresentDays=attendance.filter((a)=>(a.
+     status==='Present')).length
+    res.json({message:"Total Present days is",PresentDays})    
+ 
 
 }
 
-module.exports= {GenerateSlip} ;
+module.exports= {GenerateSlip};
