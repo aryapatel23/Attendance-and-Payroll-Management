@@ -3,7 +3,7 @@
 // import Sidebar from "../../Components/Sidebar";
 
 // const Salary = () => {
-//   const [selectedMonth, setSelectedMonth] = useState("May 2025");
+//   const [month, setmonth] = useState("May 2025");
 
 //   const salaryData = [
 //     {
@@ -35,8 +35,8 @@
 //             <h1 className="text-xl font-semibold">Salary Overview</h1>
 //             <select
 //               className="border border-gray-300 px-3 py-2 rounded-md text-sm"
-//               value={selectedMonth}
-//               onChange={(e) => setSelectedMonth(e.target.value)}
+//               value={month}
+//               onChange={(e) => setmonth(e.target.value)}
 //             >
 //               {salaryData.map((data, idx) => (
 //                 <option key={idx} value={data.month}>
@@ -49,9 +49,9 @@
 //           {/* Summary Cards */}
 //           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
 //             {salaryData
-//               .find((data) => data.month === selectedMonth) &&
+//               .find((data) => data.month === month) &&
 //               (() => {
-//                 const current = salaryData.find((data) => data.month === selectedMonth);
+//                 const current = salaryData.find((data) => data.month === month);
 //                 return (
 //                   <>
 //                     <div className="bg-white p-4 rounded shadow">
@@ -82,7 +82,7 @@
 //               <table className="min-w-full text-sm text-left text-gray-600">
 //                 <thead className="bg-gray-100 text-gray-700 uppercase text-xs">
 //                   <tr>
-//                     <th className="px-4 py-3">Month</th>
+//                     <th className="px-4 py-3">month</th>
 //                     <th className="px-4 py-3">Base Pay</th>
 //                     <th className="px-4 py-3">Bonus</th>
 //                     <th className="px-4 py-3">Deductions</th>
@@ -133,8 +133,7 @@
 
 
 import React, { useState,useEffect } from "react";
-import Header from "../../Components/Header";
-import Sidebar from "../../Components/Sidebar";
+import { useSelector } from 'react-redux';
 import {
   ChevronDown,
   ChevronUp,
@@ -148,22 +147,52 @@ import { Transition } from "@headlessui/react";
 
 const Salary = () => {
   const [openIndex, setOpenIndex] = useState(null);
-  const [selectedMonth, setSelectedMonth] = useState("");
+  const [month, setmonth] = useState("");
   const [selectedYear, setSelectedYear] = useState("");
-  const [data,setData]=useState({})
+  const [salarydata,setsalaryData]=useState([])
 
+const user = useSelector((state) => state.auth.user);
 
-  useEffect(()=>{
-   const fetchSalary=()=>{
-    fetch("http://localhost:5500/api/Generate")
-    .then(res=>res.json)
-    .then(data=>setData(data))
-   }
-  })
+const user_id=user?.id
+console.log(user_id)
+
+  useEffect(() => {
+    const fetchSalary = async () => {
+if (!month || !selectedYear || !user_id) {
+  console.warn("Missing month/year/user_id");
+  return;
+}
+
+      try {
+        const res = await fetch("http://localhost:5500/api/Generate", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            month: `${month} ${selectedYear}`,
+            user_id,
+          }),
+        });
+
+        const result = await res.json();
+        if (result.Payrolldoc) {
+       setsalaryData([result.Payrolldoc]); // ✅ make it an array with one item
+} else {
+  setsalaryData([]); // fallback if not found
+ }
+      } catch (err) {
+        console.error("Error fetching salary data:", err);
+      }
+    };
+
+    fetchSalary();
+  }, [month, selectedYear, user_id]);
+  console.log(salarydata)
+
   const toggleOpen = (index) => {
     setOpenIndex(openIndex === index ? null : index);
   };
-
   const months = [
     "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December",
@@ -172,38 +201,39 @@ const Salary = () => {
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 10 }, (_, i) => currentYear - i);
 
-  const salaryData = [
-    {
-      month: "May 2025",
-      amount: "₹44,500",
-      slipUrl: "#",
-      details: {
-        basic: "₹30,000",
-        hra: "₹10,000",
-        bonus: "₹5,000",
-        deductions: "₹500",
-      },
-    },
-    {
-      month: "April 2025",
-      amount: "₹20,000",
-      slipUrl: "#",
-      details: {
-        basic: "₹15,000",
-        hra: "₹3,000",
-        bonus: "₹2,500",
-        deductions: "₹500",
-      },
-    },
-  ];
+  // const salaryData = [
+  //   {
+  //     month: "May 2025",
+  //     amount: "₹44,500",
+  //     slipUrl: "#",
+  //     details: {
+  //       basic: "₹30,000",
+  //       hra: "₹10,000",
+  //       bonus: "₹5,000",
+  //       deductions: "₹500",
+  //     },
+  //   },
+  //   {
+  //     month: "April 2025",
+  //     amount: "₹20,000",
+  //     slipUrl: "#",
+  //     details: {
+  //       basic: "₹15,000",
+  //       hra: "₹3,000",
+  //       bonus: "₹2,500",
+  //       deductions: "₹500",
+  //     },
+  //   },
+  // ];
 
-  const filteredSalaries = salaryData.filter((item) => {
+  const filteredSalaries = salarydata.filter((item) => {
     const [monthName, year] = item.month.split(" ");
     return (
-      (!selectedMonth || selectedMonth === monthName) &&
+      (!month || month === monthName) &&
       (!selectedYear || selectedYear === year)
     );
   });
+  // console.log("Filter data is",filteredSalaries[0].salary_breakdown.net_salary)
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#f5f7fa] to-[#e4ecf7]">
@@ -213,11 +243,11 @@ const Salary = () => {
         {/* Filter Section */}
         <div className="flex flex-wrap gap-4 mb-6">
           <select
-            value={selectedMonth}
-            onChange={(e) => setSelectedMonth(e.target.value)}
+            value={month}
+            onChange={(e) => setmonth(e.target.value)}
             className="px-4 py-2 rounded-lg border border-gray-300 bg-white shadow-sm focus:ring-2 focus:ring-violet-500"
           >
-            <option value="">Select Month</option>
+            <option value="">Select month</option>
             {months.map((month) => (
               <option key={month} value={month}>
                 {month}
@@ -238,7 +268,7 @@ const Salary = () => {
             ))}
           </select>
         </div>
-        {console.log('Selected month and year is',selectedMonth,selectedYear)}
+        {console.log('Selected month and year is',month,selectedYear)}
 
         {/* Salary Slips */}
         <div className="space-y-6">
@@ -258,7 +288,7 @@ const Salary = () => {
                     </div>
                     <div className="flex flex-col">
                       <span className="text-lg font-semibold text-gray-900">
-                        {item.month}
+                        {item.month}        
                       </span>
                       <span className="text-sm text-gray-500">
                         Salary Statement
@@ -268,7 +298,7 @@ const Salary = () => {
 
                   <div className="flex items-center space-x-4">
                     <span className="text-xl font-bold text-gray-800">
-                      {item.amount}
+                      {item.salary_breakdown.net_salary}
                     </span>
                     <a
                       href={item.slipUrl}

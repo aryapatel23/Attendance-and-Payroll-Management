@@ -3,6 +3,6 @@ const{GenerateSlip}=require('./payrollcontroller')
 
 const router = express.Router();
 
-router.get("/Generate",GenerateSlip)
+router.post("/Generate",GenerateSlip)
 
 module.exports = router;
