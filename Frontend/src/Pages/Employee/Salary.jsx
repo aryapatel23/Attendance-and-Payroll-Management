@@ -132,18 +132,45 @@
 
 
 
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import Header from "../../Components/Header";
 import Sidebar from "../../Components/Sidebar";
-import { ChevronDown, ChevronUp, Download, IndianRupee, Banknote, Gift, Minus } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  Download,
+  IndianRupee,
+  Banknote,
+  Gift,
+  Minus,
+} from "lucide-react";
 import { Transition } from "@headlessui/react";
 
 const Salary = () => {
   const [openIndex, setOpenIndex] = useState(null);
+  const [selectedMonth, setSelectedMonth] = useState("");
+  const [selectedYear, setSelectedYear] = useState("");
+  const [data,setData]=useState({})
 
+
+  useEffect(()=>{
+   const fetchSalary=()=>{
+    fetch("http://localhost:5500/api/Generate")
+    .then(res=>res.json)
+    .then(data=>setData(data))
+   }
+  })
   const toggleOpen = (index) => {
     setOpenIndex(openIndex === index ? null : index);
   };
+
+  const months = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December",
+  ];
+
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 10 }, (_, i) => currentYear - i);
 
   const salaryData = [
     {
@@ -170,18 +197,57 @@ const Salary = () => {
     },
   ];
 
+  const filteredSalaries = salaryData.filter((item) => {
+    const [monthName, year] = item.month.split(" ");
+    return (
+      (!selectedMonth || selectedMonth === monthName) &&
+      (!selectedYear || selectedYear === year)
+    );
+  });
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#f5f7fa] to-[#e4ecf7]">
-        <div className="flex-1 p-6 overflow-auto">
-          <h1 className="text-2xl font-bold text-gray-800 mb-6">Salary</h1>
+      <div className="flex-1 p-6 overflow-auto">
+        <h1 className="text-2xl font-bold text-gray-800 mb-6">Salary</h1>
 
-          <div className="space-y-6">
-            {salaryData.map((item, index) => (
+        {/* Filter Section */}
+        <div className="flex flex-wrap gap-4 mb-6">
+          <select
+            value={selectedMonth}
+            onChange={(e) => setSelectedMonth(e.target.value)}
+            className="px-4 py-2 rounded-lg border border-gray-300 bg-white shadow-sm focus:ring-2 focus:ring-violet-500"
+          >
+            <option value="">Select Month</option>
+            {months.map((month) => (
+              <option key={month} value={month}>
+                {month}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={selectedYear}
+            onChange={(e) => setSelectedYear(e.target.value)}
+            className="px-4 py-2 rounded-lg border border-gray-300 bg-white shadow-sm focus:ring-2 focus:ring-violet-500"
+          >
+            <option value="">Select Year</option>
+            {years.map((year) => (
+              <option key={year} value={year}>
+                {year}
+              </option>
+            ))}
+          </select>
+        </div>
+        {console.log('Selected month and year is',selectedMonth,selectedYear)}
+
+        {/* Salary Slips */}
+        <div className="space-y-6">
+          {filteredSalaries.length > 0 ? (
+            filteredSalaries.map((item, index) => (
               <div
                 key={index}
                 className="bg-white/80 backdrop-blur-md rounded-3xl shadow-xl transition hover:shadow-2xl border border-gray-200"
               >
-                {/* Salary Header */}
                 <div
                   className="flex justify-between items-center px-6 py-5 cursor-pointer"
                   onClick={() => toggleOpen(index)}
@@ -220,7 +286,6 @@ const Salary = () => {
                   </div>
                 </div>
 
-                {/* Dropdown Body */}
                 <Transition
                   show={openIndex === index}
                   enter="transition-all duration-300 ease-out"
@@ -273,14 +338,19 @@ const Salary = () => {
                     </div>
                   </div>
                 </Transition>
-
               </div>
-            ))}
-          </div>
+            ))
+          ) : (
+            <div className="text-center text-gray-500 text-sm">
+              No salary slip found for the selected period.
+            </div>
+          )}
         </div>
+      </div>
     </div>
   );
 };
 
 export default Salary;
+
 
