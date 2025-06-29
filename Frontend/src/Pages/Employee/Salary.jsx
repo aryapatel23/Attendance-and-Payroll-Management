@@ -147,93 +147,60 @@ import { Transition } from "@headlessui/react";
 
 const Salary = () => {
   const [openIndex, setOpenIndex] = useState(null);
-  const [month, setmonth] = useState("");
-  const [selectedYear, setSelectedYear] = useState("");
-  const [salarydata,setsalaryData]=useState([])
+  const [selectedMonth, setSelectedMonth] = useState("");
+  const [selectedYear, setSelectedYear] = useState(""); 
+  const [data,setData]=useState([])
 
-const user = useSelector((state) => state.auth.user);
+  const user = useSelector((state) => state.auth.user);
 
 const user_id=user?.id
 console.log(user_id)
 
-  useEffect(() => {
-    const fetchSalary = async () => {
-if (!month || !selectedYear || !user_id) {
-  console.warn("Missing month/year/user_id");
-  return;
-}
+useEffect(() => {
+  const fetchSalary = async () => {
+    if (!selectedMonth || !selectedYear || !user_id) {
+      console.warn("Missing month/year/user_id");
+      return;
+    }
 
-      try {
-        const res = await fetch("http://localhost:5500/api/Generate", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            month: `${month} ${selectedYear}`,
-            user_id,
-          }),
-        });
+    try {
+      const res = await fetch("http://localhost:5500/api/Generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          month: `${selectedYear}-${selectedMonth}`,
+          user_id,
+        }),
+      });
 
-        const result = await res.json();
-        if (result.Payrolldoc) {
-       setsalaryData([result.Payrolldoc]); // ✅ make it an array with one item
-} else {
-  setsalaryData([]); // fallback if not found
- }
-      } catch (err) {
-        console.error("Error fetching salary data:", err);
+      const result = await res.json();
+      if (result) {
+        setData([result]); // ✅ wrap as array
+      } else {
+        setData([]);
       }
-    };
+    } catch (err) {
+      console.error("Error fetching salary data:", err);
+    }
+  };
 
-    fetchSalary();
-  }, [month, selectedYear, user_id]);
-  console.log(salarydata)
+  fetchSalary();
+}, [selectedMonth, selectedYear, user_id]);
+console.log("recieve data is",data)
 
   const toggleOpen = (index) => {
     setOpenIndex(openIndex === index ? null : index);
   };
+
   const months = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December",
+    "01", "02", "03", "04", "05", "06",
+    "07", "08", "09", "10", "11", "12",
   ];
 
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 10 }, (_, i) => currentYear - i);
-
-  // const salaryData = [
-  //   {
-  //     month: "May 2025",
-  //     amount: "₹44,500",
-  //     slipUrl: "#",
-  //     details: {
-  //       basic: "₹30,000",
-  //       hra: "₹10,000",
-  //       bonus: "₹5,000",
-  //       deductions: "₹500",
-  //     },
-  //   },
-  //   {
-  //     month: "April 2025",
-  //     amount: "₹20,000",
-  //     slipUrl: "#",
-  //     details: {
-  //       basic: "₹15,000",
-  //       hra: "₹3,000",
-  //       bonus: "₹2,500",
-  //       deductions: "₹500",
-  //     },
-  //   },
-  // ];
-
-  const filteredSalaries = salarydata.filter((item) => {
-    const [monthName, year] = item.month.split(" ");
-    return (
-      (!month || month === monthName) &&
-      (!selectedYear || selectedYear === year)
-    );
-  });
-  // console.log("Filter data is",filteredSalaries[0].salary_breakdown.net_salary)
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#f5f7fa] to-[#e4ecf7]">
@@ -243,11 +210,11 @@ if (!month || !selectedYear || !user_id) {
         {/* Filter Section */}
         <div className="flex flex-wrap gap-4 mb-6">
           <select
-            value={month}
-            onChange={(e) => setmonth(e.target.value)}
+            value={selectedMonth}
+            onChange={(e) => setSelectedMonth(e.target.value)}
             className="px-4 py-2 rounded-lg border border-gray-300 bg-white shadow-sm focus:ring-2 focus:ring-violet-500"
           >
-            <option value="">Select month</option>
+            <option value="">Select Month</option>
             {months.map((month) => (
               <option key={month} value={month}>
                 {month}
@@ -268,12 +235,12 @@ if (!month || !selectedYear || !user_id) {
             ))}
           </select>
         </div>
-        {console.log('Selected month and year is',month,selectedYear)}
+        {console.log('Selected month and year is',selectedMonth,selectedYear)}
 
         {/* Salary Slips */}
         <div className="space-y-6">
-          {filteredSalaries.length > 0 ? (
-            filteredSalaries.map((item, index) => (
+          {data.length > 0 ? (
+            data.map((item, index) => (
               <div
                 key={index}
                 className="bg-white/80 backdrop-blur-md rounded-3xl shadow-xl transition hover:shadow-2xl border border-gray-200"
@@ -288,14 +255,14 @@ if (!month || !selectedYear || !user_id) {
                     </div>
                     <div className="flex flex-col">
                       <span className="text-lg font-semibold text-gray-900">
-                        {item.month}        
+                        {item.month}
                       </span>
                       <span className="text-sm text-gray-500">
                         Salary Statement
                       </span>
                     </div>
                   </div>
-
+              
                   <div className="flex items-center space-x-4">
                     <span className="text-xl font-bold text-gray-800">
                       {item.salary_breakdown.net_salary}
@@ -332,7 +299,7 @@ if (!month || !selectedYear || !user_id) {
                           <Banknote className="text-green-600 w-4 h-4" />
                           Gross Salary
                         </div>
-                        <div className="text-right font-medium">₹60,000</div>
+                        <div className="text-right font-medium">₹{item.basic_salary}</div>
                       </div>
 
                       <div className="flex justify-between items-center">
@@ -340,30 +307,30 @@ if (!month || !selectedYear || !user_id) {
                           <IndianRupee className="text-purple-600 w-4 h-4" />
                           PF (5%)
                         </div>
-                        <div>₹3,000</div>
+                        <div>{item.deductions.pf_amount}</div>
                       </div>
 
                       <div className="flex justify-between items-center">
                         <div className="flex items-center gap-2">
                           <Minus className="text-red-500 w-4 h-4" />
-                          Tax Slab (20%)
+                          Tax Slab (10%)
                         </div>
-                        <div>₹12,000</div>
+                        <div>{item.deductions.tax_amount}</div>
                       </div>
 
                       <div className="flex justify-between items-center">
                         <div className="flex items-center gap-2">
                           <Gift className="text-blue-500 w-4 h-4" />
-                          Other Deductions
+                          Leave Deductions
                         </div>
-                        <div>₹500</div>
+                        <div>{item.deductions.leave_deduction}</div>
                       </div>
 
                       <hr className="border-dashed border-gray-400 my-2" />
 
                       <div className="flex justify-between items-center font-bold text-gray-900 text-base">
                         <div>Total Salary</div>
-                        <div>{item.amount}</div>
+                        <div>{item.salary_breakdown.net_salary}</div>
                       </div>
                     </div>
                   </div>
