@@ -134,6 +134,7 @@
 
 import React, { useState,useEffect } from "react";
 import { useSelector } from 'react-redux';
+import jsPDF from 'jspdf'
 import {
   ChevronDown,
   ChevronUp,
@@ -202,6 +203,26 @@ console.log("recieve data is",data)
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 10 }, (_, i) => currentYear - i);
 
+  const downloadPDF = (item) => {
+  const doc = new jsPDF();
+
+  doc.setFontSize(16);
+  doc.text(`Salary Slip ${item.month}`, 80, 15);
+
+  doc.setFontSize(12);
+  doc.text(`Employee ID: ${item.employee_id}`, 10, 30);
+  doc.text(`Employee Name: ${item.employee_name}`, 10, 40);
+
+
+  doc.text(`Basic Salary: ₹${item.basic_salary}`, 10, 80);
+  doc.text(`Gross Salary: ₹${item.salary_breakdown.gross_salary}`, 10, 90);
+  doc.text(`Net Salary: ₹${item.salary_breakdown.net_salary.toFixed(2)}`, 10, 100);
+
+
+
+  doc.save(`SalarySlip-${item.month}.pdf`);
+};
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#f5f7fa] to-[#e4ecf7]">
       <div className="flex-1 p-6 overflow-auto">
@@ -265,16 +286,15 @@ console.log("recieve data is",data)
               
                   <div className="flex items-center space-x-4">
                     <span className="text-xl font-bold text-gray-800">
-                      {item.salary_breakdown.net_salary}
+                      {item.salary_breakdown.net_salary.toFixed(2)}
                     </span>
-                    <a
-                      href={item.slipUrl}
-                      download
-                      className="bg-violet-600 text-white text-sm px-4 py-2 rounded-full shadow-md hover:bg-violet-700 transition flex items-center gap-2"
-                    >
-                      <Download className="w-4 h-4" />
-                      Download
-                    </a>
+                 <button
+  onClick={() => downloadPDF(item)}
+  className="bg-violet-600 text-white text-sm px-4 py-2 rounded-full shadow-md hover:bg-violet-700 transition flex items-center gap-2"
+>
+  <Download className="w-4 h-4" />
+  Download
+</button>
                     {openIndex === index ? (
                       <ChevronUp className="w-5 h-5 text-gray-600" />
                     ) : (
@@ -323,14 +343,14 @@ console.log("recieve data is",data)
                           <Gift className="text-blue-500 w-4 h-4" />
                           Leave Deductions
                         </div>
-                        <div>{item.deductions.leave_deduction}</div>
+                        <div>{item.deductions.leave_deduction.toFixed(2)}</div>
                       </div>
 
                       <hr className="border-dashed border-gray-400 my-2" />
 
                       <div className="flex justify-between items-center font-bold text-gray-900 text-base">
                         <div>Total Salary</div>
-                        <div>{item.salary_breakdown.net_salary}</div>
+                        <div>{item.salary_breakdown.net_salary.toFixed(2)}</div>
                       </div>
                     </div>
                   </div>
