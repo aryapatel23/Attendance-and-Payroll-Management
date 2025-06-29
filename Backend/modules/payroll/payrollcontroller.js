@@ -4,10 +4,11 @@ const GenerateSlip = async (req, res) => {
   const db = getDB();
   const { user_id, month } = req.body;
 
-  const user = await db.collection('users').findOne({ user_id });
+  const user = await db.collection('SalaryInfo').findOne({ 
+   employee_id :user_id });
 
 try {
-  if (!user || !user.username) {
+  if (!user || !user.employee_name) {
     return res.status(400).json({ error: "Invalid user data" });
   }
 
@@ -27,13 +28,13 @@ try {
   }).toArray();
 
   const presentDays = attendance.filter(a => a.status === 'Present').length;
-  const basicSalary = 45000;
+  const basicSalary = user.base_salary;
   const workingDays = 26;
-  const paidLeaves = 2;
+  const paidLeaves = user.paid_leaves_allowed;
   const absentDays = workingDays - presentDays;
 
-  const tax = basicSalary * 0.1;
-  const pf = basicSalary * 0.05;
+  const tax = basicSalary * (user.tax_percent/100);
+  const pf = basicSalary * (user.pf_percent/100);
   const unpaidLeaves = Math.max(0, absentDays - paidLeaves);
   const leaveDeduction = unpaidLeaves * (basicSalary / workingDays);
   const totalDeduction = tax + pf + leaveDeduction;
@@ -41,7 +42,7 @@ try {
 
   const payrollDoc = {
     employee_id: user_id,
-    employee_name: user.username,
+    employee_name: user.employee_name,
     month,
     basic_salary: basicSalary,
 
