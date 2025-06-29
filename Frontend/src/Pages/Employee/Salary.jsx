@@ -286,7 +286,7 @@ console.log("recieve data is",data)
               
                   <div className="flex items-center space-x-4">
                     <span className="text-xl font-bold text-gray-800">
-                      {item.salary_breakdown.net_salary.toFixed(2)}
+                      {(Number(item.salary_breakdown?.net_salary) || 0).toFixed(2)}
                     </span>
                  <button
   onClick={() => downloadPDF(item)}
@@ -343,14 +343,14 @@ console.log("recieve data is",data)
                           <Gift className="text-blue-500 w-4 h-4" />
                           Leave Deductions
                         </div>
-                        <div>{item.deductions.leave_deduction.toFixed(2)}</div>
+                        <div>{(Number(item.deductions?.leave_deduction) || 0).toFixed(2)}</div>
                       </div>
 
                       <hr className="border-dashed border-gray-400 my-2" />
 
                       <div className="flex justify-between items-center font-bold text-gray-900 text-base">
                         <div>Total Salary</div>
-                        <div>{item.salary_breakdown.net_salary.toFixed(2)}</div>
+                        <div>{(Number(item.salary_breakdown?.net_salary) || 0).toFixed(2)}</div>
                       </div>
                     </div>
                   </div>
