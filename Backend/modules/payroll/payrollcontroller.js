@@ -102,5 +102,26 @@ const Addsalaryinfo= async (req,res) =>{
   return res.json({message:"Data inserted sucessfully",result})
 }
 
+const Updatesalaryinfo= async (req,res) =>{
+    const db = getDB();
+  const {employee_id,employee_name,base_salary,hra,bonus,tax_percent,pf_percent,joining_date,updated_by}=req.body;
+  const nowIST = new Date(new Date().getTime() + 5.5 * 60 * 60 * 1000);
+  const today = nowIST.toISOString().split("T")[0];
 
-module.exports= {GenerateSlip,Addsalaryinfo};
+  const result=await db.collection('SalaryInfo').updateOne({employee_id},{$set:{
+     employee_id,
+     employee_name,
+     base_salary,
+     hra,
+     bonus,
+     tax_percent,
+     pf_percent,
+     joining_date,
+     last_update:nowIST,
+     updated_by
+  }})
+  return res.json({message:"Data updated sucessfully",result})
+}
+
+
+module.exports= {GenerateSlip,Addsalaryinfo,Updatesalaryinfo};
