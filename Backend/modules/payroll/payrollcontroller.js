@@ -5,70 +5,78 @@ const GenerateSlip = async (req, res) => {
   const { user_id, month } = req.body;
 
   const user = await db.collection('users').findOne({ user_id });
-  if (!user) return res.status(404).json({ message: 'User not found' });
+
+try {
+  if (!user || !user.username) {
+    return res.status(400).json({ error: "Invalid user data" });
+  }
+
+  const salaryslip = await db.collection('Payrolls').findOne({
+    employee_id: user_id,
+    month
+  });
+
+  if (salaryslip) {
+    console.log('Saved salary slip fetched:', salaryslip);
+    return res.json(salaryslip);
+  }
 
   const attendance = await db.collection('Attendance').find({
     user_id,
     date: { $regex: `^${month}` }
   }).toArray();
 
-  const PresentDays = attendance.filter(a => a.status === 'Present').length;
-
-  const basicsalary = 45000;
+  const presentDays = attendance.filter(a => a.status === 'Present').length;
+  const basicSalary = 45000;
   const workingDays = 26;
-  const absentdays = workingDays - PresentDays;
-  const paidleaves = 2;
+  const paidLeaves = 2;
+  const absentDays = workingDays - presentDays;
 
-  const tax = basicsalary * 0.1;
-  const pf = basicsalary * 0.05;
-  let givensalary, totaldeduction, leavededuction;
+  const tax = basicSalary * 0.1;
+  const pf = basicSalary * 0.05;
+  const unpaidLeaves = Math.max(0, absentDays - paidLeaves);
+  const leaveDeduction = unpaidLeaves * (basicSalary / workingDays);
+  const totalDeduction = tax + pf + leaveDeduction;
+  const netSalary = basicSalary - totalDeduction;
 
-  if (absentdays > paidleaves) {
-    leavededuction = (absentdays - paidleaves) * (basicsalary / workingDays);
-    totaldeduction = tax + pf + leavededuction;
-  } else {
-    leavededuction = 0;
-    totaldeduction = tax + pf;
-  }
+  const payrollDoc = {
+    employee_id: user_id,
+    employee_name: user.username,
+    month,
+    basic_salary: basicSalary,
 
-  givensalary = basicsalary - totaldeduction;
-
-
-    const Payrolldoc= {
-    employee_id:user_id,
-    employee_name:user.username,
-    month:month,
-
-    basic_salary:basicsalary,
-
-    attendance_summary:{
-      total_working_days:workingDays,
-      present_days:PresentDays,
-      absent_days: absentdays,
-      paid_leave_allowance: paidleaves,
-      unpaid_leave_days: Math.max(0, absentdays - paidleaves)
+    attendance_summary: {
+      total_working_days: workingDays,
+      present_days: presentDays,
+      absent_days: absentDays,
+      paid_leave_allowance: paidLeaves,
+      unpaid_leave_days: unpaidLeaves
     },
 
     deductions: {
-    tax_amount: tax,
-    pf_amount: pf,
-    leave_deduction: leavededuction.toFixed(2) || 0,
-    total_deduction: totaldeduction.toFixed(2)
-  },
+      tax_amount: tax,
+      pf_amount: pf,
+      leave_deduction: leaveDeduction,
+      total_deduction: totalDeduction
+    },
 
     salary_breakdown: {
-    gross_salary: basicsalary,
-    net_salary: givensalary.toFixed(2)
-  },
+      gross_salary: basicSalary,
+      net_salary: netSalary
+    },
 
-  status: "Processed",                  // "Draft", "Processed", "Paid"
-  generated_on: new Date().toISOString().slice(0, 10) // e.g. "2025-06-26"
-  }
+    status: "Processed",
+    generated_on: new Date().toISOString().slice(0, 10)
+  };
 
- await db.collection('Payrolls').insertOne(Payrolldoc)
+  await db.collection('Payrolls').insertOne(payrollDoc);
+  console.log('New salary slip generated:', payrollDoc);
+  return res.json(payrollDoc);
 
-  return res.json(Payrolldoc);
-
+} catch (error) {
+  console.error("Salary generation error:", error);
+  return res.status(500).json({ error: error.message });
+}
 
 };
 
