@@ -83,7 +83,10 @@ try {
 
 const Addsalaryinfo= async (req,res) =>{
     const db = getDB();
-  const {employee_id,employee_name,base_salary,hra,bonus,tax_percent,pf_percent,joining_date}=req.body;
+  const {employee_id,employee_name,base_salary,hra,bonus,tax_percent,pf_percent,joining_date,updated_by}=req.body;
+  const nowIST = new Date(new Date().getTime() + 5.5 * 60 * 60 * 1000);
+  const today = nowIST.toISOString().split("T")[0];
+
   const result=await db.collection('SalaryInfo').insertOne({
      employee_id,
      employee_name,
@@ -92,7 +95,9 @@ const Addsalaryinfo= async (req,res) =>{
      bonus,
      tax_percent,
      pf_percent,
-     joining_date
+     joining_date,
+     last_update:nowIST,
+     updated_by
   })
   return res.json({message:"Data inserted sucessfully",result})
 }
