@@ -81,5 +81,21 @@ try {
 
 };
 
+const Addsalaryinfo= async (req,res) =>{
+    const db = getDB();
+  const {employee_id,employee_name,base_salary,hra,bonus,tax_percent,pf_percent,joining_date}=req.body;
+  const result=await db.collection('SalaryInfo').insertOne({
+     employee_id,
+     employee_name,
+     base_salary,
+     hra,
+     bonus,
+     tax_percent,
+     pf_percent,
+     joining_date
+  })
+  return res.json({message:"Data inserted sucessfully",result})
+}
 
-module.exports= {GenerateSlip};
+
+module.exports= {GenerateSlip,Addsalaryinfo};
