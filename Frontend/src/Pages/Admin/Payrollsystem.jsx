@@ -61,7 +61,7 @@ useEffect(() => {
                   <tr
                     key={index}
                     className="border-t border-gray-200 hover:bg-gray-50"
-                    onClick={()=>navigate(`/hremployees/profile/${emp.user_id}`)}
+                    onClick={()=>navigate(`/payrollsystem/profile/${emp.user_id}`)}
                   >
                     <td className="px-6 py-4">{String(index + 1).padStart(2, "0")}</td>
                     <td className="px-6 py-4">{emp.user_id}</td>

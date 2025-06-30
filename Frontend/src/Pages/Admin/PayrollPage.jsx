@@ -1,140 +1,183 @@
-import React from 'react';
-import { FaDownload, FaEnvelope, FaPhone, FaGlobe } from "react-icons/fa";
+import React, { useState,useEffect } from "react";
+import { FaDownload, FaEnvelope, FaPhone, FaGlobe, FaCalendarAlt,FaRupeeSign,FaRegClock } from "react-icons/fa";
+import { CgProfile } from "react-icons/cg";
+import { Bar } from "react-chartjs-2";
+import "chart.js/auto";
+import { useParams } from "react-router-dom";
+import { useSelector, useDispatch } from 'react-redux';
+import {cacheUser} from '../../Redux/Slice'
 
-const PayrollSystem = () => {
+const months = ["April 2025", "May 2025"];
+
+const rawAttendance = {
+  "April 2025": [
+    ["2025-04-01", "Present", "09:00", "18:00"],
+    ["2025-04-02", "Present", "09:05", "18:05"],
+    ["2025-04-03", "Leave", "-", "-"],
+    ["2025-04-04", "Present", "09:10", "18:10"],
+  ],
+  "May 2025": [
+    ["2025-05-01", "Present", "09:00", "18:00"],
+    ["2025-05-02", "Absent", "-", "-"],
+    ["2025-05-03", "Present", "09:15", "18:15"],
+  ],
+};
+
+const salaryData = {
+  "April 2025": { total: 40000, tds: 4000, spf: 2000, unpaidLeave: 2200, paid: 35800, status: "Paid" },
+  "May 2025": { total: 42000, tds: 4200, spf: 2100, unpaidLeave: 0, paid: 35700, status: "Pending" },
+};
+
+const PayrollPage = () => {
+  const [tab, setTab] = useState("usersalaryinfo");
+  const [attMonth, setAttMonth] = useState(months[0]);
+  const [salMonth, setSalMonth] = useState(months[0]);
+
   return (
     <div className="min-h-screen flex flex-col bg-gray-100">
-              <div className="flex-1 h-[calc(100vh-64px)] overflow-y-auto p-6 space-y-6 bg-gray-50">
-          <h2 className="text-2xl font-semibold mb-6">Payroll System</h2>
+        <div className="flex-1 p-4 overflow-y-auto bg-gray-50">
+          <div className="flex flex-col lg:flex-row gap-6 h-[calc(100vh-64px)]">
+            <Profile />
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Employee Info */}
-            <div className="bg-white p-6 rounded-2xl shadow col-span-1">
-              <div className="flex flex-col items-center text-center">
-                <img
-                  src="https://i.pravatar.cc/100?img=56"
-                  alt="Employee"
-                  className="w-24 h-24 rounded-full mb-4 shadow"
-                />
-                <h3 className="text-lg font-semibold">Jhon Doe</h3>
-                <p className="text-sm text-gray-500">UX Designer</p>
-              </div>
-
-              <div className="mt-6 space-y-3 text-sm">
-                <p>
-                  <span className="font-medium">Department:</span> Frontend
-                </p>
-                <p>
-                  <span className="font-medium">Salary:</span>{" "}
-                  <span className="text-green-600 font-bold">₹40,000</span>
-                </p>
-                <p>
-                  <span className="font-medium">Work Shift:</span> Regular
-                </p>
-                <p>
-                  <span className="font-medium">Joining Date:</span>{" "}
-                  12 February 2023
-                </p>
-                <hr className="my-2" />
-                <div className="pt-2 space-y-2 text-gray-600">
-                  <p className="flex items-center gap-2">
-                    <FaEnvelope className="text-gray-500" />
-                    alwissuryatmaja@gmail.com
-                  </p>
-                  <p className="flex items-center gap-2">
-                    <FaPhone className="text-gray-500" /> +91 9854658741
-                  </p>
-                  <p className="flex items-center gap-2">
-                    <FaGlobe className="text-gray-500" />
-                    <a
-                      href="https://bit.ly/3uOJF79"
-                      className="text-blue-600 underline"
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      bit.ly/3uOJF79
-                    </a>
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Monthly Salary Section */}
-            <div className="bg-white p-6 rounded-2xl shadow col-span-2">
-              <div className="flex justify-between items-center">
-                <h3 className="text-lg font-semibold text-gray-700">
-                  Monthly Status › April
-                </h3>
-                <button className="border px-3 py-1 rounded text-sm hover:bg-gray-100">
-                  📅 Select Month
-                </button>
-              </div>
-
-              {/* Status Summary */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center mt-6">
-                <div>
-                  <p className="text-xl font-bold text-gray-800">28</p>
-                  <p className="text-sm text-gray-500">Working Days</p>
-                </div>
-                <div>
-                  <p className="text-xl font-bold text-gray-800">24</p>
-                  <p className="text-sm text-gray-500">Days Present</p>
-                </div>
-                <div>
-                  <p className="text-xl font-bold text-green-600">2</p>
-                  <p className="text-sm text-green-600">Paid Leaves</p>
-                </div>
-                <div>
-                  <p className="text-xl font-bold text-red-500">2</p>
-                  <p className="text-sm text-red-500">Unpaid Leaves</p>
-                </div>
-              </div>
-
-              {/* Salary Breakdown */}
-              <div className="mt-6 border rounded-xl overflow-hidden">
-                <table className="w-full text-sm">
-                  <tbody>
-                    <tr className="border-b">
-                      <td className="p-3 font-medium">Total Salary</td>
-                      <td className="p-3 text-right">₹40,000</td>
-                    </tr>
-                    <tr className="border-b text-red-600">
-                      <td className="p-3">TDS (10%)</td>
-                      <td className="p-3 text-right">- ₹4,000</td>
-                    </tr>
-                    <tr className="border-b text-red-600">
-                      <td className="p-3">SPF Fund (5%)</td>
-                      <td className="p-3 text-right">- ₹2,000</td>
-                    </tr>
-                    <tr className="border-b text-red-600">
-                      <td className="p-3">Unpaid Leave (2 Days)</td>
-                      <td className="p-3 text-right">- ₹2,200</td>
-                    </tr>
-                    <tr className="border-b font-bold bg-gray-50">
-                      <td className="p-3">Total Paid Salary</td>
-                      <td className="p-3 text-right text-gray-800">
-                        ₹35,800
-                      </td>
-                    </tr>
-                    <tr className="bg-green-50 font-semibold">
-                      <td className="p-3">Salary Status</td>
-                      <td className="p-3 text-right text-green-600">Paid</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Download Button */}
-              <div className="mt-4 flex justify-end">
-                <button className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2 shadow-md">
-                  <FaDownload /> Download Slip
-                </button>
-              </div>
-            </div>
           </div>
         </div>
     </div>
   );
 };
 
-export default PayrollSystem;
+const Profile = () =>{
+  const {id}=useParams();      
+  console.log(id)
+  const dispatch = useDispatch();
+  const usersdata = useSelector((state) => state.auth.usersdata);
+  console.log(usersdata)
+  const [employee,setEmployee]=useState(null)
+console.log("1. Profile rendered");
+useEffect(()=>{
+if (usersdata[id]){
+  console.log("Loaded from cache",usersdata)
+    console.log("2. Profile useEffect triggered");
+  setEmployee(usersdata[id])
+}else{
+const FetchEmployee= async()=>{
+  try{
+  
+    
+    const response= await fetch(`https://attendance-and-payroll-management.onrender.com/api/users/${id}`);
+    
+      if(!response.ok){
+            throw new Error("Failed to fetch employees");
+      }
+       const data=await response.json()
+       setEmployee(data.user)
+       dispatch(cacheUser({ id, userData: data.user }));
+       console.log('Fetching the data from api')
+         
+  }catch(error){
+  console.error("Error fetching employees:", error);
+  }
+}
+FetchEmployee();
+};
+},[id,dispatch,cacheUser])
+
+ if (!employee) return <p>Loading...</p>;
+console.log(employee)
+
+  return (
+ <div className="bg-white w-full lg:w-1/5 rounded-2xl shadow-md p-6 text-sm text-gray-700 space-y-6">
+  {/* Profile Header */}
+  <div className="flex flex-col items-center text-center">
+      <img src="https://i.pravatar.cc/100?img=56" alt="Employee" className="w-24 h-24 rounded-full mb-4 shadow" />
+      <h3 className="text-lg font-semibold">{employee.username}</h3>
+      <p className="text-sm text-gray-500">UX Designer</p>
+    </div>
+
+  {/* Info Section */}
+  <div>
+    <h4 className="text-xs font-semibold text-gray-500 mb-3">Info</h4>
+    <div className="space-y-4">
+      <div className="flex items-start gap-3">
+        <div className="p-2 bg-gray-100 rounded-md">
+        <FaEnvelope className="text-gray-500 mt-1" />
+        </div>
+        <div>
+          <p className="text-sm font-medium">Admin & HRM</p>
+          <p className="text-xs text-gray-400">Department</p>
+        </div>
+      </div>
+
+      <div className="flex items-start gap-3">
+        <div className="p-2 bg-gray-100 rounded-md">
+        <FaRupeeSign className="text-gray-500 mt-1" />
+        </div>
+        <div>
+          <p className="text-sm font-medium text-green-600">₹40,000</p>
+          <p className="text-xs text-gray-400">Salary</p>
+        </div>
+      </div>
+
+      <div className="flex items-start gap-3">
+        <div className="p-2 bg-gray-100 rounded-md">
+        <FaRegClock  className="text-gray-500 mt-1" />
+        </div>
+        <div>
+          <p className="text-sm font-medium">Regular</p>
+          <p className="text-xs text-gray-400">Work Shift</p>
+        </div>
+      </div>
+
+      <div className="flex items-start gap-3">
+        <div className="p-2 bg-gray-100 rounded-md">
+          <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" strokeWidth="2"
+               viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round"
+               d="M8 7V3m8 4V3m-9 8h10m-10 4h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+        </div>
+        <div>
+          <p className="text-sm font-medium">12 February 2023</p>
+          <p className="text-xs text-gray-400">Joining Date</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {/* Contact Section */}
+  <div>
+    <h4 className="text-xs font-semibold text-gray-500 mb-3">Contact</h4>
+    <div className="space-y-3">
+      <div className="flex items-start gap-3">
+        <FaEnvelope className="text-gray-500 mt-1" />
+        <div>
+          <p className="text-xs text-gray-500">Email</p>
+          <p className="text-sm">alwissuryatmaja@gmail.com</p>
+        </div>
+      </div>
+
+      <div className="flex items-start gap-3">
+        <FaPhone className="text-gray-500 mt-1" />
+        <div>
+          <p className="text-xs text-gray-500">Phone</p>
+          <p className="text-sm">+6282283386756</p>
+        </div>
+      </div>
+
+      <div className="flex items-start gap-3">
+        <FaGlobe className="text-gray-500 mt-1" />
+        <div>
+          <p className="text-xs text-gray-500">Website</p>
+          <a href="https://bit.ly/3uOJF79" className="text-sm text-blue-600 underline">
+            https://bit.ly/3uOJF79
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+)};
+
+
+
+
+
+export default PayrollPage;
