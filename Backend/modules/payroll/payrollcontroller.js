@@ -1,5 +1,22 @@
 const { getDB } = require("../../config/db");
 
+const usersalarybyitsid = async(req,res) =>{
+  const db=getDB();
+
+  const {id}=req.params;
+  console.log("id recieved is",id);
+  try{
+    const user=await db.collection('SalaryInfo').findOne(
+      {employee_id:id}
+    )
+    if(!user) return res.status(404).json({ message: 'User not found' });
+    res.status(200).json({ message: 'User fetched successfully', user });
+  }
+  catch(error){
+    console.error('Error fetching user by ID:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+}
 const GenerateSlip = async (req, res) => {
   const db = getDB();
   const { user_id, month } = req.body;
@@ -124,4 +141,4 @@ const Updatesalaryinfo= async (req,res) =>{
 }
 
 
-module.exports= {GenerateSlip,Addsalaryinfo,Updatesalaryinfo};
+module.exports= {GenerateSlip,Addsalaryinfo,Updatesalaryinfo,usersalarybyitsid};
