@@ -79,7 +79,7 @@ if (usersdata[id]){
     console.log("2. Profile useEffect triggered");
   setEmployee(usersdata[id])
 }else{
-const FetchEmployee= async()=>{
+const FetchEmployee = async()=>{
   try{
   
     
@@ -198,62 +198,75 @@ console.log(employee)
 
 function InfoTab() {
   const { id } = useParams();
-  const userFromStore = useSelector((state) => state.auth.usersdata[id]);
+
   const [employee, setEmployee] = useState(null);
-console.log("3. InfoTab rendered");
-  useEffect(() => {
-    if (userFromStore) {
-      setEmployee(userFromStore);
-      console.log("Fatching data from cach in info tab")
-        console.log("4. InfoTab useEffect triggered (cache check)");
+
+  useEffect(()=>{
+if(!id){
+  console.log("Failed to fetch the user")
+}else{
+ 
+    const fetchsalaryinfo = async ()=>{
+      try{
+        const response= await fetch(`http://localhost:5500/api/usersalaryinfo/${id}`)
+         if(!response.ok){
+            throw new Error("Failed to fetch employees");
+      }
+
+                const data=await response.json()
+                setEmployee(data)
+                console.log("Salaryinfo data is",data)
+      }catch(error){
+        console.log("Error fo fetching user",error)
+      }
     }
-  }, [userFromStore]);
+    fetchsalaryinfo()
+}
+  },[id])
+
+
 
   if (!employee) return <p>Loading...</p>;
 
   return (
     <div className="space-y-6 text-gray-700">
-      <h3 className="text-xl font-semibold border-b pb-2">Personal & Official Information</h3>
+      <h3 className="text-xl font-semibold border-b pb-2">User {employee.user_id} Salary Info</h3>
 
       {/* Personal Info */}
       <div>
         <h4 className="text-md font-semibold mb-2 text-indigo-600">👤 Personal Details</h4>
         <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
-          <p><span className="font-medium">Full Name:</span> {employee.username}</p>
-          <p><span className="font-medium">Date of Birth:</span> 20 May 1997</p>
-          <p><span className="font-medium">Gender:</span> Male</p>
-          <p><span className="font-medium">Blood Group:</span> B+</p>
-          <p><span className="font-medium">Marital Status:</span> Single</p>
+          <p><span className="font-medium">Full Name:</span> {employee.employee_name}</p>
+          <p><span className="font-medium">Employee ID:</span> {employee.employee_id}</p>
+           <p><span className="font-medium">Base Salary:</span> {employee.base_salary}</p>
+           <p><span className="font-medium">Joining Date:</span> {employee.joining_date}</p>
         </div>
       </div>
 
-      {/* Contact Info */}
+      {/* Bouns Info */}
       <div>
-        <h4 className="text-md font-semibold mb-2 text-indigo-600">📞 Contact Information</h4>
+        <h4 className="text-md font-semibold mb-2 text-indigo-600">💰 Bouns</h4>
         <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
-          <p><span className="font-medium">Phone:</span> {employee.phone || 'N/A'}</p>
-          <p><span className="font-medium">Email:</span> {employee.email || 'N/A'}</p>
-          <p className="col-span-2"><span className="font-medium">Address:</span> {employee.address || 'N/A'}</p>
+          <p><span className="font-medium">Bouns:</span> {employee.bonus}</p>
+          <p><span className="font-medium">HRA:</span> {employee.hra}</p>
         </div>
       </div>
 
-      {/* Job Info */}
+      {/* Deductions Info */}
       <div>
-        <h4 className="text-md font-semibold mb-2 text-indigo-600">💼 Job Details</h4>
+        <h4 className="text-md font-semibold mb-2 text-indigo-600">➖ Deductions</h4>
         <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
-          <p><span className="font-medium">Employee ID:</span> {employee.user_id}</p>
-          <p><span className="font-medium">Department:</span> Frontend</p>
-          <p><span className="font-medium">Designation:</span> {employee.employee_role}</p>
-          <p><span className="font-medium">Joining Date:</span> 12 Feb 2023</p>
+          <p><span className="font-medium">Tax Percent:</span>{employee.tax_percent} </p>
+          <p><span className="font-medium">PF Percent:</span> {employee.pf_percent}</p>
         </div>
       </div>
 
-      {/* Emergency Info */}
+      {/* Last Updates*/}
       <div>
-        <h4 className="text-md font-semibold mb-2 text-indigo-600">🚨 Emergency Contact</h4>
+        <h4 className="text-md font-semibold mb-2 text-indigo-600">➖ Deductions</h4>
         <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
-          <p><span className="font-medium">Name:</span> Rahul Doe</p>
-          <p><span className="font-medium">Contact:</span> +91 9999999999</p>
+          <p><span className="font-medium">Last update:</span> {new Date(employee.last_update).toISOString().split("T")[0]} </p>
+          <p><span className="font-medium">Updated By:</span> {employee.pf_percent}</p>
         </div>
       </div>
     </div>
