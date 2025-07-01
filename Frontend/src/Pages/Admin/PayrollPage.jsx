@@ -249,14 +249,13 @@ if(!id){
       <div>
         <h4 className="text-md font-semibold mb-2 text-indigo-600">🔄 Updates</h4>
         <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
-          <p><span className="font-medium">Last update:</span> {new Date(employee.last_update).toISOString().split("T")[0]} </p>
+          {/* <p><span className="font-medium">Last update:</span> {new Date(employee.last_update).toISOString().split("T")[0]} </p> */}
           <p><span className="font-medium">Updated By:</span> {employee.updated_by}</p>
         </div>
       </div>
     </div>
   );
 }
-
 
 
 
