@@ -30,8 +30,6 @@ const salaryData = {
 
 const PayrollPage = () => {
   const [tab, setTab] = useState("usersalaryinfo");
-  const [attMonth, setAttMonth] = useState(months[0]);
-  const [salMonth, setSalMonth] = useState(months[0]);
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-100">
@@ -55,8 +53,6 @@ const PayrollPage = () => {
 
               <div className="flex-1 overflow-y-auto">
                 {tab === "usersalaryinfo" && <InfoTab />} 
-
-
               </div>
             </div>
           </div>
@@ -146,18 +142,6 @@ console.log(employee)
           <p className="text-xs text-gray-400">Work Shift</p>
         </div>
       </div>
-
-      <div className="flex items-start gap-3">
-        <div className="p-2 bg-gray-100 rounded-md">
-          <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" strokeWidth="2"
-               viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round"
-               d="M8 7V3m8 4V3m-9 8h10m-10 4h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-        </div>
-        <div>
-          <p className="text-sm font-medium">12 February 2023</p>
-          <p className="text-xs text-gray-400">Joining Date</p>
-        </div>
-      </div>
     </div>
   </div>
 
@@ -169,7 +153,7 @@ console.log(employee)
         <FaEnvelope className="text-gray-500 mt-1" />
         <div>
           <p className="text-xs text-gray-500">Email</p>
-          <p className="text-sm">alwissuryatmaja@gmail.com</p>
+          <p className="text-sm">{employee.email}</p>
         </div>
       </div>
 
@@ -177,7 +161,7 @@ console.log(employee)
         <FaPhone className="text-gray-500 mt-1" />
         <div>
           <p className="text-xs text-gray-500">Phone</p>
-          <p className="text-sm">+6282283386756</p>
+          <p className="text-sm">{employee.mobile}</p>
         </div>
       </div>
 
@@ -200,7 +184,7 @@ function InfoTab() {
   const { id } = useParams();
 
   const [employee, setEmployee] = useState(null);
-
+  const [message,setMessage]=useState("Loading...")
   useEffect(()=>{
 if(!id){
   console.log("Failed to fetch the user")
@@ -210,7 +194,9 @@ if(!id){
       try{
         const response= await fetch(`http://localhost:5500/api/usersalaryinfo/${id}`)
          if(!response.ok){
+            setMessage("Salary data is not found for this user please add the user info.")
             throw new Error("Failed to fetch employees");
+           
       }
 
                 const data=await response.json()
@@ -224,9 +210,7 @@ if(!id){
 }
   },[id])
 
-
-
-  if (!employee) return <p>Loading...</p>;
+ if (!employee) return <p>{message}</p>;
 
   return (
     <div className="space-y-6 text-gray-700">
@@ -263,10 +247,10 @@ if(!id){
 
       {/* Last Updates*/}
       <div>
-        <h4 className="text-md font-semibold mb-2 text-indigo-600">➖ Deductions</h4>
+        <h4 className="text-md font-semibold mb-2 text-indigo-600">🔄 Updates</h4>
         <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
           <p><span className="font-medium">Last update:</span> {new Date(employee.last_update).toISOString().split("T")[0]} </p>
-          <p><span className="font-medium">Updated By:</span> {employee.pf_percent}</p>
+          <p><span className="font-medium">Updated By:</span> {employee.updated_by}</p>
         </div>
       </div>
     </div>
