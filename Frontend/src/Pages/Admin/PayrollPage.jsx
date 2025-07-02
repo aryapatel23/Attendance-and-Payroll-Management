@@ -163,6 +163,9 @@ function InfoTab() {
 
   const [employee, setEmployee] = useState(null);
   const [message,setMessage]=useState("Loading...")
+  const [showModal, setShowModal] = useState(false);
+  const [formMode, setFormMode] = useState("add"); // or "update"
+  const [selectedEmployeeData, setSelectedEmployeeData] = useState(null);
   useEffect(()=>{
 if(!id){
   console.log("Failed to fetch the user")
@@ -218,8 +221,8 @@ if(!id){
       <div>
         <h4 className="text-md font-semibold mb-2 text-indigo-600">➖ Deductions</h4>
         <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
-          <p><span className="font-medium">Tax Percent:</span>{employee.tax_percent} </p>
-          <p><span className="font-medium">PF Percent:</span> {employee.pf_percent}</p>
+          <p><span className="font-medium">Tax Percent:</span>{employee.tax_percent}%</p>
+          <p><span className="font-medium">PF Percent:</span> {employee.pf_percent}%</p>
         </div>
       </div>
 
@@ -231,12 +234,42 @@ if(!id){
           <p><span className="font-medium">Updated By:</span> {employee.updated_by}</p>
         </div>
       </div>
+
+<button
+  onClick={() => {
+    setFormMode("add");
+    setSelectedEmployeeData(null);
+    setShowModal(true);
+  }}
+  className="px-4 py-2 bg-green-600 text-white rounded"
+>
+  ➕ Add Salary Info
+</button>
+
+<button
+  onClick={() => {
+    setFormMode("update");
+    setSelectedEmployeeData(employee); // existing salary object
+    setShowModal(true);
+  }}
+  className="px-4 py-2 bg-yellow-500 text-white rounded ml-3"
+>
+  ✏️ Update Salary Info
+</button>
+{showModal && (
+  <SalaryModal
+    mode={formMode}
+    employeeId={id}
+    defaultData={formMode === "update" ? selectedEmployeeData : {}}
+    onClose={() => setShowModal(false)}
+  />
+)}
     </div>
   );
 }
 
-const SalaryMOdal=({ mode = "add", employeeId, defaultData = {}, onClose})=>{
-  const [formData,setFormData]=useState({
+const SalaryModal = ({ mode = "add", employeeId, defaultData = {}, onClose }) => {
+  const [formData, setFormData] = useState({
     employee_id: "",
     employee_name: "",
     base_salary: "",
@@ -245,24 +278,25 @@ const SalaryMOdal=({ mode = "add", employeeId, defaultData = {}, onClose})=>{
     tax_percent: "",
     pf_percent: "",
     joining_date: "",
-    updated_by: "Rajesh",
+    updated_by: "admin@company.com",
   });
 
-  const [message,setMessage]=useState("");
+  const [message, setMessage] = useState("");
 
-  useEffect(()=>{
-if(mode==="update" && defaultData){
-  setFormData({...defaultData})
-}else{
-  setFormData((prev)=>({...prev,employee_id:employeeId}))
-}
-  },[defaultData,mode,employeeId]);
+  // Pre-fill form for update
+  useEffect(() => {
+    if (mode === "update" && defaultData) {
+      setFormData({ ...defaultData });
+    } else {
+      setFormData((prev) => ({ ...prev, employee_id: employeeId }));
+    }
+  }, [defaultData, mode, employeeId]);
 
-  const handelchange=()=>{
-    setFormData({...formData,[e.target.name]:e.target.value})
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const url =
@@ -293,6 +327,37 @@ const handleSubmit = async (e) => {
       setMessage(err.message);
     }
   };
-}
+
+  return (
+    <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center px-4">
+      <div className="bg-white max-w-2xl w-full rounded-xl shadow-xl p-6 relative max-h-[90vh] overflow-y-auto">
+        <button onClick={onClose} className="absolute top-3 right-4 text-lg text-gray-500 hover:text-red-600">✖</button>
+
+        <h2 className="text-xl font-semibold mb-4 text-center">
+          {mode === "add" ? "Add Salary Info" : "Update Salary Info"}
+        </h2>
+
+        <form onSubmit={handleSubmit} className="space-y-3 text-sm">
+          <div className="grid grid-cols-2 gap-3">
+            <input type="text" name="employee_id" value={formData.employee_id} onChange={handleChange} placeholder="Employee ID" disabled={mode === "update"} className="border p-2 rounded" />
+            <input type="text" name="employee_name" value={formData.employee_name} onChange={handleChange} placeholder="Employee Name" className="border p-2 rounded" />
+            <input type="number" name="base_salary" value={formData.base_salary} onChange={handleChange} placeholder="Base Salary" className="border p-2 rounded" />
+            <input type="number" name="hra" value={formData.hra} onChange={handleChange} placeholder="HRA" className="border p-2 rounded" />
+            <input type="number" name="bonus" value={formData.bonus} onChange={handleChange} placeholder="Bonus" className="border p-2 rounded" />
+            <input type="number" name="tax_percent" value={formData.tax_percent} onChange={handleChange} placeholder="Tax %" className="border p-2 rounded" />
+            <input type="number" name="pf_percent" value={formData.pf_percent} onChange={handleChange} placeholder="PF %" className="border p-2 rounded" />
+            <input type="date" name="joining_date" value={formData.joining_date} onChange={handleChange} placeholder="Joining Date" className="border p-2 rounded" />
+          </div>
+
+          <button type="submit" className="w-full mt-4 bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
+            {mode === "add" ? "Add Info" : "Update Info"}
+          </button>
+        </form>
+
+        {message && <p className="text-center text-sm mt-3 text-green-600">{message}</p>}
+      </div>
+    </div>
+  );
+};
 
 export default PayrollPage;
