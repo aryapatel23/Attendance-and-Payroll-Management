@@ -98,26 +98,60 @@ try {
 
 };
 
-const Addsalaryinfo= async (req,res) =>{
-    const db = getDB();
-  const {employee_id,employee_name,base_salary,hra,bonus,tax_percent,pf_percent,joining_date,updated_by}=req.body;
-  const nowIST = new Date(new Date().getTime() + 5.5 * 60 * 60 * 1000);
-  const today = nowIST.toISOString().split("T")[0];
+const Addsalaryinfo = async (req, res) => {
+  const db = getDB();
+  const {
+    employee_id,
+    employee_name,
+    base_salary,
+    hra,
+    bonus,
+    tax_percent,
+    pf_percent,
+    joining_date,
+    updated_by
+  } = req.body;
 
-  const result=await db.collection('SalaryInfo').insertOne({
-     employee_id,
-     employee_name,
-     base_salary,
-     hra,
-     bonus,
-     tax_percent,
-     pf_percent,
-     joining_date,
-     last_update:nowIST,
-     updated_by
-  })
-  return res.json({message:"Data inserted sucessfully",result})
-}
+  // 1. Basic validation
+  if (!employee_id || !employee_name || !base_salary || !joining_date || !updated_by) {
+    return res.status(400).json({ message: "Missing required fields." });
+  }
+
+  try {
+    // 2. Check if salary info already exists
+    const existing = await db.collection('SalaryInfo').findOne({ employee_id });
+    if (existing) {
+      return res.status(409).json({ message: "Salary info already exists for this employee." });
+    }
+
+    // 3. Current IST timestamp
+    const nowIST = new Date(new Date().getTime() + 5.5 * 60 * 60 * 1000);
+
+    // 4. Insert new record
+    const result = await db.collection('SalaryInfo').insertOne({
+      employee_id,
+      employee_name,
+      base_salary,
+      hra,
+      bonus,
+      tax_percent,
+      pf_percent,
+      joining_date,
+      last_update: nowIST,
+      updated_by
+    });
+
+    return res.status(201).json({
+      message: "Salary info added successfully.",
+      insertedId: result.insertedId
+    });
+
+  } catch (error) {
+    console.error("Error adding salary info:", error);
+    return res.status(500).json({ message: "Server error while adding salary info." });
+  }
+};
+
 
 const Updatesalaryinfo = async (req, res) => {
   const db = getDB();
