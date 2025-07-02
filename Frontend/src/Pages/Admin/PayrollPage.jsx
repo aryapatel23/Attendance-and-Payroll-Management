@@ -106,7 +106,8 @@ console.log(employee)
         <FaRupeeSign className="text-gray-500 mt-1" />
         </div>
         <div>
-          <p className="text-sm font-medium text-green-600">₹40,000</p>
+          <p className="text-sm font-medium text-green-600">{employee.
+salary}</p>
           <p className="text-xs text-gray-400">Salary</p>
         </div>
       </div>
