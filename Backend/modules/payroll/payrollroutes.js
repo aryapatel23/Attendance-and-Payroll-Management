@@ -4,8 +4,8 @@ const{GenerateSlip,Addsalaryinfo,Updatesalaryinfo,usersalarybyitsid}=require('./
 const router = express.Router();
 
 router.post("/Generate",GenerateSlip)
-router.post("/AddSlaryinfo",Addsalaryinfo)
-router.post("/Updatesalaryinfo",Updatesalaryinfo)
+router.post("/usersalaryinfo/add",Addsalaryinfo)
+router.put("/usersalaryinfo/update",Updatesalaryinfo)
 router.get("/usersalaryinfo/:id",usersalarybyitsid)
 
 module.exports = router;

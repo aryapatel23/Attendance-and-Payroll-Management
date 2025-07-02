@@ -1,32 +1,10 @@
 import React, { useState,useEffect } from "react";
 import { FaDownload, FaEnvelope, FaPhone, FaGlobe, FaCalendarAlt,FaRupeeSign,FaRegClock } from "react-icons/fa";
-import { CgProfile } from "react-icons/cg";
-import { Bar } from "react-chartjs-2";
 import "chart.js/auto";
 import { useParams } from "react-router-dom";
 import { useSelector, useDispatch } from 'react-redux';
 import {cacheUser} from '../../Redux/Slice'
 
-const months = ["April 2025", "May 2025"];
-
-const rawAttendance = {
-  "April 2025": [
-    ["2025-04-01", "Present", "09:00", "18:00"],
-    ["2025-04-02", "Present", "09:05", "18:05"],
-    ["2025-04-03", "Leave", "-", "-"],
-    ["2025-04-04", "Present", "09:10", "18:10"],
-  ],
-  "May 2025": [
-    ["2025-05-01", "Present", "09:00", "18:00"],
-    ["2025-05-02", "Absent", "-", "-"],
-    ["2025-05-03", "Present", "09:15", "18:15"],
-  ],
-};
-
-const salaryData = {
-  "April 2025": { total: 40000, tds: 4000, spf: 2000, unpaidLeave: 2200, paid: 35800, status: "Paid" },
-  "May 2025": { total: 42000, tds: 4200, spf: 2100, unpaidLeave: 0, paid: 35700, status: "Pending" },
-};
 
 const PayrollPage = () => {
   const [tab, setTab] = useState("usersalaryinfo");
@@ -257,6 +235,64 @@ if(!id){
   );
 }
 
+const SalaryMOdal=({ mode = "add", employeeId, defaultData = {}, onClose})=>{
+  const [formData,setFormData]=useState({
+    employee_id: "",
+    employee_name: "",
+    base_salary: "",
+    hra: "",
+    bonus: "",
+    tax_percent: "",
+    pf_percent: "",
+    joining_date: "",
+    updated_by: "Rajesh",
+  });
 
+  const [message,setMessage]=useState("");
+
+  useEffect(()=>{
+if(mode==="update" && defaultData){
+  setFormData({...defaultData})
+}else{
+  setFormData((prev)=>({...prev,employee_id:employeeId}))
+}
+  },[defaultData,mode,employeeId]);
+
+  const handelchange=()=>{
+    setFormData({...formData,[e.target.name]:e.target.value})
+  };
+
+const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const url =
+      mode === "add"
+        ? "http://localhost:5500/api/usersalaryinfo/add"
+        : "http://localhost:5500/api/usersalaryinfo/update";
+
+    const method = mode === "add" ? "POST" : "PUT";
+
+    try {
+      const response = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) throw new Error(result.message);
+
+      setMessage(result.message);
+      setTimeout(() => {
+        onClose(); // Close modal after success
+      }, 1000);
+    } catch (err) {
+      setMessage(err.message);
+    }
+  };
+}
 
 export default PayrollPage;
