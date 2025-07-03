@@ -159,115 +159,132 @@ salary}</p>
 
 )};
 
+
 function InfoTab() {
   const { id } = useParams();
 
   const [employee, setEmployee] = useState(null);
-  const [message,setMessage]=useState("Loading...")
+  const [message, setMessage] = useState("Loading...");
+  const [showAddButton, setShowAddButton] = useState(false);
+
   const [showModal, setShowModal] = useState(false);
-  const [formMode, setFormMode] = useState("add"); // or "update"
+  const [formMode, setFormMode] = useState("add");
   const [selectedEmployeeData, setSelectedEmployeeData] = useState(null);
-  useEffect(()=>{
-if(!id){
-  console.log("Failed to fetch the user")
-}else{
- 
-    const fetchsalaryinfo = async ()=>{
-      try{
-        const response= await fetch(`http://localhost:5500/api/usersalaryinfo/${id}`)
-         if(!response.ok){
-            setMessage("Salary data is not found for this user please add the user info.")
-            throw new Error("Failed to fetch employees");
-           
-      }
 
-                const data=await response.json()
-                setEmployee(data)
-                console.log("Salaryinfo data is",data)
-      }catch(error){
-        console.log("Error fo fetching user",error)
-      }
-    }
-    fetchsalaryinfo()
-}
-  },[id])
+  useEffect(() => {
+    if (!id) return;
 
- if (!employee) return <p>{message}</p>;
+    const fetchSalaryInfo = async () => {
+      try {
+        const response = await fetch(`http://localhost:5500/api/usersalaryinfo/${id}`);
+
+        if (!response.ok) {
+          setMessage("Salary data is not found for this user. Please add the user info.");
+          setShowAddButton(true);
+          return;
+        }
+
+        const data = await response.json();
+        setEmployee(data);
+        setShowAddButton(false);
+      } catch (error) {
+        console.error("Error fetching salary info:", error);
+        setMessage("Something went wrong while fetching salary info.");
+      }
+    };
+
+    fetchSalaryInfo();
+  }, [id]);
+
+  const openModal = (mode, data = null) => {
+    setFormMode(mode);
+    setSelectedEmployeeData(data);
+    setShowModal(true);
+  };
 
   return (
     <div className="space-y-6 text-gray-700">
-      <h3 className="text-xl font-semibold border-b pb-2">User {employee.user_id} Salary Info</h3>
+      {employee ? (
+        <>
+          <h3 className="text-xl font-semibold border-b pb-2">
+            User {employee.user_id} Salary Info
+          </h3>
 
-      {/* Personal Info */}
-      <div>
-        <h4 className="text-md font-semibold mb-2 text-indigo-600">👤 Personal Details</h4>
-        <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
-          <p><span className="font-medium">Full Name:</span> {employee.employee_name}</p>
-          <p><span className="font-medium">Employee ID:</span> {employee.employee_id}</p>
-           <p><span className="font-medium">Base Salary:</span> {employee.base_salary}</p>
-           <p><span className="font-medium">Joining Date:</span> {employee.joining_date}</p>
-        </div>
-      </div>
+          {/* Personal Info */}
+          <div>
+            <h4 className="text-md font-semibold mb-2 text-indigo-600">👤 Personal Details</h4>
+            <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
+              <p><span className="font-medium">Full Name:</span> {employee.employee_name}</p>
+              <p><span className="font-medium">Employee ID:</span> {employee.employee_id}</p>
+              <p><span className="font-medium">Base Salary:</span> ₹{employee.base_salary}</p>
+              <p><span className="font-medium">Joining Date:</span> {employee.joining_date}</p>
+            </div>
+          </div>
 
-      {/* Bouns Info */}
-      <div>
-        <h4 className="text-md font-semibold mb-2 text-indigo-600">💰 Bouns</h4>
-        <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
-          <p><span className="font-medium">Bouns:</span> {employee.bonus}</p>
-          <p><span className="font-medium">HRA:</span> {employee.hra}</p>
-        </div>
-      </div>
+          {/* Bonus Info */}
+          <div>
+            <h4 className="text-md font-semibold mb-2 text-indigo-600">💰 Bonus</h4>
+            <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
+              <p><span className="font-medium">Bonus:</span> ₹{employee.bonus}</p>
+              <p><span className="font-medium">HRA:</span> ₹{employee.hra}</p>
+            </div>
+          </div>
 
-      {/* Deductions Info */}
-      <div>
-        <h4 className="text-md font-semibold mb-2 text-indigo-600">➖ Deductions</h4>
-        <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
-          <p><span className="font-medium">Tax Percent:</span>{employee.tax_percent}%</p>
-          <p><span className="font-medium">PF Percent:</span> {employee.pf_percent}%</p>
-        </div>
-      </div>
+          {/* Deductions Info */}
+          <div>
+            <h4 className="text-md font-semibold mb-2 text-indigo-600">➖ Deductions</h4>
+            <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
+              <p><span className="font-medium">Tax Percent:</span> {employee.tax_percent}%</p>
+              <p><span className="font-medium">PF Percent:</span> {employee.pf_percent}%</p>
+            </div>
+          </div>
 
-      {/* Last Updates*/}
-      <div>
-        <h4 className="text-md font-semibold mb-2 text-indigo-600">🔄 Updates</h4>
-        <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
-          {/* <p><span className="font-medium">Last update:</span> {new Date(employee.last_update).toISOString().split("T")[0]} </p> */}
-          <p><span className="font-medium">Updated By:</span> {employee.updated_by}</p>
-        </div>
-      </div>
+          {/* Updates */}
+          <div>
+            <h4 className="text-md font-semibold mb-2 text-indigo-600">🔄 Updates</h4>
+            <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
+              <p><span className="font-medium">Updated By:</span> {employee.updated_by}</p>
+            </div>
+          </div>
 
-<button
-  onClick={() => {
-    setFormMode("add");
-    setSelectedEmployeeData(null);
-    setShowModal(true);
-  }}
-  className="px-4 py-2 bg-green-600 text-white rounded"
->
-  ➕ Add Salary Info
-</button>
+          {/* Buttons */}
+          <div className="pt-4">
+            <button
+              onClick={() => openModal("update", employee)}
+              className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+            >
+              ✏️ Update Salary Info
+            </button>
+          </div>
+        </>
+      ) : (
+        <>
+          <p className="text-red-600 font-medium">{message}</p>
 
-<button
-  onClick={() => {
-    setFormMode("update");
-    setSelectedEmployeeData(employee); // existing salary object
-    setShowModal(true);
-  }}
-  className="px-4 py-2 bg-yellow-500 text-white rounded ml-3"
->
-  ✏️ Update Salary Info
-</button>
-{showModal && (
-  <SalaryModal
-    mode={formMode}
-    employeeId={id}
-    defaultData={formMode === "update" ? selectedEmployeeData : {}}
-    onClose={() => setShowModal(false)}
-  />
-)}
+          {showAddButton && (
+            <button
+              onClick={() => openModal("add")}
+              className="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+            >
+              ➕ Add Salary Info
+            </button>
+          )}
+        </>
+      )}
+
+      {/* Modal */}
+      {showModal && (
+        <SalaryModal
+          mode={formMode}
+          employeeId={id}
+          defaultData={formMode === "update" ? selectedEmployeeData : {}}
+          onClose={() => setShowModal(false)}
+        />
+      )}
     </div>
   );
 }
+
 
 const SalaryModal = ({ mode = "add", employeeId, defaultData = {}, onClose }) => {
   const [formData, setFormData] = useState({

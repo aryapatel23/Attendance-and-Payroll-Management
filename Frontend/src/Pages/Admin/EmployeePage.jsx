@@ -366,7 +366,7 @@ useEffect(() => {
 
   fetchSalary();
 }, [selectedMonth, selectedYear, user_id]);
-
+console.log("recieve data is, in data variable",data)
 
   const toggleOpen = (index) => {
     setOpenIndex(openIndex === index ? null : index);
@@ -403,7 +403,7 @@ useEffect(() => {
   return (
     <div className="min-h-screen flex flex-col ">
       <div className="flex-1 p-6 overflow-auto">
-        <h1 className="text-2xl font-bold text-gray-800 mb-6">Salary info</h1>
+        <h1 className="text-2xl font-bold text-gray-800 mb-6">Salary Info Of User {id}</h1>
 
         {/* Filter Section */}
         <div className="flex flex-wrap gap-4 mb-6">
