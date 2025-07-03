@@ -200,7 +200,7 @@ function InfoTab() {
     setFormMode(mode);
     setSelectedEmployeeData(data);
     setShowModal(true);
-  };
+  };  
 
   return (
     <div className="space-y-6 text-gray-700">
@@ -244,6 +244,7 @@ function InfoTab() {
             <h4 className="text-md font-semibold mb-2 text-indigo-600">🔄 Updates</h4>
             <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
               <p><span className="font-medium">Updated By:</span> {employee.updated_by}</p>
+               <p><span className="font-medium">Last Update:</span> {(employee.last_update).split("T")[0]}</p>
             </div>
           </div>
 
@@ -287,6 +288,8 @@ function InfoTab() {
 
 
 const SalaryModal = ({ mode = "add", employeeId, defaultData = {}, onClose }) => {
+    const user = useSelector((state) => state.auth.user);
+    console.log("Hr data is",user.username)
   const [formData, setFormData] = useState({
     employee_id: "",
     employee_name: "",
@@ -296,10 +299,11 @@ const SalaryModal = ({ mode = "add", employeeId, defaultData = {}, onClose }) =>
     tax_percent: "",
     pf_percent: "",
     joining_date: "",
-    updated_by: "admin@company.com",
+    updated_by: user.username,
   });
 
   const [message, setMessage] = useState("");
+  
 
   // Pre-fill form for update
   useEffect(() => {
@@ -357,7 +361,7 @@ const SalaryModal = ({ mode = "add", employeeId, defaultData = {}, onClose }) =>
 
         <form onSubmit={handleSubmit} className="space-y-3 text-sm">
           <div className="grid grid-cols-2 gap-3">
-            <input type="text" name="employee_id" value={formData.employee_id} onChange={handleChange} placeholder="Employee ID" disabled={mode === "update"} className="border p-2 rounded" />
+            <input type="text" name="employee_id" value={formData.employee_id} onChange={handleChange} placeholder="Employee ID" disabled={mode === "update" || mode==="add"} className="border p-2 rounded" />
             <input type="text" name="employee_name" value={formData.employee_name} onChange={handleChange} placeholder="Employee Name" className="border p-2 rounded" />
             <input type="number" name="base_salary" value={formData.base_salary} onChange={handleChange} placeholder="Base Salary" className="border p-2 rounded" />
             <input type="number" name="hra" value={formData.hra} onChange={handleChange} placeholder="HRA" className="border p-2 rounded" />
@@ -365,6 +369,8 @@ const SalaryModal = ({ mode = "add", employeeId, defaultData = {}, onClose }) =>
             <input type="number" name="tax_percent" value={formData.tax_percent} onChange={handleChange} placeholder="Tax %" className="border p-2 rounded" />
             <input type="number" name="pf_percent" value={formData.pf_percent} onChange={handleChange} placeholder="PF %" className="border p-2 rounded" />
             <input type="date" name="joining_date" value={formData.joining_date} onChange={handleChange} placeholder="Joining Date" className="border p-2 rounded" />
+            <input type="text" name="updated_by" value={formData.updated_by} onChange={handleChange} placeholder="updated_by" disabled={mode === "update" || mode==="add"} className="border p-2 rounded" />
+            
           </div>
 
           <button type="submit" className="w-full mt-4 bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
