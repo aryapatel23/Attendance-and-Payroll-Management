@@ -1,7 +1,6 @@
 import React, { useState,useEffect } from "react";
 import { FaDownload, FaEnvelope, FaPhone, FaGlobe, FaCalendarAlt,FaRupeeSign,FaRegClock } from "react-icons/fa";
 import { CgProfile } from "react-icons/cg";
-import { Bar } from "react-chartjs-2";
 import "chart.js/auto";
 import { useParams } from "react-router-dom";
 import { useSelector, useDispatch } from 'react-redux';
@@ -17,6 +16,17 @@ import {
   Minus,
 } from "lucide-react";
 import { Transition } from "@headlessui/react";
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+  Legend,
+  Cell,
+} from 'recharts';
 
 const months = ["April 2025", "May 2025"];
 
@@ -62,7 +72,7 @@ const EmployeeDashboard = () => {
               <div className="flex-1 overflow-y-auto">
                 {tab === "userinfo" && <InfoTab />}
                 {tab === "attendance" && (
-                  <AttendanceTab month={attMonth} setMonth={setAttMonth} />
+                  <Attendance/>
                 )}
                 {tab === "salary" && <Salary/>}
               </div>
@@ -268,60 +278,7 @@ console.log("3. InfoTab rendered");
   );
 }
 
-function AttendanceTab({ month, setMonth }) {
-  const data = rawAttendance[month] || [];
-  const total = data.length;
-  const present = data.filter((r) => r[1] === "Present").length;
-  const leave = data.filter((r) => r[1] === "Leave").length;
-  const absent = data.filter((r) => r[1] === "Absent").length;
 
-  const chartData = {
-    labels: ["Present", "Leave", "Absent"],
-    datasets: [{ label: "Days", data: [present, leave, absent], backgroundColor: ["#22c55e","#f97316","#ef4444"] }],
-  };
-
-  return (
-    <div className="space-y-4 text-gray-700">
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold">Attendance - {month}</h3>
-        <select
-          value={month}
-          onChange={(e) => setMonth(e.target.value)}
-          className="border px-2 py-1 rounded flex items-center"
-        >
-          {months.map((m) => (
-            <option key={m}>{m}</option>
-          ))}
-        </select>
-      </div>
-
-      <Bar data={chartData} />
-
-      <table className="w-full text-sm border rounded-lg overflow-hidden">
-        <thead className="bg-gray-100">
-          <tr>
-            <th className="p-3">Date</th>
-            <th className="p-3">Status</th>
-            <th className="p-3">Check-In</th>
-            <th className="p-3">Check-Out</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((r, i) => (
-            <tr key={i} className="border-b">
-              <td className="p-3">{r[0]}</td>
-              <td className={`p-3 ${r[1] === "Leave" ? "text-orange-600" : r[1] === "Absent" ? "text-red-600" : "text-green-600"}`}>
-                {r[1]}
-              </td>
-              <td className="p-3">{r[2]}</td>
-              <td className="p-3">{r[3]}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
 
 const Salary = () => {
   const [openIndex, setOpenIndex] = useState(null);
@@ -544,5 +501,107 @@ console.log("recieve data is, in data variable",data)
     </div>
   );
 };
+
+const Attendance=()=>{
+  const [selectedMonth, setSelectedMonth] = useState('2025-06');
+  const [chartData, setChartData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const {id}=useParams()
+  const user_id=id
+    useEffect(() => {
+    const fetchAttendanceData = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch(`https://attendance-and-payroll-management.onrender.com/api/getAllAttendanceByMonthofuser/${user_id}/${selectedMonth}`);
+        const attendanceRecords = await res.json();
+
+        const presentDates = new Set(attendanceRecords.map(att => att.date));
+        console.log("Present Dates:", presentDates);
+        const [year, month] = selectedMonth.split("-");
+        const daysInMonth = new Date(Number(year), Number(month), 0).getDate();
+
+        const data = Array.from({ length: daysInMonth }, (_, i) => {
+          const day = String(i + 1).padStart(2, '0');
+          const dateKey = `${selectedMonth}-${day}`;
+          return {
+            name: `Day ${i + 1}`,
+            Attendance: presentDates.has(dateKey) ? 1 : 0,
+          };
+        });
+
+        setChartData(data);
+      } catch (error) {
+        console.error("Error loading chart data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (user_id) fetchAttendanceData();
+  }, [selectedMonth, user_id]);
+
+  return(
+  <>
+            {/* Attendance Statistics */}
+  <div className=" p-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+            <h2 className="text-md sm:text-lg font-semibold text-gray-800">
+              Attendance Statistics
+            </h2>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-purple-600 font-semibold">Month</span>
+              <select
+                className="text-sm border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(e.target.value)}
+              >
+                <option value="2025-06">June 2025</option>
+                <option value="2025-05">May 2025</option>
+                <option value="2025-04">April 2025</option>
+              </select>
+            </div>
+          </div>
+  
+          {loading ? (
+            <p className="text-center text-gray-500">Loading chart...</p>
+          ) : (
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <XAxis
+                  dataKey="name"
+                  interval={0}
+                  angle={0}
+                  height={70}
+                  tick={{ fontSize: 10 }}
+                />
+                <YAxis ticks={[0, 1]} domain={[0, 1]} />
+                <Tooltip
+                  formatter={(value) => (value === 1 ? "Present" : "Absent")}
+                  labelFormatter={(label) => `Date: ${label}`}
+                />
+                <Legend
+                  payload={[
+                    { value: "Present", type: "square", color: "#10b981", id: "present" },
+                    { value: "Absent", type: "square", color: "#ef4444", id: "absent" },
+                  ]}
+                />
+                <Bar dataKey="Attendance" radius={[8, 8, 0, 0]} barSize={20}>
+                  {chartData.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={entry.Attendance === 1 ? "#10b981" : "#ef4444"}
+                    />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          )}
+        </div>
+  
+  </>
+
+  )
+}
 
 export default EmployeeDashboard;
