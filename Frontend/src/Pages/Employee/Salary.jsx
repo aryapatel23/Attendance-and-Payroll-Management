@@ -203,37 +203,107 @@ console.log("recieve data is",data)
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 10 }, (_, i) => currentYear - i);
 
-   const downloadPDF = (item) => {
+const downloadPDF = (item) => {
   const doc = new jsPDF();
+  const lineHeight = 8;
+  let y = 15;
 
-  doc.setFontSize(16);
-  doc.text(`Salary Slip ${item.month}`, 80, 15);
+  // ===== Header =====
+  doc.setFontSize(18);
+  doc.text("Company Name", 105, y, { align: 'center' });
+  y += lineHeight;
+  doc.setFontSize(14);
+  doc.text(`Pay Slip - ${item.month}`, 105, y, { align: 'center' });
 
+  y += 2 * lineHeight;
+
+  // ===== Employee Info =====
   doc.setFontSize(12);
-  doc.text(`Employee ID: ${item.employee_id}`, 10, 30);
-  doc.text(`Employee Name: ${item.employee_name}`, 10, 40);
-  doc.text(`Month: ${item.month}`, 10, 50);
-  doc.text(`Generated On: ${item.generated_on}`, 10, 60);
+  doc.text("Employee Details:", 10, y);
+  y += lineHeight;
+  doc.text(`Employee ID: ${item.employee_id}`, 10, y);
+  doc.text(`Generated On: ${item.generated_on}`, 130, y);
+  y += lineHeight;
+  doc.text(`Name: ${item.employee_name}`, 10, y);
+  doc.text(`Month: ${item.month}`, 130, y);
 
-  doc.text(`Basic Salary: ₹${item.basic_salary}`, 10, 80);
-  doc.text(`Gross Salary: ₹${item.salary_breakdown.gross_salary}`, 10, 90);
-  doc.text(`Net Salary: ₹${Number(item.salary_breakdown.net_salary).toFixed(2)}`, 10, 100);
+  y += 2 * lineHeight;
 
-  doc.text(`\nDeductions:`, 10, 120);
-  doc.text(`• Tax: ₹${item.deductions.tax_amount}`, 10, 130);
-  doc.text(`• PF: ₹${item.deductions.pf_amount}`, 10, 140);
-  doc.text(`• Leave Deduction: ₹${Number(item.deductions.leave_deduction).toFixed(2)}`, 10, 150);
-  doc.text(`• Total Deduction: ₹${Number(item.deductions.total_deduction).toFixed(2)}`, 10, 160);
+  // ===== Attendance Summary =====
+  doc.setFontSize(12);
+  doc.text("Attendance Summary:", 10, y);
+  y += lineHeight;
+  doc.text(`• Total Working Days: ${item.attendance_summary.total_working_days}`, 10, y);
+  y += lineHeight;
+  doc.text(`• Present Days: ${item.attendance_summary.present_days}`, 10, y);
+  y += lineHeight;
+  doc.text(`• Absent Days: ${item.attendance_summary.absent_days}`, 10, y);
+  y += lineHeight;
+  doc.text(`• Paid Leaves: ${item.attendance_summary.paid_leave_allowance}`, 10, y);
+  y += lineHeight;
+  doc.text(`• Unpaid Leaves: ${item.attendance_summary.unpaid_leave_days}`, 10, y);
 
-  doc.text(`\nAttendance Summary:`, 10, 180);
-  doc.text(`• Total Working Days: ${item.attendance_summary.total_working_days}`, 10, 190);
-  doc.text(`• Present Days: ${item.attendance_summary.present_days}`, 10, 200);
-  doc.text(`• Absent Days: ${item.attendance_summary.absent_days}`, 10, 210);
-  doc.text(`• Paid Leaves: ${item.attendance_summary.paid_leave_allowance}`, 10, 220);
-  doc.text(`• Unpaid Leave Days: ${item.attendance_summary.unpaid_leave_days}`, 10, 230);
+  y += 2 * lineHeight;
 
+  // ===== Salary Breakdown =====
+  doc.setFontSize(12);
+  doc.text("Salary Breakdown:", 10, y);
+  y += lineHeight;
+
+  // Table Headers
+  doc.setFont("helvetica", "bold");
+  doc.text("Earnings", 10, y);
+  doc.text("Amount (₹)", 60, y);
+  doc.text("Deductions", 110, y);
+  doc.text("Amount (₹)", 160, y);
+  doc.setFont("helvetica", "normal");
+
+  y += lineHeight;
+
+  // Table Rows
+  doc.text("Basic Salary", 10, y);
+  doc.text(`₹${item.basic_salary}`, 60, y);
+  doc.text("Tax", 110, y);
+  doc.text(`₹${item.deductions.tax_amount}`, 160, y);
+
+  y += lineHeight;
+  doc.text("Gross Salary", 10, y);
+  doc.text(`₹${item.salary_breakdown.gross_salary}`, 60, y);
+  doc.text("PF", 110, y);
+  doc.text(`₹${item.deductions.pf_amount}`, 160, y);
+
+  y += lineHeight;
+  doc.text("", 10, y);
+  doc.text("", 60, y);
+  doc.text("Leave Deduction", 110, y);
+  doc.text(`₹${Number(item.deductions.leave_deduction).toFixed(2)}`, 160, y);
+
+  y += lineHeight;
+  doc.text("", 10, y);
+  doc.text("", 60, y);
+  doc.text("Total Deduction", 110, y);
+  doc.text(`₹${Number(item.deductions.total_deduction).toFixed(2)}`, 160, y);
+
+  y += 2 * lineHeight;
+
+  // ===== Final Salary Summary =====
+  doc.setFont("helvetica", "bold");
+  doc.text(`Net Salary: ₹${Number(item.salary_breakdown.net_salary).toFixed(2)}`, 10, y);
+  doc.setFont("helvetica", "normal");
+
+  y += 3 * lineHeight;
+
+  // ===== Footer =====
+  doc.line(10, y, 200, y); // horizontal line
+  y += lineHeight;
+  doc.text("Prepared By", 20, y);
+  doc.text("Checked By", 90, y);
+  doc.text("Authorized By", 160, y);
+
+  // Save PDF
   doc.save(`SalarySlip-${item.month}.pdf`);
 };
+
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#f5f7fa] to-[#e4ecf7]">
