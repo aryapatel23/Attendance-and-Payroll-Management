@@ -208,25 +208,45 @@ const downloadPDF = (item) => {
   const doc = new jsPDF();
   registerNotoSans(doc);
   doc.setFont("NotoSansVariable");
-  const lineHeight = 8;
-  let y = 15;
-  const rupee = String.fromCharCode(8377); // ₹ symbol
 
-  // ===== Header =====
-  doc.setFontSize(18);
-  doc.text("Company Name", 105, y, { align: 'center' });
+  const lineHeight = 8;
+  const rupee = String.fromCharCode(8377);
+  let y = 15;
+
+  // ===== Colors =====
+  const blue = "#0096FF";
+  const lightGray = "#f2f2f2";
+  const green = "#007F00";
+
+  // ===== Header Bar =====
+  doc.setFillColor(blue);
+  doc.setTextColor(255, 255, 255);
+  doc.rect(0, 0, 210, 15, "F");
+  doc.setFontSize(24);
+  doc.text("Circle Soft", 105, 10, { align: "center" });
+
+  y = 24;
+  doc.setTextColor(0, 0, 0);
+  doc.setFontSize(16);
+  doc.text(`Pay Slip - ${item.month}`, 105, y, { align: 'center' });
+
   y += lineHeight;
   doc.setFontSize(14);
-  doc.text(`Pay Slip - ${item.month}`, 105, y, { align: 'center' });
+
 
   y += 2 * lineHeight;
 
   // ===== Employee Info =====
+  doc.setFillColor(lightGray);
+  doc.rect(10, y - 6, 190, 8, "F");
   doc.setFontSize(12);
-  doc.text("Employee Details:", 10, y);
+  doc.setTextColor(0, 0, 0);
+  doc.text("Employee Details:", 12, y);
+
   y += lineHeight;
   doc.text(`Employee ID: ${item.employee_id}`, 10, y);
   doc.text(`Generated On: ${item.generated_on}`, 130, y);
+
   y += lineHeight;
   doc.text(`Name: ${item.employee_name}`, 10, y);
   doc.text(`Month: ${item.month}`, 130, y);
@@ -234,8 +254,9 @@ const downloadPDF = (item) => {
   y += 2 * lineHeight;
 
   // ===== Attendance Summary =====
-  doc.setFontSize(12);
-  doc.text("Attendance Summary:", 10, y);
+  doc.setFillColor(lightGray);
+  doc.rect(10, y - 6, 190, 8, "F");
+  doc.text("Attendance Summary:", 12, y);
   y += lineHeight;
   doc.text(`• Total Working Days: ${item.attendance_summary.total_working_days}`, 10, y);
   y += lineHeight;
@@ -249,53 +270,54 @@ const downloadPDF = (item) => {
 
   y += 2 * lineHeight;
 
-  // ===== Salary Breakdown =====
-  doc.setFontSize(12);
-  doc.text("Salary Breakdown:", 10, y);
-  y += lineHeight;
-
-  // Table Headers
-  doc.setFont("NotoSansVariable", "bold"); 
-  doc.text("Earnings", 10, y);
-  doc.text(`Amount (${rupee})`, 60, y);
-  doc.text("Deductions", 110, y);
-  doc.text(`Amount (${rupee})`, 160, y);
-  doc.setFont("NotoSansVariable", "normal");
+  // ===== Salary Breakdown Header =====
+  doc.setFillColor(lightGray);
+  doc.rect(10, y - 6, 190, 8, "F");
+  doc.text("Salary Breakdown:", 12, y);
 
   y += lineHeight;
 
-  // Table Rows
-  doc.text("Basic Salary", 10, y);
-  doc.text(`${rupee}${item.basic_salary}`, 60, y);
-  doc.text("Tax", 110, y);
-  doc.text(`${rupee}${item.deductions.tax_amount}`, 160, y);
+  // ===== Table Headers =====
+  doc.rect(10, y, 190, lineHeight * 1.1); // table header background
+  doc.setFillColor("#e6e6e6");
+  doc.setDrawColor(200);
+  doc.setLineWidth(0.1);
+  doc.text("Earnings", 12, y + 6);
+  doc.text(`Amount (${rupee})`, 60, y + 6);
+  doc.text("Deductions", 112, y + 6);
+  doc.text(`Amount (${rupee})`, 160, y + 6);
 
+  y += lineHeight * 1.2;
+
+  const drawRow = (labelLeft, valLeft, labelRight, valRight) => {
+    doc.rect(10, y - 1, 95, lineHeight);  // Earnings column
+    doc.rect(105, y - 1, 95, lineHeight); // Deductions column
+
+    doc.text(labelLeft || "", 12, y + 5);
+    doc.text(valLeft || "", 60, y + 5);
+    doc.text(labelRight || "", 112, y + 5);
+    doc.text(valRight || "", 160, y + 5);
+    y += lineHeight;
+  };
+
+  drawRow("Basic Salary", `${rupee}${item.basic_salary}`, "Tax", `${rupee}${item.deductions.tax_amount}`);
+  drawRow("Gross Salary", `${rupee}${item.salary_breakdown.gross_salary}`, "PF", `${rupee}${item.deductions.pf_amount}`);
+  drawRow("", "", "Leave Deduction", `${rupee}${Number(item.deductions.leave_deduction).toFixed(2)}`);
+  drawRow("", "", "Total Deduction", `${rupee}${Number(item.deductions.total_deduction).toFixed(2)}`);
+
+  // ===== Net Salary Highlight =====
   y += lineHeight;
-  doc.text("Gross Salary", 10, y);
-  doc.text(`${rupee}${item.salary_breakdown.gross_salary}`, 60, y);
-  doc.text("PF", 110, y);
-  doc.text(`${rupee}${item.deductions.pf_amount}`, 160, y);
-
-  y += lineHeight;
-  doc.text("", 10, y);
-  doc.text("", 60, y);
-  doc.text("Leave Deduction", 110, y);
-  doc.text(`${rupee}${Number(item.deductions.leave_deduction).toFixed(2)}`, 160, y);
-
-  y += lineHeight;
-  doc.text("", 10, y);
-  doc.text("", 60, y);
-  doc.text("Total Deduction", 110, y);
-  doc.text(`${rupee}${Number(item.deductions.total_deduction).toFixed(2)}`, 160, y);
-
-  y += 2 * lineHeight;
-
-  // ===== Final Salary Summary =====
-  doc.text(`Net Salary: ${rupee}${Number(item.salary_breakdown.net_salary).toFixed(2)}`, 10, y);
+  doc.setFillColor("#d9fdd3");
+  doc.rect(10, y, 190, lineHeight + 2, "F");
+  doc.setTextColor(0, 102, 0);
+  doc.text(`Net Salary: ${rupee}${Number(item.salary_breakdown.net_salary).toFixed(2)}`, 12, y + 7);
+ 
+  doc.setTextColor(0, 0, 0);
 
   y += 3 * lineHeight;
 
-  // ===== Footer =====
+  // ===== Footer Section =====
+  doc.setDrawColor(180);
   doc.line(10, y, 200, y); // horizontal line
   y += lineHeight;
   doc.text("Prepared By", 20, y);
