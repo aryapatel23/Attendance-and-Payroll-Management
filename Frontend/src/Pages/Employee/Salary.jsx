@@ -324,6 +324,21 @@ const downloadPDF = (item) => {
   doc.text("Checked By", 90, y);
   doc.text("Authorized By", 160, y);
 
+    y += lineHeight-1;  
+doc.setFontSize(10);
+// Prepared By
+doc.text("Rajeev Sharma", 20, y);
+doc.text("(HR Executive)", 20, y + 4);
+
+
+// Checked By
+doc.text("Meenal Kapoor", 90, y);
+doc.text("(Payroll Manager)", 90, y + 4);
+
+// Authorized By
+doc.text("Anil Deshmukh", 160, y);
+doc.text("(Head - Finance)", 160, y + 4);
+
   // Save PDF
   doc.save(`SalarySlip-${item.month}.pdf`);
 };
