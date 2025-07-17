@@ -207,6 +207,7 @@ const downloadPDF = (item) => {
   const doc = new jsPDF();
   const lineHeight = 8;
   let y = 15;
+  const rupee = String.fromCharCode(8377);
 
   // ===== Header =====
   doc.setFontSize(18);
@@ -253,42 +254,42 @@ const downloadPDF = (item) => {
   // Table Headers
   doc.setFont("helvetica", "bold");
   doc.text("Earnings", 10, y);
-  doc.text("Amount (₹)", 60, y);
+  doc.text(`Amount (${rupee})`, 60, y);
   doc.text("Deductions", 110, y);
-  doc.text("Amount (₹)", 160, y);
+  doc.text(`Amount (${rupee})`, 160, y);
   doc.setFont("helvetica", "normal");
 
   y += lineHeight;
 
   // Table Rows
   doc.text("Basic Salary", 10, y);
-  doc.text(`₹${item.basic_salary}`, 60, y);
+  doc.text(`${rupee}${item.basic_salary}`, 60, y);
   doc.text("Tax", 110, y);
-  doc.text(`₹${item.deductions.tax_amount}`, 160, y);
+  doc.text(`${rupee}${item.deductions.tax_amount}`, 160, y);
 
   y += lineHeight;
   doc.text("Gross Salary", 10, y);
-  doc.text(`₹${item.salary_breakdown.gross_salary}`, 60, y);
+  doc.text(`${rupee}${item.salary_breakdown.gross_salary}`, 60, y);
   doc.text("PF", 110, y);
-  doc.text(`₹${item.deductions.pf_amount}`, 160, y);
+  doc.text(`${rupee}${item.deductions.pf_amount}`, 160, y);
 
   y += lineHeight;
   doc.text("", 10, y);
   doc.text("", 60, y);
   doc.text("Leave Deduction", 110, y);
-  doc.text(`₹${Number(item.deductions.leave_deduction).toFixed(2)}`, 160, y);
+  doc.text(`${rupee}${Number(item.deductions.leave_deduction).toFixed(2)}`, 160, y);
 
   y += lineHeight;
   doc.text("", 10, y);
   doc.text("", 60, y);
   doc.text("Total Deduction", 110, y);
-  doc.text(`₹${Number(item.deductions.total_deduction).toFixed(2)}`, 160, y);
+  doc.text(`${rupee}${Number(item.deductions.total_deduction).toFixed(2)}`, 160, y);
 
   y += 2 * lineHeight;
 
   // ===== Final Salary Summary =====
   doc.setFont("helvetica", "bold");
-  doc.text(`Net Salary: ₹${Number(item.salary_breakdown.net_salary).toFixed(2)}`, 10, y);
+  doc.text(`Net Salary: ${rupee}${Number(item.salary_breakdown.net_salary).toFixed(2)}`, 10, y);
   doc.setFont("helvetica", "normal");
 
   y += 3 * lineHeight;
