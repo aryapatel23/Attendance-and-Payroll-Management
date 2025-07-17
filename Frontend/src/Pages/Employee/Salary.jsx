@@ -135,6 +135,7 @@
 import React, { useState,useEffect } from "react";
 import { useSelector } from 'react-redux';
 import jsPDF from 'jspdf'
+import { registerNotoSans } from '../NotoSansVariable.react'
 import {
   ChevronDown,
   ChevronUp,
@@ -205,9 +206,11 @@ console.log("recieve data is",data)
 
 const downloadPDF = (item) => {
   const doc = new jsPDF();
+  registerNotoSans(doc);
+  doc.setFont("NotoSansVariable");
   const lineHeight = 8;
   let y = 15;
-  const rupee = String.fromCharCode(8377);
+  const rupee = String.fromCharCode(8377); // ₹ symbol
 
   // ===== Header =====
   doc.setFontSize(18);
@@ -252,12 +255,12 @@ const downloadPDF = (item) => {
   y += lineHeight;
 
   // Table Headers
-  doc.setFont("helvetica", "bold");
+  doc.setFont("NotoSansVariable", "bold"); 
   doc.text("Earnings", 10, y);
   doc.text(`Amount (${rupee})`, 60, y);
   doc.text("Deductions", 110, y);
   doc.text(`Amount (${rupee})`, 160, y);
-  doc.setFont("helvetica", "normal");
+  doc.setFont("NotoSansVariable", "normal");
 
   y += lineHeight;
 
@@ -288,9 +291,7 @@ const downloadPDF = (item) => {
   y += 2 * lineHeight;
 
   // ===== Final Salary Summary =====
-  doc.setFont("helvetica", "bold");
   doc.text(`Net Salary: ${rupee}${Number(item.salary_breakdown.net_salary).toFixed(2)}`, 10, y);
-  doc.setFont("helvetica", "normal");
 
   y += 3 * lineHeight;
 
