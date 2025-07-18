@@ -491,4 +491,3 @@ doc.text("(Head - Finance)", 160, y + 4);
 
 export default Salary;
 
-
