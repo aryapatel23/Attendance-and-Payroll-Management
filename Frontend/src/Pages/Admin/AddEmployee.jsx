@@ -5,6 +5,9 @@ import Sidebar from "../../Components/HRSidebar";
 const AddEmployee = () => {
   const [formData, setFormData] = useState({
     name: "",
+    dob: "",
+    gender: "",
+    department:"",
     id:"",
     address: "",
     bankAccount: "",
