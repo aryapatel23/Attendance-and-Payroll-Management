@@ -23,16 +23,22 @@ const addUser = async (req, res) => {
     const db = getDB();
     const {
       name,
+      gender,
       id,
+      joigningDate,
+      designation,
       address,
-      bankAccount,
-      mobile,
-      email,
-      password,
-      role,
-      salary,
-      employmentType,
-      attendanceType,
+    bankAccount,
+    mobile,
+    email,
+    password,
+    role,
+    salary,
+    employmentType,
+    attendanceType,
+    emergencyContact,
+    emergencyContactname,
+    IFSC,
     } = req.body;
 
     // Basic validation
@@ -59,11 +65,17 @@ const addUser = async (req, res) => {
       mobile,
       email,
       password: hashedPassword,
-      employee_role: role,
+      designation,
       salary,
       employmentType,
       attendanceType,
-      role: 'HR',
+      role,
+        emergencyContact,
+    emergencyContactname,
+          joigningDate,
+      designation,
+            gender,
+            IFSC,
     });
 
     res.status(201).json({

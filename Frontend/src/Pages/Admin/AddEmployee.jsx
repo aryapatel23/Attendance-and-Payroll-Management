@@ -18,6 +18,7 @@ const AddEmployee = () => {
     attendanceType: "",
     emergencyContact: "",
     emergencyContactname: "",
+    IFSC:""
   });
 
   const handleChange = (e) => {
@@ -30,7 +31,7 @@ const AddEmployee = () => {
 
     try {
       const response = await fetch(
-        "https://attendance-and-payroll-management.onrender.com/api/add",
+        "http://localhost:5500/api/add",
         {
           method: "POST",
           headers: {
@@ -64,6 +65,7 @@ const AddEmployee = () => {
     attendanceType: "",
     emergencyContact: "",
     emergencyContactname: "",
+    IFSC:"",
         });
       } else {
         alert(`❌ Error: ${data.message || "Failed to add employee."}`);
@@ -127,7 +129,7 @@ const AddEmployee = () => {
               />
             </div>
 
-              <div>{/*Role*/}
+              <div>{/*Gender*/}
               <label className="block text-sm font-medium mb-1">
                 Gender:
               </label>
@@ -139,12 +141,13 @@ const AddEmployee = () => {
                 required
               >
                 <option value="">Please Select</option>
-                <option value="Full Time">Male</option>
-                <option value="Part Time">Female</option>
-                <option value="Part Time">Other</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
               </select>
             </div>
-            <div>
+
+                        <div>
               <label className="block text-sm font-medium mb-1">
                 Employee Bank Account No.:
               </label>
@@ -153,6 +156,21 @@ const AddEmployee = () => {
                 name="bankAccount"
                 placeholder="ex. ************"
                 value={formData.bankAccount}
+                onChange={handleChange}
+                className="w-full border px-4 py-2 rounded"
+                required
+              />
+            </div>
+          
+              <div>
+              <label className="block text-sm font-medium mb-1">
+                IFSC CODE.:
+              </label>
+              <input
+                type="text"
+                name="IFSC"
+                placeholder="ex. SBI001"
+                value={formData.IFSC}
                 onChange={handleChange}
                 className="w-full border px-4 py-2 rounded"
                 required
@@ -246,8 +264,8 @@ const AddEmployee = () => {
                 required
               >
                 <option value="">Please Select</option>
-                <option value="Full Time">HR</option>
-                <option value="Part Time">Employee</option>
+                <option value="HR">HR</option>
+                <option value="employee">Employee</option>
               </select>
             </div>
 
