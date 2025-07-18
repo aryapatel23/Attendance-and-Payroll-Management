@@ -1,11 +1,32 @@
 import React, { useState,useEffect } from "react";
 import { FaDownload, FaEnvelope, FaPhone, FaGlobe, FaCalendarAlt,FaRupeeSign,FaRegClock } from "react-icons/fa";
 import { CgProfile } from "react-icons/cg";
-import { Bar } from "react-chartjs-2";
 import "chart.js/auto";
 import { useParams } from "react-router-dom";
 import { useSelector, useDispatch } from 'react-redux';
 import {cacheUser} from '../../Redux/Slice'
+import jsPDF from 'jspdf'
+import {
+  ChevronDown,
+  ChevronUp,
+  Download,
+  IndianRupee,
+  Banknote,
+  Gift,
+  Minus,
+} from "lucide-react";
+import { Transition } from "@headlessui/react";
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+  Legend,
+  Cell,
+} from 'recharts';
 
 const months = ["April 2025", "May 2025"];
 
@@ -21,11 +42,6 @@ const rawAttendance = {
     ["2025-05-02", "Absent", "-", "-"],
     ["2025-05-03", "Present", "09:15", "18:15"],
   ],
-};
-
-const salaryData = {
-  "April 2025": { total: 40000, tds: 4000, spf: 2000, unpaidLeave: 2200, paid: 35800, status: "Paid" },
-  "May 2025": { total: 42000, tds: 4200, spf: 2100, unpaidLeave: 0, paid: 35700, status: "Pending" },
 };
 
 const EmployeeDashboard = () => {
@@ -56,9 +72,9 @@ const EmployeeDashboard = () => {
               <div className="flex-1 overflow-y-auto">
                 {tab === "userinfo" && <InfoTab />}
                 {tab === "attendance" && (
-                  <AttendanceTab month={attMonth} setMonth={setAttMonth} />
+                  <Attendance/>
                 )}
-                {tab === "salary" && <SalaryTab month={salMonth} setMonth={setSalMonth} />}
+                {tab === "salary" && <Salary/>}
               </div>
             </div>
           </div>
@@ -262,92 +278,342 @@ console.log("3. InfoTab rendered");
   );
 }
 
-function AttendanceTab({ month, setMonth }) {
-  const data = rawAttendance[month] || [];
-  const total = data.length;
-  const present = data.filter((r) => r[1] === "Present").length;
-  const leave = data.filter((r) => r[1] === "Leave").length;
-  const absent = data.filter((r) => r[1] === "Absent").length;
 
-  const chartData = {
-    labels: ["Present", "Leave", "Absent"],
-    datasets: [{ label: "Days", data: [present, leave, absent], backgroundColor: ["#22c55e","#f97316","#ef4444"] }],
+
+const Salary = () => {
+  const [openIndex, setOpenIndex] = useState(null);
+  const [selectedMonth, setSelectedMonth] = useState("");
+  const [selectedYear, setSelectedYear] = useState(""); 
+  const [data,setData]=useState([])
+
+  const user = useSelector((state) => state.auth.user);
+
+const {id}=useParams()
+const user_id=id
+
+useEffect(() => {
+  const fetchSalary = async () => {
+    if (!selectedMonth || !selectedYear || !user_id) {
+      console.warn("Missing month/year/user_id");
+      return;
+    }
+
+    try {
+      const res = await fetch("https://attendance-and-payroll-management.onrender.com/api/Generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          month: `${selectedYear}-${selectedMonth}`,
+          user_id,
+        }),
+      });
+
+      const result = await res.json();
+      if (result) {
+        setData([result]); // ✅ wrap as array
+      } else {
+        setData([]);
+      }
+    } catch (err) {
+      console.error("Error fetching salary data:", err);
+    }
   };
 
+  fetchSalary();
+}, [selectedMonth, selectedYear, user_id]);
+console.log("recieve data is, in data variable",data)
+
+  const toggleOpen = (index) => {
+    setOpenIndex(openIndex === index ? null : index);
+  };
+
+  const months = [
+    "01", "02", "03", "04", "05", "06",
+    "07", "08", "09", "10", "11", "12",
+  ];
+
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 10 }, (_, i) => currentYear - i);
+
+  const downloadPDF = (item) => {
+  const doc = new jsPDF();
+
+  doc.setFontSize(16);
+  doc.text(`Salary Slip ${item.month}`, 80, 15);
+
+  doc.setFontSize(12);
+  doc.text(`Employee ID: ${item.employee_id}`, 10, 30);
+  doc.text(`Employee Name: ${item.employee_name}`, 10, 40);
+  doc.text(`Month: ${item.month}`, 10, 50);
+  doc.text(`Generated On: ${item.generated_on}`, 10, 60);
+
+  doc.text(`Basic Salary: ₹${item.basic_salary}`, 10, 80);
+  doc.text(`Gross Salary: ₹${item.salary_breakdown.gross_salary}`, 10, 90);
+  doc.text(`Net Salary: ₹${Number(item.salary_breakdown.net_salary).toFixed(2)}`, 10, 100);
+
+  doc.text(`\nDeductions:`, 10, 120);
+  doc.text(`• Tax: ₹${item.deductions.tax_amount}`, 10, 130);
+  doc.text(`• PF: ₹${item.deductions.pf_amount}`, 10, 140);
+  doc.text(`• Leave Deduction: ₹${Number(item.deductions.leave_deduction).toFixed(2)}`, 10, 150);
+  doc.text(`• Total Deduction: ₹${Number(item.deductions.total_deduction).toFixed(2)}`, 10, 160);
+
+  doc.text(`\nAttendance Summary:`, 10, 180);
+  doc.text(`• Total Working Days: ${item.attendance_summary.total_working_days}`, 10, 190);
+  doc.text(`• Present Days: ${item.attendance_summary.present_days}`, 10, 200);
+  doc.text(`• Absent Days: ${item.attendance_summary.absent_days}`, 10, 210);
+  doc.text(`• Paid Leaves: ${item.attendance_summary.paid_leave_allowance}`, 10, 220);
+  doc.text(`• Unpaid Leave Days: ${item.attendance_summary.unpaid_leave_days}`, 10, 230);
+
+  doc.save(`SalarySlip-${item.month}.pdf`);
+};
+
   return (
-    <div className="space-y-4 text-gray-700">
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold">Attendance - {month}</h3>
-        <select
-          value={month}
-          onChange={(e) => setMonth(e.target.value)}
-          className="border px-2 py-1 rounded flex items-center"
-        >
-          {months.map((m) => (
-            <option key={m}>{m}</option>
-          ))}
-        </select>
+    <div className="min-h-screen flex flex-col ">
+      <div className="flex-1 p-6 overflow-auto">
+        <h1 className="text-2xl font-bold text-gray-800 mb-6">Salary Info Of User {id}</h1>
+
+        {/* Filter Section */}
+        <div className="flex flex-wrap gap-4 mb-6">
+          <select
+            value={selectedMonth}
+            onChange={(e) => setSelectedMonth(e.target.value)}
+            className="px-4 py-2 rounded-lg border border-gray-300 bg-white shadow-sm focus:ring-2 focus:ring-violet-500"
+          >
+            <option value="">Select Month</option>
+            {months.map((month) => (
+              <option key={month} value={month}>
+                {month}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={selectedYear}
+            onChange={(e) => setSelectedYear(e.target.value)}
+            className="px-4 py-2 rounded-lg border border-gray-300 bg-white shadow-sm focus:ring-2 focus:ring-violet-500"
+          >
+            <option value="">Select Year</option>
+            {years.map((year) => (
+              <option key={year} value={year}>
+                {year}
+              </option>
+            ))}
+          </select>
+        </div>
+        {console.log('Selected month and year is',selectedMonth,selectedYear)}
+
+        {/* Salary Slips */}
+        <div className="space-y-6">
+          {data.length > 0 ? (
+            data.map((item, index) => (
+              <div
+                key={index}
+                className="bg-white/80 backdrop-blur-md rounded-3xl shadow-xl transition hover:shadow-2xl border border-gray-200"
+              >
+                <div
+                  className="flex justify-between items-center px-6 py-5 cursor-pointer"
+                  onClick={() => toggleOpen(index)}
+                >
+                  <div className="flex items-center space-x-4">
+                    <div className="bg-violet-100 p-3 rounded-xl shadow-sm">
+                      <Banknote className="w-6 h-6 text-violet-600" />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-lg font-semibold text-gray-900">
+                        {item.month}
+                      </span>
+                      <span className="text-sm text-gray-500">
+                        Salary Statement
+                      </span>
+                    </div>
+                  </div>
+              
+                  <div className="flex items-center space-x-4">
+                    <span className="text-xl font-bold text-gray-800">
+                      {(Number(item.salary_breakdown?.net_salary) || 0).toFixed(2)}
+                    </span>
+                 <button
+  onClick={() => downloadPDF(item)}
+  className="bg-violet-600 text-white text-sm px-4 py-2 rounded-full shadow-md hover:bg-violet-700 transition flex items-center gap-2"
+>
+  <Download className="w-4 h-4" />
+  Download
+</button>
+                    {openIndex === index ? (
+                      <ChevronUp className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    )}
+                  </div>
+                </div>
+
+                <Transition
+                  show={openIndex === index}
+                  enter="transition-all duration-300 ease-out"
+                  enterFrom="max-h-0 opacity-0"
+                  enterTo="max-h-screen opacity-100"
+                  leave="transition-all duration-200 ease-in"
+                  leaveFrom="max-h-screen opacity-100"
+                  leaveTo="max-h-0 opacity-0"
+                >
+                  <div className="bg-gray-50 px-6 pb-6 pt-2 rounded-b-3xl">
+                    <div className="space-y-4 text-gray-700 text-sm">
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-2 font-medium">
+                          <Banknote className="text-green-600 w-4 h-4" />
+                          Gross Salary
+                        </div>
+                        <div className="text-right font-medium">₹{item.basic_salary}</div>
+                      </div>
+
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-2">
+                          <IndianRupee className="text-purple-600 w-4 h-4" />
+                          PF (5%)
+                        </div>
+                        <div>{item.deductions.pf_amount}</div>
+                      </div>
+
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-2">
+                          <Minus className="text-red-500 w-4 h-4" />
+                          Tax Slab (10%)
+                        </div>
+                        <div>{item.deductions.tax_amount}</div>
+                      </div>
+
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-2">
+                          <Gift className="text-blue-500 w-4 h-4" />
+                          Leave Deductions
+                        </div>
+                        <div>{(Number(item.deductions?.leave_deduction) || 0).toFixed(2)}</div>
+                      </div>
+
+                      <hr className="border-dashed border-gray-400 my-2" />
+
+                      <div className="flex justify-between items-center font-bold text-gray-900 text-base">
+                        <div>Total Salary</div>
+                        <div>{(Number(item.salary_breakdown?.net_salary) || 0).toFixed(2)}</div>
+                      </div>
+                    </div>
+                  </div>
+                </Transition>
+              </div>
+            ))
+          ) : (
+            <div className="text-center text-gray-500 text-sm">
+              No salary slip found for the selected period.
+            </div>
+          )}
+        </div>
       </div>
-
-      <Bar data={chartData} />
-
-      <table className="w-full text-sm border rounded-lg overflow-hidden">
-        <thead className="bg-gray-100">
-          <tr>
-            <th className="p-3">Date</th>
-            <th className="p-3">Status</th>
-            <th className="p-3">Check-In</th>
-            <th className="p-3">Check-Out</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((r, i) => (
-            <tr key={i} className="border-b">
-              <td className="p-3">{r[0]}</td>
-              <td className={`p-3 ${r[1] === "Leave" ? "text-orange-600" : r[1] === "Absent" ? "text-red-600" : "text-green-600"}`}>
-                {r[1]}
-              </td>
-              <td className="p-3">{r[2]}</td>
-              <td className="p-3">{r[3]}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
     </div>
   );
-}
+};
 
-function SalaryTab({ month, setMonth }) {
-  const s = salaryData[month] || {};
-  return (
-    <div className="text-gray-700 space-y-4">
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold">Salary Details - {month}</h3>
-        <select value={month} onChange={(e) => setMonth(e.target.value)} className="border px-2 py-1 rounded">
-          {months.map((m) => (
-            <option key={m}>{m}</option>
-          ))}
-        </select>
-      </div>
+const Attendance=()=>{
+  const [selectedMonth, setSelectedMonth] = useState('2025-06');
+  const [chartData, setChartData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const {id}=useParams()
+  const user_id=id
+    useEffect(() => {
+    const fetchAttendanceData = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch(`https://attendance-and-payroll-management.onrender.com/api/getAllAttendanceByMonthofuser/${user_id}/${selectedMonth}`);
+        const attendanceRecords = await res.json();
 
-      <table className="w-full text-sm border rounded-xl overflow-hidden mb-4">
-        <tbody>
-          <tr className="border-b"><td className="p-3 font-medium">Total Salary</td><td className="p-3 text-right">₹{s.total}</td></tr>
-          <tr className="border-b text-red-600"><td className="p-3">TDS (10%)</td><td className="p-3 text-right">- ₹{s.tds}</td></tr>
-          <tr className="border-b text-red-600"><td className="p-3">SPF Fund (5%)</td><td className="p-3 text-right">- ₹{s.spf}</td></tr>
-          <tr className="border-b text-red-600"><td className="p-3">Unpaid Leave</td><td className="p-3 text-right">- ₹{s.unpaidLeave}</td></tr>
-          <tr className="border-b font-bold bg-gray-50"><td className="p-3">Total Paid</td><td className="p-3 text-right">₹{s.paid}</td></tr>
-          <tr className="bg-green-50 font-semibold"><td className="p-3">Status</td><td className="p-3 text-right">{s.status}</td></tr>
-        </tbody>
-      </table>
+        const presentDates = new Set(attendanceRecords.map(att => att.date));
+        console.log("Present Dates:", presentDates);
+        const [year, month] = selectedMonth.split("-");
+        const daysInMonth = new Date(Number(year), Number(month), 0).getDate();
 
-      <div className="flex justify-end">
-        <button className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2 hover:bg-indigo-700">
-          <FaDownload /> Download Slip
-        </button>
-      </div>
-    </div>
-  );
+        const data = Array.from({ length: daysInMonth }, (_, i) => {
+          const day = String(i + 1).padStart(2, '0');
+          const dateKey = `${selectedMonth}-${day}`;
+          return {
+            name: `Day ${i + 1}`,
+            Attendance: presentDates.has(dateKey) ? 1 : 0,
+          };
+        });
+
+        setChartData(data);
+      } catch (error) {
+        console.error("Error loading chart data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (user_id) fetchAttendanceData();
+  }, [selectedMonth, user_id]);
+
+  return(
+  <>
+            {/* Attendance Statistics */}
+  <div className=" p-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+            <h2 className="text-md sm:text-lg font-semibold text-gray-800">
+              Attendance Statistics
+            </h2>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-purple-600 font-semibold">Month</span>
+              <select
+                className="text-sm border border-gray-300 rounded-md px-2 py-1 focus:outline-none"
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(e.target.value)}
+              >
+                <option value="2025-06">June 2025</option>
+                <option value="2025-05">May 2025</option>
+                <option value="2025-04">April 2025</option>
+              </select>
+            </div>
+          </div>
+  
+          {loading ? (
+            <p className="text-center text-gray-500">Loading chart...</p>
+          ) : (
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <XAxis
+                  dataKey="name"
+                  interval={0}
+                  angle={0}
+                  height={70}
+                  tick={{ fontSize: 10 }}
+                />
+                <YAxis ticks={[0, 1]} domain={[0, 1]} />
+                <Tooltip
+                  formatter={(value) => (value === 1 ? "Present" : "Absent")}
+                  labelFormatter={(label) => `Date: ${label}`}
+                />
+                <Legend
+                  payload={[
+                    { value: "Present", type: "square", color: "#10b981", id: "present" },
+                    { value: "Absent", type: "square", color: "#ef4444", id: "absent" },
+                  ]}
+                />
+                <Bar dataKey="Attendance" radius={[8, 8, 0, 0]} barSize={20}>
+                  {chartData.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={entry.Attendance === 1 ? "#10b981" : "#ef4444"}
+                    />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          )}
+        </div>
+  
+  </>
+
+  )
 }
 
 export default EmployeeDashboard;

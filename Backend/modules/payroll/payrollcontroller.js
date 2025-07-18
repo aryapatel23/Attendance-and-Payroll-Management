@@ -1,5 +1,22 @@
 const { getDB } = require("../../config/db");
 
+const usersalarybyitsid = async(req,res) =>{
+  const db=getDB();
+
+  const {id}=req.params;
+  console.log("id recieved is",id);
+  try{
+    const user=await db.collection('SalaryInfo').findOne(
+      {employee_id:id}
+    )
+    if(!user) return res.status(404).json({ message: 'User not found' });
+    res.status(200).json(user);
+  }
+  catch(error){
+    console.error('Error fetching user by ID:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+}
 const GenerateSlip = async (req, res) => {
   const db = getDB();
   const { user_id, month } = req.body;
@@ -81,47 +98,116 @@ try {
 
 };
 
-const Addsalaryinfo= async (req,res) =>{
-    const db = getDB();
-  const {employee_id,employee_name,base_salary,hra,bonus,tax_percent,pf_percent,joining_date,updated_by}=req.body;
-  const nowIST = new Date(new Date().getTime() + 5.5 * 60 * 60 * 1000);
-  const today = nowIST.toISOString().split("T")[0];
+const Addsalaryinfo = async (req, res) => {
+  const db = getDB();
+  const {
+    employee_id,
+    employee_name,
+    base_salary,
+    hra,
+    bonus,
+    tax_percent,
+    pf_percent,
+    joining_date,
+    updated_by
+  } = req.body;
 
-  const result=await db.collection('SalaryInfo').insertOne({
-     employee_id,
-     employee_name,
-     base_salary,
-     hra,
-     bonus,
-     tax_percent,
-     pf_percent,
-     joining_date,
-     last_update:nowIST,
-     updated_by
-  })
-  return res.json({message:"Data inserted sucessfully",result})
-}
+  // 1. Basic validation
+  if (!employee_id || !employee_name || !base_salary || !joining_date || !updated_by) {
+    return res.status(400).json({ message: "Missing required fields." });
+  }
 
-const Updatesalaryinfo= async (req,res) =>{
-    const db = getDB();
-  const {employee_id,employee_name,base_salary,hra,bonus,tax_percent,pf_percent,joining_date,updated_by}=req.body;
-  const nowIST = new Date(new Date().getTime() + 5.5 * 60 * 60 * 1000);
-  const today = nowIST.toISOString().split("T")[0];
+  try {
+    // 2. Check if salary info already exists
+    const existing = await db.collection('SalaryInfo').findOne({ employee_id });
+    if (existing) {
+      return res.status(409).json({ message: "Salary info already exists for this employee." });
+    }
 
-  const result=await db.collection('SalaryInfo').updateOne({employee_id},{$set:{
-     employee_id,
-     employee_name,
-     base_salary,
-     hra,
-     bonus,
-     tax_percent,
-     pf_percent,
-     joining_date,
-     last_update:nowIST,
-     updated_by
-  }})
-  return res.json({message:"Data updated sucessfully",result})
-}
+    // 3. Current IST timestamp
+    const nowIST = new Date(new Date().getTime() + 5.5 * 60 * 60 * 1000);
+
+    // 4. Insert new record
+    const result = await db.collection('SalaryInfo').insertOne({
+      employee_id,
+      employee_name,
+      base_salary,
+      hra,
+      bonus,
+      tax_percent,
+      pf_percent,
+      joining_date,
+      last_update: nowIST,
+      updated_by
+    });
+
+    return res.status(201).json({
+      message: "Salary info added successfully.",
+      insertedId: result.insertedId
+    });
+
+  } catch (error) {
+    console.error("Error adding salary info:", error);
+    return res.status(500).json({ message: "Server error while adding salary info." });
+  }
+};
 
 
-module.exports= {GenerateSlip,Addsalaryinfo,Updatesalaryinfo};
+const Updatesalaryinfo = async (req, res) => {
+  const db = getDB();
+
+  const {
+    employee_id,
+    employee_name,
+    base_salary,
+    hra,
+    bonus,
+    tax_percent,
+    pf_percent,
+    joining_date,
+    updated_by
+  } = req.body;
+
+  if (!employee_id) {
+    return res.status(400).json({ message: "Employee ID is required." });
+  }
+
+  try {
+    // Convert current time to IST
+    const nowIST = new Date(new Date().getTime() + 5.5 * 60 * 60 * 1000);
+
+    const updateFields = {
+      employee_name,
+      base_salary,
+      hra,
+      bonus,
+      tax_percent,
+      pf_percent,
+      joining_date,
+      last_update: nowIST,
+      updated_by
+    };
+
+    const result = await db.collection('SalaryInfo').updateOne(
+      { employee_id },
+      { $set: updateFields }
+    );
+
+    if (result.matchedCount === 0) {
+      return res.status(404).json({ message: "Employee not found." });
+    }
+
+    res.status(200).json({
+      message: "Salary info updated successfully",
+      updatedFields: updateFields,
+      result
+    });
+
+  } catch (error) {
+    console.error("Error updating salary info:", error);
+    res.status(500).json({ message: "Server error while updating salary info." });
+  }
+};
+
+
+module.exports= {GenerateSlip,Addsalaryinfo,Updatesalaryinfo,usersalarybyitsid};

@@ -135,6 +135,7 @@
 import React, { useState,useEffect } from "react";
 import { useSelector } from 'react-redux';
 import jsPDF from 'jspdf'
+import { registerNotoSans } from '../NotoSansVariable.react'
 import {
   ChevronDown,
   ChevronUp,
@@ -205,97 +206,142 @@ console.log("recieve data is",data)
 
 const downloadPDF = (item) => {
   const doc = new jsPDF();
+  registerNotoSans(doc);
+  doc.setFont("NotoSansVariable");
 
-  // ==== Logo ====
-  const logoUrl = "https://your-logo-url.com/logo.png"; // Replace with your real logo or base64
-  const img = new Image();
-  img.crossOrigin = "Anonymous";
-  img.src = logoUrl;
+  const lineHeight = 8;
+  const rupee = String.fromCharCode(8377);
+  let y = 15;
 
-  img.onload = () => {
-    doc.addImage(img, "PNG", 15, 10, 30, 15);
+  // ===== Colors =====
+  const blue = "#0096FF";
+  const lightGray = "#f2f2f2";
+  const green = "#007F00";
 
-    // ==== Header ====
-    doc.setFontSize(18);
-    doc.setTextColor(54, 54, 54);
-    doc.text("ABC Corporation Pvt. Ltd.", 105, 20, null, null, "center");
+  // ===== Header Bar =====
+  doc.setFillColor(blue);
+  doc.setTextColor(255, 255, 255);
+  doc.rect(0, 0, 210, 15, "F");
+  doc.setFontSize(24);
+  doc.text("Circle Soft", 105, 10, { align: "center" });
 
-    doc.setFontSize(12);
-    doc.setTextColor(100, 100, 100);
-    doc.text("Official Salary Receipt", 105, 28, null, null, "center");
+  y = 24;
+  doc.setTextColor(0, 0, 0);
+  doc.setFontSize(16);
+  doc.text(`Pay Slip - ${item.month}`, 105, y, { align: 'center' });
 
-    // ==== Background Section Box ====
-    doc.setFillColor(230, 230, 250); // Lavender
-    doc.rect(15, 35, 180, 15, "F");
+  y += lineHeight;
+  doc.setFontSize(14);
 
-    // ==== Employee Info ====
-    doc.setFontSize(11);
-    doc.setTextColor(33, 33, 33);
-    doc.text(`Employee ID: ${item.employee_id}`, 20, 44);
-    doc.text(`Name: ${item.employee_name}`, 75, 44);
-    doc.text(`Month: ${item.month}`, 150, 44);
 
-    // ==== Earnings Section ====
-    doc.setFontSize(12);
-    doc.setTextColor(255, 255, 255);
-    doc.setFillColor(72, 61, 139); // Dark Slate Blue
-    doc.rect(15, 60, 90, 8, "F");
-    doc.text("Earnings", 20, 66);
+  y += 2 * lineHeight;
 
-    doc.setFontSize(11);
-    doc.setTextColor(0, 0, 0);
-    doc.text(`Basic Salary: ₹${item.basic_salary}`, 20, 75);
-    doc.text(`Gross Salary: ₹${item.salary_breakdown?.gross_salary}`, 20, 83);
+  // ===== Employee Info =====
+  doc.setFillColor(lightGray);
+  doc.rect(10, y - 6, 190, 8, "F");
+  doc.setFontSize(12);
+  doc.setTextColor(0, 0, 0);
+  doc.text("Employee Details:", 12, y);
 
-    // ==== Deductions Section ====
-    doc.setTextColor(255, 255, 255);
-    doc.setFillColor(139, 0, 0); // Dark Red
-    doc.rect(105, 60, 90, 8, "F");
-    doc.text("Deductions", 110, 66);
+  y += lineHeight;
+  doc.text(`Employee ID: ${item.employee_id}`, 10, y);
+  doc.text(`Generated On: ${item.generated_on}`, 130, y);
 
-    doc.setFontSize(11);
-    doc.setTextColor(0, 0, 0);
-    doc.text(`PF (5%): ₹${item.deductions?.pf_amount}`, 110, 75);
-    doc.text(`Tax (10%): ₹${item.deductions?.tax_amount}`, 110, 83);
-    doc.text(
-      `Leave Deduction: ₹${(Number(item.deductions?.leave_deduction) || 0).toFixed(2)}`,
-      110,
-      91
-    );
+  y += lineHeight;
+  doc.text(`Name: ${item.employee_name}`, 10, y);
+  doc.text(`Month: ${item.month}`, 130, y);
 
-    // ==== Net Salary Section ====
-    doc.setFontSize(12);
-    doc.setTextColor(255, 255, 255);
-    doc.setFillColor(0, 128, 0); // Green
-    doc.rect(15, 105, 180, 10, "F");
+  y += 2 * lineHeight;
 
-    doc.setFont("helvetica", "bold");
-    doc.text(
-      `Net Salary (In Hand): ₹${(Number(item.salary_breakdown?.net_salary) || 0).toFixed(2)}`,
-      20,
-      112
-    );
+  // ===== Attendance Summary =====
+  doc.setFillColor(lightGray);
+  doc.rect(10, y - 6, 190, 8, "F");
+  doc.text("Attendance Summary:", 12, y);
+  y += lineHeight;
+  doc.text(`• Total Working Days: ${item.attendance_summary.total_working_days}`, 10, y);
+  y += lineHeight;
+  doc.text(`• Present Days: ${item.attendance_summary.present_days}`, 10, y);
+  y += lineHeight;
+  doc.text(`• Absent Days: ${item.attendance_summary.absent_days}`, 10, y);
+  y += lineHeight;
+  doc.text(`• Paid Leaves: ${item.attendance_summary.paid_leave_allowance}`, 10, y);
+  y += lineHeight;
+  doc.text(`• Unpaid Leaves: ${item.attendance_summary.unpaid_leave_days}`, 10, y);
 
-    // ==== Footer ====
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "normal");
-    doc.setTextColor(100, 100, 100);
-    doc.text("This is a system-generated payslip and does not require a signature.", 15, 130);
+  y += 2 * lineHeight;
 
-    // ==== Save ====
-    doc.save(`SalarySlip-${item.month}.pdf`);
+  // ===== Salary Breakdown Header =====
+  doc.setFillColor(lightGray);
+  doc.rect(10, y - 6, 190, 8, "F");
+  doc.text("Salary Breakdown:", 12, y);
+
+  y += lineHeight;
+
+  // ===== Table Headers =====
+  doc.rect(10, y, 190, lineHeight * 1.1); // table header background
+  doc.setFillColor("#e6e6e6");
+  doc.setDrawColor(200);
+  doc.setLineWidth(0.1);
+  doc.text("Earnings", 12, y + 6);
+  doc.text(`Amount (${rupee})`, 60, y + 6);
+  doc.text("Deductions", 112, y + 6);
+  doc.text(`Amount (${rupee})`, 160, y + 6);
+
+  y += lineHeight * 1.2;
+
+  const drawRow = (labelLeft, valLeft, labelRight, valRight) => {
+    doc.rect(10, y - 1, 95, lineHeight);  // Earnings column
+    doc.rect(105, y - 1, 95, lineHeight); // Deductions column
+
+    doc.text(labelLeft || "", 12, y + 5);
+    doc.text(valLeft || "", 60, y + 5);
+    doc.text(labelRight || "", 112, y + 5);
+    doc.text(valRight || "", 160, y + 5);
+    y += lineHeight;
   };
 
-  img.onerror = () => {
-    console.warn("Logo failed to load. Generating PDF without logo.");
-    // Retry without image
-    doc.setFontSize(18);
-    doc.text("ABC Corporation Pvt. Ltd.", 105, 20, null, null, "center");
-    // You can call a simplified version of the above PDF here
-    doc.save(`SalarySlip-${item.month}.pdf`);
-  };
+  drawRow("Basic Salary", `${rupee}${item.basic_salary}`, "Tax", `${rupee}${item.deductions.tax_amount}`);
+  drawRow("Gross Salary", `${rupee}${item.salary_breakdown.gross_salary}`, "PF", `${rupee}${item.deductions.pf_amount}`);
+  drawRow("", "", "Leave Deduction", `${rupee}${Number(item.deductions.leave_deduction).toFixed(2)}`);
+  drawRow("", "", "Total Deduction", `${rupee}${Number(item.deductions.total_deduction).toFixed(2)}`);
+
+  // ===== Net Salary Highlight =====
+  y += lineHeight;
+  doc.setFillColor("#d9fdd3");
+  doc.rect(10, y, 190, lineHeight + 2, "F");
+  doc.setTextColor(0, 102, 0);
+  doc.text(`Net Salary: ${rupee}${Number(item.salary_breakdown.net_salary).toFixed(2)}`, 12, y + 7);
+ 
+  doc.setTextColor(0, 0, 0);
+
+  y += 3 * lineHeight;
+
+  // ===== Footer Section =====
+  doc.setDrawColor(180);
+  doc.line(10, y, 200, y); // horizontal line
+  y += lineHeight;
+  doc.text("Prepared By", 20, y);
+  doc.text("Checked By", 90, y);
+  doc.text("Authorized By", 160, y);
+
+    y += lineHeight-1;  
+doc.setFontSize(10);
+// Prepared By
+doc.text("Rajeev Sharma", 20, y);
+doc.text("(HR Executive)", 20, y + 4);
+
+
+// Checked By
+doc.text("Meenal Kapoor", 90, y);
+doc.text("(Payroll Manager)", 90, y + 4);
+
+// Authorized By
+doc.text("Anil Deshmukh", 160, y);
+doc.text("(Head - Finance)", 160, y + 4);
+
+  // Save PDF
+  doc.save(`SalarySlip-${item.month}.pdf`);
 };
-
 
 
   return (
@@ -444,5 +490,4 @@ const downloadPDF = (item) => {
 };
 
 export default Salary;
-
 

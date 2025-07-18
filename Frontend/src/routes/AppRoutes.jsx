@@ -16,6 +16,7 @@ import AddEmployee from "../Pages/Admin/AddEmployee";
 import PayrollSystem from "../Pages/Admin/Payrollsystem";
 import HRCalendar from "../Pages/Admin/HRCalendar";
 import EmployeeDashboard from '../Pages/Admin/EmployeePage'
+import PayrollPage from "../Pages/Admin/PayrollPage";
 
 // Employee Pages
 import Dashboard from "../Pages/Employee/EmployeeHome";
@@ -23,6 +24,7 @@ import Attendance from "../Pages/Employee/Attendance";
 import Salary from "../Pages/Employee/Salary";
 import Calendar from "../Pages/Employee/Calendar";
 import AttendanceNew from "../Components/attendance";
+import Emprofile from "../Pages/Employee/Emprofile";
 
 // Common / Temp
 import Add from "../Pages/Add";
@@ -48,6 +50,7 @@ const AppRoutes = () => {
           <Route path="emsalary" element={<Salary />} />
           <Route path="emcalendar" element={<Calendar />} />
           <Route path="attendance" element={<AttendanceNew />} />
+          <Route path="emprofile/:id" element={<Emprofile />} />
         </Route>
       )}
 
@@ -60,6 +63,7 @@ const AppRoutes = () => {
           <Route path="hrpayrollsystem" element={<PayrollSystem />} />
           <Route path="hrcalendar" element={<HRCalendar />} />
           <Route path="hremployees/profile/:id" element={<EmployeeDashboard />} />
+          <Route path="payrollsystem/profile/:id" element={<PayrollPage/>}/>
         </Route>
       )}
 
