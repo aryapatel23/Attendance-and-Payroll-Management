@@ -1,14 +1,12 @@
 import React, { useState,useEffect } from "react";
-import Header from "../../Components/Header";
-import Sidebar from "../../Components/HRSidebar";
 
 const AddEmployee = () => {
   const [formData, setFormData] = useState({
     name: "",
-    dob: "",
     gender: "",
-    department:"",
     id:"",
+    joigningDate: "",
+    designation: "",
     address: "",
     bankAccount: "",
     mobile: "",
@@ -18,6 +16,8 @@ const AddEmployee = () => {
     salary: "",
     employmentType: "",
     attendanceType: "",
+    emergencyContact: "",
+    emergencyContactname: "",
   });
 
   const handleChange = (e) => {
@@ -48,17 +48,22 @@ const AddEmployee = () => {
         alert("✅ Employee added successfully!");
         console.log("Server Response:", data);
         setFormData({
-          name: "",
-          id: "",
-          address: "",
-          bankAccount: "",
-          mobile: "",
-          email: "",
-          password: "",
-          role: "",
-          salary: "",
-          employmentType: "",
-          attendanceType: "",
+    name: "",
+    gender: "",
+    id:"",
+    joigningDate: "",
+    designation: "",
+    address: "",
+    bankAccount: "",
+    mobile: "",
+    email: "",
+    password: "",
+    role: "",
+    salary: "",
+    employmentType: "",
+    attendanceType: "",
+    emergencyContact: "",
+    emergencyContactname: "",
         });
       } else {
         alert(`❌ Error: ${data.message || "Failed to add employee."}`);
@@ -122,6 +127,23 @@ const AddEmployee = () => {
               />
             </div>
 
+              <div>{/*Role*/}
+              <label className="block text-sm font-medium mb-1">
+                Gender:
+              </label>
+              <select
+                name="gender"
+                value={formData.gender}
+                onChange={handleChange}
+                className="w-full border px-4 py-2 rounded"
+                required
+              >
+                <option value="">Please Select</option>
+                <option value="Full Time">Male</option>
+                <option value="Part Time">Female</option>
+                <option value="Part Time">Other</option>
+              </select>
+            </div>
             <div>
               <label className="block text-sm font-medium mb-1">
                 Employee Bank Account No.:
@@ -182,20 +204,20 @@ const AddEmployee = () => {
               />
             </div>
 
-            <div>
+            <div> {/*Designation*/}
               <label className="block text-sm font-medium mb-1">
-                Employee Role:
+                Designation:
               </label>
               <input
                 type="text"
-                name="role"
+                name="designation"
                 placeholder="ex. Software Engineer"
-                value={formData.role}
+                value={formData.designation}
                 onChange={handleChange}
                 className="w-full border px-4 py-2 rounded"
                 required
               />
-            </div>
+            </div> 
 
             <div>
               <label className="block text-sm font-medium mb-1">
@@ -210,6 +232,23 @@ const AddEmployee = () => {
                 className="w-full border px-4 py-2 rounded"
                 required
               />
+            </div>
+
+              <div>{/*Role*/}
+              <label className="block text-sm font-medium mb-1">
+                Role:
+              </label>
+              <select
+                name="role"
+                value={formData.role}
+                onChange={handleChange}
+                className="w-full border px-4 py-2 rounded"
+                required
+              >
+                <option value="">Please Select</option>
+                <option value="Full Time">HR</option>
+                <option value="Part Time">Employee</option>
+              </select>
             </div>
 
             <div>
@@ -246,6 +285,54 @@ const AddEmployee = () => {
                 <option value="Hourly">Hourly</option>
               </select>
             </div>
+
+              <div>{/*Joining Date*/}
+              <label className="block text-sm font-medium mb-1">
+                 Joining Date:
+              </label>
+              <input
+                type="text"
+                name="joigningDate"
+                placeholder="ex. 18-07-2025"
+                value={formData.joigningDate}
+                onChange={handleChange}
+                className="w-full border px-4 py-2 rounded"
+                required
+              />
+            </div>
+
+
+            <div>{/*Emergencycontactname*/}
+              <label className="block text-sm font-medium mb-1">
+                Emergency Contact Name:
+              </label>
+              <input
+                type="text"
+                name="emergencyContactname"
+                placeholder="ex. Rahul"
+                value={formData.emergencyContactname}
+                onChange={handleChange}
+                className="w-full border px-4 py-2 rounded"
+                required
+              />
+            </div>
+
+            
+              <div>{/*Emergencycontact*/}
+              <label className="block text-sm font-medium mb-1">
+                Emergency Contact:
+              </label>
+              <input
+                type="text"
+                name="emergencyContact"
+                placeholder="ex. 9875641230"
+                value={formData.emergencyContact}
+                onChange={handleChange}
+                className="w-full border px-4 py-2 rounded"
+                required
+              />
+            </div>
+
 
             <div className="col-span-1 md:col-span-2 mt-4">
               <button
