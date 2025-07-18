@@ -203,25 +203,100 @@ console.log("recieve data is",data)
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 10 }, (_, i) => currentYear - i);
 
-  const downloadPDF = (item) => {
+const downloadPDF = (item) => {
   const doc = new jsPDF();
 
-  doc.setFontSize(16);
-  doc.text(`Salary Slip ${item.month}`, 80, 15);
+  // ==== Logo ====
+  const logoUrl = "https://your-logo-url.com/logo.png"; // Replace with your real logo or base64
+  const img = new Image();
+  img.crossOrigin = "Anonymous";
+  img.src = logoUrl;
 
-  doc.setFontSize(12);
-  doc.text(`Employee ID: ${item.employee_id}`, 10, 30);
-  doc.text(`Employee Name: ${item.employee_name}`, 10, 40);
+  img.onload = () => {
+    doc.addImage(img, "PNG", 15, 10, 30, 15);
 
+    // ==== Header ====
+    doc.setFontSize(18);
+    doc.setTextColor(54, 54, 54);
+    doc.text("ABC Corporation Pvt. Ltd.", 105, 20, null, null, "center");
 
-  doc.text(`Basic Salary: ₹${item.basic_salary}`, 10, 80);
-  doc.text(`Gross Salary: ₹${item.salary_breakdown.gross_salary}`, 10, 90);
-  doc.text(`Net Salary: ₹${item.salary_breakdown.net_salary.toFixed(2)}`, 10, 100);
+    doc.setFontSize(12);
+    doc.setTextColor(100, 100, 100);
+    doc.text("Official Salary Receipt", 105, 28, null, null, "center");
 
+    // ==== Background Section Box ====
+    doc.setFillColor(230, 230, 250); // Lavender
+    doc.rect(15, 35, 180, 15, "F");
 
+    // ==== Employee Info ====
+    doc.setFontSize(11);
+    doc.setTextColor(33, 33, 33);
+    doc.text(`Employee ID: ${item.employee_id}`, 20, 44);
+    doc.text(`Name: ${item.employee_name}`, 75, 44);
+    doc.text(`Month: ${item.month}`, 150, 44);
 
-  doc.save(`SalarySlip-${item.month}.pdf`);
+    // ==== Earnings Section ====
+    doc.setFontSize(12);
+    doc.setTextColor(255, 255, 255);
+    doc.setFillColor(72, 61, 139); // Dark Slate Blue
+    doc.rect(15, 60, 90, 8, "F");
+    doc.text("Earnings", 20, 66);
+
+    doc.setFontSize(11);
+    doc.setTextColor(0, 0, 0);
+    doc.text(`Basic Salary: ₹${item.basic_salary}`, 20, 75);
+    doc.text(`Gross Salary: ₹${item.salary_breakdown?.gross_salary}`, 20, 83);
+
+    // ==== Deductions Section ====
+    doc.setTextColor(255, 255, 255);
+    doc.setFillColor(139, 0, 0); // Dark Red
+    doc.rect(105, 60, 90, 8, "F");
+    doc.text("Deductions", 110, 66);
+
+    doc.setFontSize(11);
+    doc.setTextColor(0, 0, 0);
+    doc.text(`PF (5%): ₹${item.deductions?.pf_amount}`, 110, 75);
+    doc.text(`Tax (10%): ₹${item.deductions?.tax_amount}`, 110, 83);
+    doc.text(
+      `Leave Deduction: ₹${(Number(item.deductions?.leave_deduction) || 0).toFixed(2)}`,
+      110,
+      91
+    );
+
+    // ==== Net Salary Section ====
+    doc.setFontSize(12);
+    doc.setTextColor(255, 255, 255);
+    doc.setFillColor(0, 128, 0); // Green
+    doc.rect(15, 105, 180, 10, "F");
+
+    doc.setFont("helvetica", "bold");
+    doc.text(
+      `Net Salary (In Hand): ₹${(Number(item.salary_breakdown?.net_salary) || 0).toFixed(2)}`,
+      20,
+      112
+    );
+
+    // ==== Footer ====
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(100, 100, 100);
+    doc.text("This is a system-generated payslip and does not require a signature.", 15, 130);
+
+    // ==== Save ====
+    doc.save(`SalarySlip-${item.month}.pdf`);
+  };
+
+  img.onerror = () => {
+    console.warn("Logo failed to load. Generating PDF without logo.");
+    // Retry without image
+    doc.setFontSize(18);
+    doc.text("ABC Corporation Pvt. Ltd.", 105, 20, null, null, "center");
+    // You can call a simplified version of the above PDF here
+    doc.save(`SalarySlip-${item.month}.pdf`);
+  };
 };
+
+
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#f5f7fa] to-[#e4ecf7]">
