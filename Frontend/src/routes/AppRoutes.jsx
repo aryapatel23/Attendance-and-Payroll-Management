@@ -24,6 +24,7 @@ import Attendance from "../Pages/Employee/Attendance";
 import Salary from "../Pages/Employee/Salary";
 import Calendar from "../Pages/Employee/Calendar";
 import AttendanceNew from "../Components/attendance";
+import Emprofile from "../Pages/Employee/Emprofile";
 
 // Common / Temp
 import Add from "../Pages/Add";
@@ -49,6 +50,7 @@ const AppRoutes = () => {
           <Route path="emsalary" element={<Salary />} />
           <Route path="emcalendar" element={<Calendar />} />
           <Route path="attendance" element={<AttendanceNew />} />
+          <Route path="emprofile/:id" element={<Emprofile />} />
         </Route>
       )}
 
