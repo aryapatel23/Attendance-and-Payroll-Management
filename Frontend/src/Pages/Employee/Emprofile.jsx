@@ -97,7 +97,7 @@ console.log(employee)
         <FaEnvelope className="text-gray-500 mt-1" />
         </div>
         <div>
-          <p className="text-sm font-medium">Admin & HRM</p>
+          <p className="text-sm font-medium">{employee.role}</p>
           <p className="text-xs text-gray-400">Department</p>
         </div>
       </div>
@@ -107,7 +107,7 @@ console.log(employee)
         <FaRupeeSign className="text-gray-500 mt-1" />
         </div>
         <div>
-          <p className="text-sm font-medium text-green-600">₹40,000</p>
+          <p className="text-sm font-medium text-green-600">₹{employee.salary}</p>
           <p className="text-xs text-gray-400">Salary</p>
         </div>
       </div>
@@ -118,7 +118,7 @@ console.log(employee)
         </div>
         <div>
           <p className="text-sm font-medium">Regular</p>
-          <p className="text-xs text-gray-400">Work Shift</p>
+          <p className="text-xs text-gray-400">{employee.employmentType}</p>
         </div>
       </div>
 
@@ -129,7 +129,7 @@ console.log(employee)
                d="M8 7V3m8 4V3m-9 8h10m-10 4h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
         </div>
         <div>
-          <p className="text-sm font-medium">12 February 2023</p>
+          <p className="text-sm font-medium">{employee.joigningDate}</p>
           <p className="text-xs text-gray-400">Joining Date</p>
         </div>
       </div>
@@ -144,7 +144,7 @@ console.log(employee)
         <FaEnvelope className="text-gray-500 mt-1" />
         <div>
           <p className="text-xs text-gray-500">Email</p>
-          <p className="text-sm">alwissuryatmaja@gmail.com</p>
+          <p className="text-sm">{employee.email}</p>
         </div>
       </div>
 
@@ -152,7 +152,7 @@ console.log(employee)
         <FaPhone className="text-gray-500 mt-1" />
         <div>
           <p className="text-xs text-gray-500">Phone</p>
-          <p className="text-sm">+6282283386756</p>
+          <p className="text-sm">{employee.mobile}</p>
         </div>
       </div>
 
@@ -195,10 +195,9 @@ console.log("3. InfoTab rendered");
         <h4 className="text-md font-semibold mb-2 text-indigo-600">👤 Personal Details</h4>
         <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
           <p><span className="font-medium">Full Name:</span> {employee.username}</p>
-          <p><span className="font-medium">Date of Birth:</span> 20 May 1997</p>
-          <p><span className="font-medium">Gender:</span> Male</p>
-          <p><span className="font-medium">Blood Group:</span> B+</p>
-          <p><span className="font-medium">Marital Status:</span> Single</p>
+          <p><span className="font-medium">Bank Account NO:</span> {employee.bankAccount}</p>
+          <p><span className="font-medium">Gender:</span> {employee.gender}</p>
+          <p><span className="font-medium">IFSC CODE:</span> {employee.IFSC}</p>
         </div>
       </div>
 
@@ -206,7 +205,7 @@ console.log("3. InfoTab rendered");
       <div>
         <h4 className="text-md font-semibold mb-2 text-indigo-600">📞 Contact Information</h4>
         <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
-          <p><span className="font-medium">Phone:</span> {employee.phone || 'N/A'}</p>
+          <p><span className="font-medium">Phone:</span> {employee.mobile || 'N/A'}</p>
           <p><span className="font-medium">Email:</span> {employee.email || 'N/A'}</p>
           <p className="col-span-2"><span className="font-medium">Address:</span> {employee.address || 'N/A'}</p>
         </div>
@@ -217,9 +216,9 @@ console.log("3. InfoTab rendered");
         <h4 className="text-md font-semibold mb-2 text-indigo-600">💼 Job Details</h4>
         <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
           <p><span className="font-medium">Employee ID:</span> {employee.user_id}</p>
-          <p><span className="font-medium">Department:</span> Frontend</p>
-          <p><span className="font-medium">Designation:</span> {employee.employee_role}</p>
-          <p><span className="font-medium">Joining Date:</span> 12 Feb 2023</p>
+          <p><span className="font-medium">Designation:</span> {employee.designation}</p>
+          <p><span className="font-medium">Attendance Type:</span> {employee.attendanceType}</p>
+          <p><span className="font-medium">Joining Date:</span> {employee.joigningDate}</p>
         </div>
       </div>
 
