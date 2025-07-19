@@ -31,7 +31,7 @@ const AddEmployee = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:5500/api/add",
+        "https://attendance-and-payroll-management.onrender.com/api/add",
         {
           method: "POST",
           headers: {

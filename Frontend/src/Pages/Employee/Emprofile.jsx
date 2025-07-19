@@ -226,8 +226,8 @@ console.log("3. InfoTab rendered");
       <div>
         <h4 className="text-md font-semibold mb-2 text-indigo-600">🚨 Emergency Contact</h4>
         <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
-          <p><span className="font-medium">Name:</span> Rahul Doe</p>
-          <p><span className="font-medium">Contact:</span> +91 9999999999</p>
+          <p><span className="font-medium">Name:</span> {employee.emergencyContactname}</p>
+          <p><span className="font-medium">Contact:</span> {employee.emergencyContact}</p>
         </div>
       </div>
     </div>
