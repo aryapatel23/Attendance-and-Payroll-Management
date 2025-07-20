@@ -128,7 +128,7 @@ console.log(employee)
   <div className="flex flex-col items-center text-center">
       <img src="https://i.pravatar.cc/100?img=56" alt="Employee" className="w-24 h-24 rounded-full mb-4 shadow" />
       <h3 className="text-lg font-semibold">{employee.username}</h3>
-      <p className="text-sm text-gray-500">UX Designer</p>
+      <p className="text-sm text-gray-500">{employee.designation}</p>
     </div>
 
   {/* Info Section */}
@@ -140,7 +140,7 @@ console.log(employee)
         <FaEnvelope className="text-gray-500 mt-1" />
         </div>
         <div>
-          <p className="text-sm font-medium">Admin & HRM</p>
+          <p className="text-sm font-medium">{employee.role}</p>
           <p className="text-xs text-gray-400">Department</p>
         </div>
       </div>
@@ -150,7 +150,7 @@ console.log(employee)
         <FaRupeeSign className="text-gray-500 mt-1" />
         </div>
         <div>
-          <p className="text-sm font-medium text-green-600">₹40,000</p>
+          <p className="text-sm font-medium text-green-600">{employee.salary}</p>
           <p className="text-xs text-gray-400">Salary</p>
         </div>
       </div>
@@ -160,7 +160,7 @@ console.log(employee)
         <FaRegClock  className="text-gray-500 mt-1" />
         </div>
         <div>
-          <p className="text-sm font-medium">Regular</p>
+          <p className="text-sm font-medium">{employee.employmentType}</p>
           <p className="text-xs text-gray-400">Work Shift</p>
         </div>
       </div>
@@ -172,7 +172,7 @@ console.log(employee)
                d="M8 7V3m8 4V3m-9 8h10m-10 4h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
         </div>
         <div>
-          <p className="text-sm font-medium">12 February 2023</p>
+          <p className="text-sm font-medium">{employee.joigningDate}</p>
           <p className="text-xs text-gray-400">Joining Date</p>
         </div>
       </div>
@@ -187,7 +187,7 @@ console.log(employee)
         <FaEnvelope className="text-gray-500 mt-1" />
         <div>
           <p className="text-xs text-gray-500">Email</p>
-          <p className="text-sm">alwissuryatmaja@gmail.com</p>
+          <p className="text-sm">{employee.email}</p>
         </div>
       </div>
 
@@ -195,7 +195,7 @@ console.log(employee)
         <FaPhone className="text-gray-500 mt-1" />
         <div>
           <p className="text-xs text-gray-500">Phone</p>
-          <p className="text-sm">+6282283386756</p>
+          <p className="text-sm">{employee.mobile}</p>
         </div>
       </div>
 
@@ -249,7 +249,7 @@ console.log("3. InfoTab rendered");
       <div>
         <h4 className="text-md font-semibold mb-2 text-indigo-600">📞 Contact Information</h4>
         <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
-          <p><span className="font-medium">Phone:</span> {employee.phone || 'N/A'}</p>
+          <p><span className="font-medium">Phone:</span> {employee.mobile || 'N/A'}</p>
           <p><span className="font-medium">Email:</span> {employee.email || 'N/A'}</p>
           <p className="col-span-2"><span className="font-medium">Address:</span> {employee.address || 'N/A'}</p>
         </div>
