@@ -77,13 +77,13 @@ const Dashboard = () => {
 
   const statusmanager = () => {
     if (attendanceStatus === "Present") {
-      return "✅ Present";
+      return "Present";
     } else if (attendanceStatus === "Late") {
-      return "❗ Late";
+      return "Late";
     } else if (attendanceStatus === "Late Absent") {
-      return "❗ Late Absent";
+      return "Late Absent";
     } else {
-      return "❌ Absent";
+      return "Absent";
     }
   }
 
