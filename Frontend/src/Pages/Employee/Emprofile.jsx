@@ -203,12 +203,12 @@ function InfoTab() {
 
   return (
     <>
-    <div className="space-y-6 text-gray-700">
+    <div className="space-y-5 text-gray-700">
       {employee ? (
         <>
-          <h3 className="text-xl font-semibold border-b pb-2">
-            User {employee.user_id} Salary Info
-          </h3>
+          {/* <h3 className="text-xl font-semibold border-b pb-2">
+            User {employee.user_id} Profile Info
+          </h3> */}
 
           {/* Personal Info */}
           <div>
@@ -251,6 +251,15 @@ function InfoTab() {
         </div>
       </div>
 
+            {/* Emergency Info */}
+      <div>
+        <h4 className="text-md font-semibold mb-2 text-indigo-600">Bank Info</h4>
+        <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
+          <p><span className="font-medium">BankAccount No:</span> {employee.bankAccount}</p>
+          <p><span className="font-medium">IFSC:</span> {employee.IFSC}</p>
+        </div>
+      </div>
+
           {/* Buttons */}
           <div className="pt-2">
             <button
@@ -277,13 +286,102 @@ function InfoTab() {
         />
       )}
     </div>
-    
-    
-    
     </>
-    
-    
   );
 }
+
+const SalaryModal = ({ mode = "update", employeeId, defaultData = {}, onClose }) => {
+    const user = useSelector((state) => state.auth.user);
+    console.log("Hr data is",user)
+    const [formData, setFormData] = useState({
+    user_id:"",
+    username:"",
+    email:"",
+    mobile:"",  
+    address:"",
+    bankAccount:"",
+    gender:"",
+    IFSC:"",
+    emergencyContact:"",
+    emergencyContactname:"",
+   });
+
+  const [message, setMessage] = useState("");
+  
+
+  // Pre-fill form for update
+  useEffect(() => {
+    if (mode === "update" && defaultData) {
+      setFormData({ ...defaultData });
+    } else {
+      setFormData((prev) => ({ ...prev, employee_id: employeeId }));
+    }
+  }, [defaultData, mode, employeeId]);
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const url =`http://localhost:5500/api/update/${user.id}`;
+
+    const method = "PUT";
+
+    try {
+      const response = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+        
+      });
+
+      const result = await response.json();
+      console.log("result send is",result)
+      if (!response.ok) throw new Error(result.message);
+
+      setMessage(result.message);
+      setTimeout(() => {
+        onClose(); // Close modal after success
+      }, 1000);
+    } catch (err) {
+      setMessage(err.message);
+    }
+  };
+  return (
+    <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center px-4">
+      <div className="bg-white max-w-2xl w-full rounded-xl shadow-xl p-6 relative max-h-[90vh] overflow-y-auto">
+        <button onClick={onClose} className="absolute top-3 right-4 text-lg text-gray-500 hover:text-red-600">✖</button>
+
+        <h2 className="text-xl font-semibold mb-4 text-center">
+          {mode === "add" ? "Add Salary Info" : "Update Salary Info"}
+        </h2>
+
+        <form onSubmit={handleSubmit} className="space-y-3 text-sm">
+          <div className="grid grid-cols-2 gap-3">
+            <input type="text" name="employee_id" value={formData.user_id} onChange={handleChange} placeholder="Employee ID" disabled={mode === "update"} className="border p-2 rounded" />
+            <input type="text" name="username" value={formData.username} onChange={handleChange} placeholder="Employee Name" className="border p-2 rounded" />
+            <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Email" className="border p-2 rounded" />
+            <input type="text" name="mobile" value={formData.mobile} onChange={handleChange} placeholder="Mobile" className="border p-2 rounded" />
+            <input type="text" name="address" value={formData.address} onChange={handleChange} placeholder="Address" className="border p-2 rounded" />
+            <input type="text" name="bankAccount" value={formData.bankAccount} onChange={handleChange} placeholder="Bank Account" className="border p-2 rounded" />
+            <input type="text" name="IFSC" value={formData.IFSC} onChange={handleChange} placeholder="IFSC Code" className="border p-2 rounded" />
+            <input type="text" name="emergencyContact" value={formData.emergencyContact} onChange={handleChange} placeholder="emergencyContact" className="border p-2 rounded" />
+            <input type="text" name="emergencyContactname" value={formData.emergencyContactname} onChange={handleChange} placeholder="emergencyContactname" className="border p-2 rounded" />
+          </div>
+
+          <button type="submit" className="w-full mt-4 bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
+            {mode === "add" ? "Add Info" : "Update Info"}
+          </button>
+        </form>
+
+        {message && <p className="text-center text-sm mt-3 text-green-600">{message}</p>}
+      </div>
+    </div>
+  );
+};
 
 export default Emprofile;

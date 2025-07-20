@@ -21,11 +21,10 @@ const getProfile = async (req, res) => {
 const updateProfile = async (req, res) => {
   const db = getDB();
   const { userId } = req.params;
-
   if (!userId) return res.status(400).json({ message: 'Invalid user' });
 
   const {
-    name,
+    username,
     email,
     mobile,
     address,
@@ -35,11 +34,10 @@ const updateProfile = async (req, res) => {
     emergencyContact,
     emergencyContactname,
   } = req.body;
-
   // Dynamically construct update fields
   const updateFields = {};
 
-  if (name !== undefined) updateFields.username = name;
+  if (username !== undefined) updateFields.username = username;
   if (email !== undefined) updateFields.email = email;
   if (mobile !== undefined) updateFields.mobile = mobile;
   if (address !== undefined) updateFields.address = address;
@@ -58,7 +56,6 @@ const updateProfile = async (req, res) => {
       { user_id: userId },
       { $set: updateFields }
     );
-
     if (result.modifiedCount === 0) {
       return res.status(404).json({ message: 'User not found or no changes made' });
     }
