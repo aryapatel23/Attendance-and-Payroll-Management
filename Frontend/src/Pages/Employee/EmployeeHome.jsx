@@ -24,8 +24,11 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [selectedRange, setSelectedRange] = useState("This Year");
 
-  const handleNavigate = () => {
+  const handleBuddyPunching = () => {
     navigate('/emattendance'); // your route path
+  };
+  const handleManagerPOV = () => {
+    navigate('/emprofile/:id'); // your route path
   };
 
   const user = useSelector((state) => state.auth.user);
@@ -104,20 +107,23 @@ const Dashboard = () => {
 
           <div className="flex flex-wrap gap-2 items-center">
             <button
-              onClick={handleNavigate}
+              onClick={handleBuddyPunching}
               className="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm shadow hover:bg-indigo-700 transition"
             >
               + Buddy Punching
             </button>
-            <button className="border px-4 py-2 rounded-md text-sm shadow hover:bg-gray-50 transition">
+            <button
+              onClick={handleManagerPOV}
+              className="border px-4 py-2 rounded-md text-sm shadow hover:bg-gray-50 transition"
+            >
               Manager POV
             </button>
 
             {/* Today's Attendance Status */}
             <div
               className={`px-4 py-2 rounded-md text-sm font-medium shadow transition ${(attendanceStatus === 'Present' || attendanceStatus === 'Late')
-                  ? 'bg-green-500 text-white'
-                  : 'bg-red-500 text-white'
+                ? 'bg-green-500 text-white'
+                : 'bg-red-500 text-white'
                 }`}
             >
               {statusmanager()}
