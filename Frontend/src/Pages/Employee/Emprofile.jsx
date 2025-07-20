@@ -173,35 +173,55 @@ console.log(employee)
 
 function InfoTab() {
   const { id } = useParams();
-  const userFromStore = useSelector((state) => state.auth.usersdata[id]);
   const [employee, setEmployee] = useState(null);
-console.log("3. InfoTab rendered");
+  const [message, setMessage] = useState("Loading...");
+  const [showModal, setShowModal] = useState(false);
+  const [formMode, setFormMode] = useState("add");
+  const [selectedEmployeeData, setSelectedEmployeeData] = useState(null);
+   
+  const userFromStore = useSelector((state) => state.auth.usersdata[id]);
+  console.log("3. InfoTab rendered");
+
   useEffect(() => {
     if (userFromStore) {
       setEmployee(userFromStore);
       console.log("Fatching data from cach in info tab")
         console.log("4. InfoTab useEffect triggered (cache check)");
+    }else{
+    setMessage("User data is not found for this user. Please add the user info.");
+    return;
     }
   }, [userFromStore]);
 
+    const openModal = (mode, data = null) => {
+    setFormMode(mode);
+    setSelectedEmployeeData(data);
+    setShowModal(true);
+  };  
+  
   if (!employee) return <p>Loading...</p>;
 
   return (
+    <>
     <div className="space-y-6 text-gray-700">
-      <h3 className="text-xl font-semibold border-b pb-2">Personal & Official Information</h3>
+      {employee ? (
+        <>
+          <h3 className="text-xl font-semibold border-b pb-2">
+            User {employee.user_id} Salary Info
+          </h3>
 
-      {/* Personal Info */}
-      <div>
-        <h4 className="text-md font-semibold mb-2 text-indigo-600">👤 Personal Details</h4>
-        <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
-          <p><span className="font-medium">Full Name:</span> {employee.username}</p>
-          <p><span className="font-medium">Bank Account NO:</span> {employee.bankAccount}</p>
-          <p><span className="font-medium">Gender:</span> {employee.gender}</p>
-          <p><span className="font-medium">IFSC CODE:</span> {employee.IFSC}</p>
-        </div>
-      </div>
+          {/* Personal Info */}
+          <div>
+            <h4 className="text-md font-semibold mb-2 text-indigo-600">👤 Personal Details</h4>
+            <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
+              <p><span className="font-medium">Full Name:</span> {employee.username}</p>
+              <p><span className="font-medium">Employee ID:</span> {employee.user_id}</p>
+              <p><span className="font-medium">Base Salary:</span> ₹{employee.salary}</p>
+              <p><span className="font-medium">Joining Date:</span> {employee.joigningDate}</p>
+            </div>
+          </div>
 
-      {/* Contact Info */}
+       {/* Contact Info */}
       <div>
         <h4 className="text-md font-semibold mb-2 text-indigo-600">📞 Contact Information</h4>
         <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
@@ -230,7 +250,39 @@ console.log("3. InfoTab rendered");
           <p><span className="font-medium">Contact:</span> {employee.emergencyContact}</p>
         </div>
       </div>
+
+          {/* Buttons */}
+          <div className="pt-2">
+            <button
+              onClick={() => openModal("update", employee)}
+              className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+            >
+              ✏️ Update Your Profile
+            </button>
+          </div>
+        </>
+      ) : (
+        <>
+          <p className="text-red-600 font-medium">{message}</p>
+        </>
+      )}
+
+      {/* Modal */}
+      {showModal && (
+        <SalaryModal
+          mode={formMode}
+          employeeId={id}
+          defaultData={formMode === "update" ? selectedEmployeeData : {}}
+          onClose={() => setShowModal(false)}
+        />
+      )}
     </div>
+    
+    
+    
+    </>
+    
+    
   );
 }
 
