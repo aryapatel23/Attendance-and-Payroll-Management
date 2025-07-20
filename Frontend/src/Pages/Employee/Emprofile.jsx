@@ -32,6 +32,7 @@ const Emprofile = () => {
 
                         <div className="flex-1 overflow-y-auto">
                 {tab === "Personal Info" && <InfoTab />}
+                {tab === "Salary Info" && <SalaryInfoTab />}
               </div>
             </div>
           </div>
@@ -206,9 +207,9 @@ function InfoTab() {
     <div className="space-y-5 text-gray-700">
       {employee ? (
         <>
-          {/* <h3 className="text-xl font-semibold border-b pb-2">
+          <h3 className="text-xl font-semibold border-b pb-2">
             User {employee.user_id} Profile Info
-          </h3> */}
+          </h3>
 
           {/* Personal Info */}
           <div>
@@ -287,6 +288,92 @@ function InfoTab() {
       )}
     </div>
     </>
+  );
+}
+
+function SalaryInfoTab() {
+  const { id } = useParams();
+
+  const [employee, setEmployee] = useState(null);
+  const [message, setMessage] = useState("Loading...");
+
+
+
+  useEffect(() => {
+    if (!id) return;
+
+    const fetchSalaryInfo = async () => {
+      try {
+        const response = await fetch(`http://localhost:5500/api/usersalaryinfo/${id}`);
+
+        if (!response.ok) {
+          setMessage("Salary data is not found for this user. Please add the user info.");
+          return;
+        }
+
+        const data = await response.json();
+        setEmployee(data);
+      } catch (error) {
+        console.error("Error fetching salary info:", error);
+        setMessage("Something went wrong while fetching salary info.");
+      }
+    };
+
+    fetchSalaryInfo();
+  }, [id]);
+
+  return (
+    <div className="space-y-6 text-gray-700">
+      {employee ? (
+        <>
+          <h3 className="text-xl font-semibold border-b pb-2">
+            User {employee.user_id} Salary Info
+          </h3>
+
+          {/* Personal Info */}
+          <div>
+            <h4 className="text-md font-semibold mb-2 text-indigo-600">👤 Personal Details</h4>
+            <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
+              <p><span className="font-medium">Full Name:</span> {employee.employee_name}</p>
+              <p><span className="font-medium">Employee ID:</span> {employee.employee_id}</p>
+              <p><span className="font-medium">Base Salary:</span> ₹{employee.base_salary}</p>
+              <p><span className="font-medium">Joining Date:</span> {employee.joining_date}</p>
+            </div>
+          </div>
+
+          {/* Bonus Info */}
+          <div>
+            <h4 className="text-md font-semibold mb-2 text-indigo-600">💰 Bonus</h4>
+            <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
+              <p><span className="font-medium">Bonus:</span> ₹{employee.bonus}</p>
+              <p><span className="font-medium">HRA:</span> ₹{employee.hra}</p>
+            </div>
+          </div>
+
+          {/* Deductions Info */}
+          <div>
+            <h4 className="text-md font-semibold mb-2 text-indigo-600">➖ Deductions</h4>
+            <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
+              <p><span className="font-medium">Tax Percent:</span> {employee.tax_percent}%</p>
+              <p><span className="font-medium">PF Percent:</span> {employee.pf_percent}%</p>
+            </div>
+          </div>
+
+          {/* Updates */}
+          <div>
+            <h4 className="text-md font-semibold mb-2 text-indigo-600">🔄 Updates</h4>
+            <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
+              <p><span className="font-medium">Updated By:</span> {employee.updated_by}</p>
+               <p><span className="font-medium">Last Update:</span> {(employee.last_update).split("T")[0]}</p>
+            </div>
+          </div>
+        </>
+      ) : (
+        <>
+          <p className="text-red-600 font-medium">{message}</p>
+        </>
+      )}
+    </div>
   );
 }
 
