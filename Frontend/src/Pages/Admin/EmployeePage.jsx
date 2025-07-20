@@ -233,19 +233,18 @@ console.log("3. InfoTab rendered");
     <div className="space-y-6 text-gray-700">
       <h3 className="text-xl font-semibold border-b pb-2">Personal & Official Information</h3>
 
-      {/* Personal Info */}
-      <div>
-        <h4 className="text-md font-semibold mb-2 text-indigo-600">👤 Personal Details</h4>
-        <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
-          <p><span className="font-medium">Full Name:</span> {employee.username}</p>
-          <p><span className="font-medium">Date of Birth:</span> 20 May 1997</p>
-          <p><span className="font-medium">Gender:</span> Male</p>
-          <p><span className="font-medium">Blood Group:</span> B+</p>
-          <p><span className="font-medium">Marital Status:</span> Single</p>
-        </div>
-      </div>
+          {/* Personal Info */}
+          <div>
+            <h4 className="text-md font-semibold mb-2 text-indigo-600">👤 Personal Details</h4>
+            <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
+              <p><span className="font-medium">Full Name:</span> {employee.username}</p>
+              <p><span className="font-medium">Employee ID:</span> {employee.user_id}</p>
+              <p><span className="font-medium">Base Salary:</span> ₹{employee.salary}</p>
+              <p><span className="font-medium">Joining Date:</span> {employee.joigningDate}</p>
+            </div>
+          </div>
 
-      {/* Contact Info */}
+       {/* Contact Info */}
       <div>
         <h4 className="text-md font-semibold mb-2 text-indigo-600">📞 Contact Information</h4>
         <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
@@ -260,9 +259,9 @@ console.log("3. InfoTab rendered");
         <h4 className="text-md font-semibold mb-2 text-indigo-600">💼 Job Details</h4>
         <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
           <p><span className="font-medium">Employee ID:</span> {employee.user_id}</p>
-          <p><span className="font-medium">Department:</span> Frontend</p>
-          <p><span className="font-medium">Designation:</span> {employee.employee_role}</p>
-          <p><span className="font-medium">Joining Date:</span> 12 Feb 2023</p>
+          <p><span className="font-medium">Designation:</span> {employee.designation}</p>
+          <p><span className="font-medium">Attendance Type:</span> {employee.attendanceType}</p>
+          <p><span className="font-medium">Joining Date:</span> {employee.joigningDate}</p>
         </div>
       </div>
 
@@ -270,8 +269,17 @@ console.log("3. InfoTab rendered");
       <div>
         <h4 className="text-md font-semibold mb-2 text-indigo-600">🚨 Emergency Contact</h4>
         <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
-          <p><span className="font-medium">Name:</span> Rahul Doe</p>
-          <p><span className="font-medium">Contact:</span> +91 9999999999</p>
+          <p><span className="font-medium">Name:</span> {employee.emergencyContactname}</p>
+          <p><span className="font-medium">Contact:</span> {employee.emergencyContact}</p>
+        </div>
+      </div>
+
+            {/* Emergency Info */}
+      <div>
+        <h4 className="text-md font-semibold mb-2 text-indigo-600">Bank Info</h4>
+        <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
+          <p><span className="font-medium">BankAccount No:</span> {employee.bankAccount}</p>
+          <p><span className="font-medium">IFSC:</span> {employee.IFSC}</p>
         </div>
       </div>
     </div>
