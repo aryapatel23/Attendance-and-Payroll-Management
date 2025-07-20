@@ -18,21 +18,79 @@ const getProfile = async (req, res) => {
   res.json({ user });
 };
 
+const updateProfile = async (req, res) => {
+  const db = getDB();
+  const { userId } = req.params;
+
+  if (!userId) return res.status(400).json({ message: 'Invalid user' });
+
+  const {
+    name,
+    email,
+    mobile,
+    address,
+    bankAccount,
+    gender,
+    IFSC,
+    emergencyContact,
+    emergencyContactname,
+  } = req.body;
+
+  // Dynamically construct update fields
+  const updateFields = {};
+
+  if (name !== undefined) updateFields.username = name;
+  if (email !== undefined) updateFields.email = email;
+  if (mobile !== undefined) updateFields.mobile = mobile;
+  if (address !== undefined) updateFields.address = address;
+  if (bankAccount !== undefined) updateFields.bankAccount = bankAccount;
+  if (gender !== undefined) updateFields.gender = gender;
+  if (IFSC !== undefined) updateFields.IFSC = IFSC;
+  if (emergencyContact !== undefined) updateFields.emergencyContact = emergencyContact;
+  if (emergencyContactname !== undefined) updateFields.emergencyContactname = emergencyContactname;
+
+  try {
+    if (Object.keys(updateFields).length === 0) {
+      return res.status(400).json({ message: 'No fields to update' });
+    }
+
+    const result = await db.collection('users').updateOne(
+      { user_id: userId },
+      { $set: updateFields }
+    );
+
+    if (result.modifiedCount === 0) {
+      return res.status(404).json({ message: 'User not found or no changes made' });
+    }
+
+    res.json({ message: 'Profile updated successfully' });
+  } catch (error) {
+    console.error('Error updating profile:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
 const addUser = async (req, res) => {
   try {
     const db = getDB();
     const {
       name,
+      gender,
       id,
+      joigningDate,
+      designation,
       address,
-      bankAccount,
-      mobile,
-      email,
-      password,
-      role,
-      salary,
-      employmentType,
-      attendanceType,
+    bankAccount,
+    mobile,
+    email,
+    password,
+    role,
+    salary,
+    employmentType,
+    attendanceType,
+    emergencyContact,
+    emergencyContactname,
+    IFSC,
     } = req.body;
 
     // Basic validation
@@ -59,11 +117,17 @@ const addUser = async (req, res) => {
       mobile,
       email,
       password: hashedPassword,
-      employee_role: role,
+      designation,
       salary,
       employmentType,
       attendanceType,
-      role: 'HR',
+      role,
+        emergencyContact,
+    emergencyContactname,
+          joigningDate,
+      designation,
+            gender,
+            IFSC,
     });
 
     res.status(201).json({
@@ -112,4 +176,4 @@ const userByitsId = async (req,res)=>{
 }
 
 
-module.exports = { getProfile, addUser, alluser,userByitsId};
+module.exports = { getProfile, addUser, alluser,userByitsId,updateProfile};
