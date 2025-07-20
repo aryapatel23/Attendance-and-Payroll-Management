@@ -10,7 +10,7 @@ const Calendar = () => {
   const [selectedDate, setSelectedDate] = useState(null);
 
   useEffect(() => {
-    fetch("http://localhost:5500/api/holidays")
+    fetch("https://attendance-and-payroll-management.onrender.com/api/holidays")
       .then(res => res.json())
       .then(data => {
         const map = {};
