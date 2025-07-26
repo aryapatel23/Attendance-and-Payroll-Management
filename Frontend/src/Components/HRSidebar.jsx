@@ -62,7 +62,7 @@ const Sidebar = () => {
               { label: 'Add Employee', icon: <UserPlus size={18} />, path: '/hraddemployee' },
               { label: 'Payroll System', icon: <Wallet size={18} />, path: '/hrpayrollsystem' },
               { label: 'Calendar', icon: <Calendar size={18} />, path: '/hrcalendar' },
-              { label: 'Profile', icon: <User size={18} />, path: '/profile' },
+              { label: 'Profile', icon: <User size={18} />, path: `/hrprofile/${user?.id}` },
               { label: 'Settings', icon: <Settings size={18} />, path: '/settings' },
             ].map(({ label, icon, path }) => (
               <button
