@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { setPassword } = require("./mailcontrollers");
+const { setPassword } = require("./mailController");
 
 router.post("/set-password", setPassword);
 // router.post("/send-welcome-mail", sendWelcomeMail);
