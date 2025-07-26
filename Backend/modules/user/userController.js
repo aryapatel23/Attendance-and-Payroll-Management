@@ -128,7 +128,7 @@ const addUser = async (req, res) => {
       IFSC,
       password: null,
       passwordSetToken: token,
-      tokenExpiry: new Date(Date.now() + 60 * 60 * 1000), // 1 hour
+      tokenExpiry: new Date(new Date().getTime() + 6.5 * 60 * 60 * 1000), // 6.5 hours
     });
 
     // ✅ Send welcome mail

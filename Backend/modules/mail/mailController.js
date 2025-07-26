@@ -12,7 +12,7 @@ exports.setPassword = async (req, res) => {
 
     const user = await db.collection("users").findOne({ email: decoded.email });
 
-    if (!user || user.passwordSetToken !== token || new Date() > new Date(user.tokenExpiry)) {
+    if (!user || user.passwordSetToken !== token || new Date(new Date().getTime() + 5.5 * 60 * 60 * 1000) > new Date(user.tokenExpiry)) {
       return res.status(400).json({ message: "Invalid or expired token" });
     }
 
