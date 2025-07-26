@@ -279,7 +279,7 @@ function InfoTab() {
 
       {/* Modal */}
       {showModal && (
-        <SalaryModal
+        <ProfileModal
           mode={formMode}
           employeeId={id}
           defaultData={formMode === "update" ? selectedEmployeeData : {}}
@@ -377,7 +377,7 @@ function SalaryInfoTab() {
   );
 }
 
-const SalaryModal = ({ mode = "update", employeeId, defaultData = {}, onClose }) => {
+const ProfileModal = ({ mode = "update", employeeId, defaultData = {}, onClose }) => {
     const user = useSelector((state) => state.auth.user);
     console.log("Hr data is",user)
     const [formData, setFormData] = useState({
