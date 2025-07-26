@@ -1,6 +1,7 @@
 const { getDB } = require('../../config/db');
 const { ObjectId } = require('mongodb');
-const bcrypt = require('bcrypt');
+const jwt = require("jsonwebtoken");
+const transporter = require("../mail/mailtransporter");
 
 const getProfile = async (req, res) => {
   const db = getDB();
@@ -77,63 +78,84 @@ const addUser = async (req, res) => {
       joigningDate,
       designation,
       address,
-    bankAccount,
-    mobile,
-    email,
-    password,
-    role,
-    salary,
-    employmentType,
-    attendanceType,
-    emergencyContact,
-    emergencyContactname,
-    IFSC,
+      bankAccount,
+      mobile,
+      email,
+      role,
+      salary,
+      employmentType,
+      attendanceType,
+      emergencyContact,
+      emergencyContactname,
+      IFSC,
     } = req.body;
 
-    // Basic validation
-    if (!name || !id || !email || !password || !role) {
-      return res.status(400).json({ message: 'Missing required fields' });
+    // ✅ Required Fields Check
+    if (!name || !id || !email || !role) {
+      return res.status(400).json({ message: "Missing required fields" });
     }
 
-    // Check for duplicate email or ID
-    const existingUser = await db.collection('users').findOne({
+    // ✅ Check for duplicate email or ID
+    const existingUser = await db.collection("users").findOne({
       $or: [{ email }, { user_id: id }],
     });
     if (existingUser) {
-      return res.status(400).json({ message: 'User already exists' });
+      return res.status(400).json({ message: "User already exists" });
     }
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // ✅ Generate token for setting password (valid for 1 hour)
+    const token = jwt.sign({ email }, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
 
-    const result = await db.collection('users').insertOne({
+    // ✅ Insert user with null password initially
+    const result = await db.collection("users").insertOne({
       username: name,
       user_id: id,
+      gender,
+      joigningDate,
+      designation,
       address,
       bankAccount,
       mobile,
       email,
-      password: hashedPassword,
-      designation,
+      role,
       salary,
       employmentType,
       attendanceType,
-      role,
-        emergencyContact,
-    emergencyContactname,
-          joigningDate,
-      designation,
-            gender,
-            IFSC,
+      emergencyContact,
+      emergencyContactname,
+      IFSC,
+      password: null,
+      passwordSetToken: token,
+      tokenExpiry: new Date(Date.now() + 60 * 60 * 1000), // 1 hour
     });
 
+    // ✅ Send welcome mail
+    const setPasswordLink = `${process.env.FRONTEND_URL}/set-password?token=${token}`;
+
+    await transporter.sendMail({
+      from: `"Payroll App" <${process.env.SMTP_EMAIL}>`,
+      to: email,
+      subject: "Welcome to the Team – Set Your Password",
+      html: `
+        <p>Hello <strong>${name}</strong>,</p>
+        <p>Your HR has created an account for you in the Payroll system.</p>
+        <p>Click the link below to set your password (valid for 1 hour):</p>
+        <a href="${setPasswordLink}">${setPasswordLink}</a>
+        <br /><br />
+        <p>If you weren't expecting this email, you can ignore it.</p>
+      `,
+    });
+
+    // ✅ Final Response
     res.status(201).json({
-      message: 'User added successfully',
+      message: "User created & welcome email sent.",
       userId: result.insertedId,
     });
   } catch (error) {
-    console.error('Error adding user:', error);
-    res.status(500).json({ message: 'Internal Server Error' });
+    console.error("Error adding user:", error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
