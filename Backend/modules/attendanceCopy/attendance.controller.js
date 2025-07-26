@@ -33,7 +33,7 @@ exports.markAttendance = async (req, res) => {
   if (!user) return res.status(404).json({ message: "❌ User not found" });
 
   // 2. Check location
-  const office = { lat: 23.81316329003863, lng: 72.38415649295264 };
+  const office = { lat: 22.816958, lng: 72.473781};
   const distance = (loc1, loc2) => {
     const R = 6371;
     const toRad = deg => (deg * Math.PI) / 180;
@@ -53,7 +53,7 @@ exports.markAttendance = async (req, res) => {
     return res.status(403).json({ message: "⛔ Not at office location!" });
 
   // ✅ Safe way to get IST time using UTC offset
-  const utcNow = new Date();
+ 
   console.log("utcNow is:", utcNow.toISOString());
   const istOffset = 5.5 * 60 * 60 * 1000; // IST offset in milliseconds
   const istNow = new Date(utcNow.getTime() + istOffset);
