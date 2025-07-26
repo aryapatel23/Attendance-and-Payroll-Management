@@ -125,7 +125,7 @@ useEffect(() => {
                       </div>
                       <span>{emp.username}</span>
                     </td>
-                    <td className="px-6 py-4">{emp.employee_role}</td>
+                    <td className="px-6 py-4">{emp.designation}</td>
                     <td className="px-6 py-4">{emp.employmentType}</td>
                   </tr>
                 ))
