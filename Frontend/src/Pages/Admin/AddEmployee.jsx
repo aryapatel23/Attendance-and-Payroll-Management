@@ -11,7 +11,6 @@ const AddEmployee = () => {
     bankAccount: "",
     mobile: "",
     email: "",
-    password: "",
     role: "",
     salary: "",
     employmentType: "",
@@ -58,7 +57,6 @@ const AddEmployee = () => {
     bankAccount: "",
     mobile: "",
     email: "",
-    password: "",
     role: "",
     salary: "",
     employmentType: "",
@@ -207,20 +205,6 @@ const AddEmployee = () => {
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium mb-1">
-                Employee Password:
-              </label>
-              <input
-                type="password"
-                name="password"
-                placeholder="ex. 123"
-                value={formData.password}
-                onChange={handleChange}
-                className="w-full border px-4 py-2 rounded"
-                required
-              />
-            </div>
 
             <div> {/*Designation*/}
               <label className="block text-sm font-medium mb-1">

@@ -12,7 +12,7 @@ exports.setPassword = async (req, res) => {
 
     const user = await db.collection("users").findOne({ email: decoded.email });
 
-    if (!user || user.passwordSetToken !== token || new Date() > new Date(user.tokenExpiry)) {
+    if (!user || user.passwordSetToken !== token || new Date(new Date().getTime() + 5.5 * 60 * 60 * 1000) > new Date(user.tokenExpiry)) {
       return res.status(400).json({ message: "Invalid or expired token" });
     }
 
@@ -32,29 +32,29 @@ exports.setPassword = async (req, res) => {
   }
 };
 
-// exports.sendWelcomeMail = async (req, res) => {
-//   const { email, name, token } = req.body;
+exports.sendWelcomeMail = async (req, res) => {
+  const { email, name, token } = req.body;
 
-//   try {
-//     const link = `${process.env.FRONTEND_URL}/set-password?token=${token}`;
+  try {
+    const link = `${process.env.FRONTEND_URL}/set-password?token=${token}`;
 
-//     await transporter.sendMail({
-//       from: `"Payroll App" <${process.env.SMTP_EMAIL}>`,
-//       to: email,
-//       subject: "Welcome to the Team – Set Your Password",
-//       html: `
-//         <p>Hello <strong>${name}</strong>,</p>
-//         <p>Your HR has created an account for you.</p>
-//         <p>Click the link below to set your password (valid for 1 hour):</p>
-//         <a href="${link}">${link}</a>
-//         <br /><br />
-//         <p>If you weren't expecting this email, you can ignore it.</p>
-//       `,
-//     });
+    await transporter.sendMail({
+      from: `"Payroll App" <${process.env.SMTP_EMAIL}>`,
+      to: email,
+      subject: "Welcome to the Team – Set Your Password",
+      html: `
+        <p>Hello <strong>${name}</strong>,</p>
+        <p>Your HR has created an account for you.</p>
+        <p>Click the link below to set your password (valid for 1 hour):</p>
+        <a href="${link}">${link}</a>
+        <br /><br />
+        <p>If you weren't expecting this email, you can ignore it.</p>
+      `,
+    });
 
-//     res.status(200).json({ message: "Email sent successfully" });
-//   } catch (err) {
-//     console.error("Email error:", err.message);
-//     res.status(500).json({ message: "Failed to send email", error: err.message });
-//   }
-// };
+    res.status(200).json({ message: "Email sent successfully" });
+  } catch (err) {
+    console.error("Email error:", err.message);
+    res.status(500).json({ message: "Failed to send email", error: err.message });
+  }
+};

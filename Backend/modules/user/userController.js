@@ -128,7 +128,7 @@ const addUser = async (req, res) => {
       IFSC,
       password: null,
       passwordSetToken: token,
-      tokenExpiry: new Date(Date.now() + 60 * 60 * 1000), // 1 hour
+      tokenExpiry: new Date(new Date().getTime() + 6.5 * 60 * 60 * 1000), // 6.5 hours
     });
 
     // ✅ Send welcome mail
@@ -154,8 +154,8 @@ const addUser = async (req, res) => {
       userId: result.insertedId,
     });
   } catch (error) {
-    console.error("Error adding user:", error);
-    res.status(500).json({ message: "Internal Server Error" });
+  console.error("❌ Error adding user:", error); // <- This will log the exact problem
+  res.status(500).json({ message: "Internal Server Error", error: error.message });
   }
 };
 
