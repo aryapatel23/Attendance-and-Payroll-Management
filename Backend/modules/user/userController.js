@@ -154,8 +154,8 @@ const addUser = async (req, res) => {
       userId: result.insertedId,
     });
   } catch (error) {
-    console.error("Error adding user:", error);
-    res.status(500).json({ message: "Internal Server Error" });
+  console.error("❌ Error adding user:", error); // <- This will log the exact problem
+  res.status(500).json({ message: "Internal Server Error", error: error.message });
   }
 };
 

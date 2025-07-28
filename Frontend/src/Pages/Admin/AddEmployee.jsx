@@ -11,7 +11,6 @@ const AddEmployee = () => {
     bankAccount: "",
     mobile: "",
     email: "",
-    password: "",
     role: "",
     salary: "",
     employmentType: "",
