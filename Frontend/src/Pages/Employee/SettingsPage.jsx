@@ -121,12 +121,12 @@ function SecuritySettings() {
       const token = localStorage.getItem("token");
 
       // ✅ Debugging
-      console.log("🌐 API URL:", "http://localhost:5500/api/change-password");
+      console.log("🌐 API URL:", "https://attendance-and-payroll-management.onrender.com/api/change-password");
       console.log("🔑 Token being sent:", token);
 
       // ✅ 3. Send API Request to Backend
       const res = await axios.post(
-        "http://localhost:5500/api/change-password",
+        "https://attendance-and-payroll-management.onrender.com/api/change-password",
         { currentPassword, newPassword },
         {
           headers: {
