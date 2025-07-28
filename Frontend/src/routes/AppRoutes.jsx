@@ -32,6 +32,7 @@ import Add from "../Pages/Add";
 
 //Not Found Page
 import NotFound from '../Components/NotFound'
+import SettingsPage from "../Pages/Employee/SettingsPage";
 
 const AppRoutes = () => {
   const token = useSelector((state) => state.auth.token);
@@ -51,6 +52,7 @@ const AppRoutes = () => {
           <Route path="emsalary" element={<Salary />} />
           <Route path="emcalendar" element={<Calendar />} />
           <Route path="attendance" element={<AttendanceNew />} />
+          <Route path="settings" element={<SettingsPage />} />
           <Route path="emprofile/:id" element={<Emprofile />} />
         </Route>
       )}
