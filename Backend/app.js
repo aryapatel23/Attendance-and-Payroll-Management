@@ -12,10 +12,7 @@ const mailroutes = require('./modules/mail/mailroutes');
 const app = express();
 
 // ✅ Configure CORS for React frontend
-app.use(cors({
-  origin: 'http://localhost:5173', // Allow only your React dev server
-  credentials: true,              // Allow cookies/authorization headers
-}));
+app.use(cors());
 
 // ✅ Body parser & cookies
 app.use(express.json());
