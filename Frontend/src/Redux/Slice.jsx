@@ -28,6 +28,8 @@ const authSlice = createSlice({
       state.usersdata = {}; // ✅ Clear cache
       localStorage.removeItem("user");
       localStorage.removeItem("token");
+      localStorage.removeItem("role");
+      console.log("🧹 User logged out and cache cleared");
     },
 
     setUser: (state, action) => {

@@ -143,8 +143,26 @@ const addUser = async (req, res) => {
         <p>Your HR has created an account for you in the Payroll system.</p>
         <p>Click the link below to set your password (valid for 1 hour):</p>
         <a href="${setPasswordLink}">${setPasswordLink}</a>
+        <p>Please review your details below:</p>
+        <ul>
+          <li><strong>User ID:</strong> ${id}</li>
+          <li><strong>Name:</strong> ${name}</li>
+          <li><strong>Email:</strong> ${email}</li>
+          <li><strong>Phone:</strong> ${mobile}</li>
+          <li><strong>Designation:</strong> ${designation}</li>
+          <li><strong>Salary:</strong> ${salary}</li>
+          <li><strong>Bank Account:</strong> ${bankAccount}</li>
+          <li><strong>IFSC:</strong> ${IFSC}</li>
+          <li><strong>Employment Type:</strong> ${employmentType}</li>
+          <li><strong>Attendance Type:</strong> ${attendanceType}</li>
+          <li><strong>Emergency Contact:</strong> ${emergencyContact}</li>
+          <li><strong>Emergency Contact Name:</strong> ${emergencyContactname}</li>
+          <li><strong>Joining Date:</strong> ${joigningDate}</li>
+        </ul>
         <br /><br />
-        <p>If you weren't expecting this email, you can ignore it.</p>
+        <p>If any of these details are incorrect, please contact the HR team at ${process.env.HR_EMAIL}</p>
+        <p>Thank you!</p>
+        <p>Best regards,</p>
       `,
     });
 

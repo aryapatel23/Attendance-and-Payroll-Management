@@ -44,7 +44,7 @@ export default function SettingsPage() {
           </button>
         ))}
       </div>
-
+      
       {/* ✅ Section Content */}
       <motion.div
         key={activeTab}

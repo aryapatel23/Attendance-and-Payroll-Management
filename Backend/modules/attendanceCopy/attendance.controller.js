@@ -24,71 +24,84 @@ exports.getTodayAttendance = async (req, res) => {
 
 // ✅ POST /mark-attendance
 exports.markAttendance = async (req, res) => {
-  const db = getDB();
-  const { username, location, id } = req.body;
-  console.log("📥 Request body:", req.body);
+  try {
+    const db = getDB();
+    const { username, location, id } = req.body;
+    console.log("📥 Request body:", req.body);
 
-  // 1. Find user
-  const user = await db.collection("users").findOne({ user_id: id, username });
-  if (!user) return res.status(404).json({ message: "❌ User not found" });
+    // 1. Find user
+    const user = await db.collection("users").findOne({ user_id: id, username });
+    if (!user) return res.status(404).json({ message: "❌ User not found" });
 
-  // 2. Check location
-  const office = { lat: 22.816958, lng: 72.473781};
-  const distance = (loc1, loc2) => {
-    const R = 6371;
-    const toRad = deg => (deg * Math.PI) / 180;
-    const dLat = toRad(loc1.lat - loc2.lat);
-    const dLon = toRad(loc1.lng - loc2.lng);
-    const a =
-      Math.sin(dLat / 2) ** 2 +
-      Math.cos(toRad(loc1.lat)) *
-        Math.cos(toRad(loc2.lat)) *
-        Math.sin(dLon / 2) ** 2;
-    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  };
+    // 2. Check location
+    const office = { lat: 22.816958, lng: 72.473781 };
+    const distance = (loc1, loc2) => {
+      const R = 6371;
+      const toRad = deg => (deg * Math.PI) / 180;
+      const dLat = toRad(loc1.lat - loc2.lat);
+      const dLon = toRad(loc1.lng - loc2.lng);
+      const a =
+        Math.sin(dLat / 2) ** 2 +
+        Math.cos(toRad(loc1.lat)) *
+          Math.cos(toRad(loc2.lat)) *
+          Math.sin(dLon / 2) ** 2;
+      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    };
 
-  const dist = distance(location, office);
-  console.log("📍 Distance from office:", dist.toFixed(2), "km");
-  if (dist > 3)
-    return res.status(403).json({ message: "⛔ Not at office location!" });
+    const dist = distance(location, office);
+    console.log("📍 Distance from office:", dist.toFixed(2), "km");
+    if (dist > 3) {
+      return res.status(403).json({ message: "⛔ Not at office location!" });
+    }
 
-  // ✅ Safe way to get IST time using UTC offset
- 
-  console.log("utcNow is:", utcNow.toISOString());
-  const istOffset = 5.5 * 60 * 60 * 1000; // IST offset in milliseconds
-  const istNow = new Date(utcNow.getTime() + istOffset);
-  console.log("Total seconds is After", istNow.getTime() );
-  const hours = istNow.getUTCHours(); // Already IST adjusted
-  const minutes = istNow.getUTCMinutes();
-  const totalMinutes = hours * 60 + minutes;
+    // 3. Get IST time using UTC offset
+    const utcNow = new Date();
+    console.log("utcNow is:", utcNow.toISOString());
 
-  console.log("🕒 Current IST time (ISO):", istNow.toISOString());
-  console.log("🕘 IST Hours:", hours, "| Minutes:", minutes);
+    const istOffset = 5.5 * 60 * 60 * 1000;
+    const istNow = new Date(utcNow.getTime() + istOffset);
 
-  // 3. Time validation
-  if (hours < 9 || hours >= 19) {
-    return res.status(403).json({ message: `⏰ Not within office hours (9:00–18:59 IST) and hours of attendance is ${hours}:${minutes < 10 ? '0' : ''}${minutes}`, });
+    const hours = istNow.getUTCHours();
+    const minutes = istNow.getUTCMinutes();
+    const totalMinutes = hours * 60 + minutes;
+
+    console.log("🕒 Current IST time (ISO):", istNow.toISOString());
+    console.log("🕘 IST Hours:", hours, "| Minutes:", minutes);
+
+    // 4. Time validation
+    if (hours < 9 || hours >= 19) {
+      return res.status(403).json({
+        message: `⏰ Not within office hours (9:00–18:59 IST). Current time is ${hours}:${minutes < 10 ? '0' : ''}${minutes}`,
+      });
+    }
+
+    // 5. Prepare data
+    const timeData = {
+      user_id: id,
+      username,
+      location,
+      time: istNow,
+      date: istNow.toISOString().split("T")[0],
+    };
+
+    // 6. Status logic
+    let status = "Late Absent";
+    if (totalMinutes <= 615) {
+      status = "Present";
+    } else if (totalMinutes <= 645) {
+      status = "Late";
+    }
+
+    await db.collection("Attendance").insertOne({ ...timeData, status });
+
+    return res.json({
+      message: `✅ Attendance marked as '${status}'`,
+    });
+
+  } catch (error) {
+    console.error("❌ Error in markAttendance:", error);
+    res.status(500).json({ message: "Internal Server Error. Please try again later." });
   }
-
-  // 4. Prepare data
-  const timeData = {
-    user_id: id,
-    username,
-    location,
-    time: istNow, // Date object (MongoDB stores in UTC)
-    date: istNow.toISOString().split("T")[0],
-  };
-
-  // 5. Status logic
-  let status = "Late Absent";
-  if (totalMinutes <= 615) {
-    status = "Present";
-  } else if (totalMinutes <= 645) {
-    status = "Late";
-  }
-
-  await db.collection("Attendance").insertOne({ ...timeData, status });
-  res.json({ message: `✅ Attendance marked as '${status}'`, });
 };
 
 // ✅ GET /all-attendance
