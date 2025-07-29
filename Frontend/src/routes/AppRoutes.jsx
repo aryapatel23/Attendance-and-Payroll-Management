@@ -52,7 +52,6 @@ const AppRoutes = () => {
           <Route path="emsalary" element={<Salary />} />
           <Route path="emcalendar" element={<Calendar />} />
           <Route path="attendance" element={<AttendanceNew />} />
-          <Route path="settings" element={<SettingsPage />} />
           <Route path="emprofile/:id" element={<Emprofile />} />
         </Route>
       )}

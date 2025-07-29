@@ -12,34 +12,39 @@ const Emprofile = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-100">
-        <div className="flex-1 p-4 overflow-y-auto bg-gray-50">
-          <div className="flex flex-col lg:flex-row gap-6 h-[calc(100vh-64px)]">
+      <div className="flex-1 p-4 overflow-y-auto bg-gray-50">
+        <div className="flex flex-col lg:flex-row gap-6 h-[calc(100vh-64px)]">
           <Profile />
-            <div className="flex-1 bg-white p-6 rounded-2xl shadow-md flex flex-col">
-              <nav className="flex gap-4 border-b pb-3 mb-4 text-sm font-medium">
-                {["Personal Info", "Salary Info"].map((t) => (
-                  <button
-                    key={t}
-                    className={`capitalize px-4 py-2 rounded-lg transition ${
-                      tab === t ? "bg-indigo-100 text-indigo-600" : "hover:bg-gray-100"
-                    }`}
-                    onClick={() => setTab(t)}
-                  >
-                    {t.replace("info", " Info")}
-                  </button>
-                ))}
-              </nav>
+          <div className="flex-1 bg-white p-6 rounded-2xl shadow-md flex flex-col">
+            
+            {/* 🔹 Add new tab for Change Password */}
+            <nav className="flex gap-4 border-b pb-3 mb-4 text-sm font-medium">
+              {["Personal Info", "Salary Info", "Change Password"].map((t) => (
+                <button
+                  key={t}
+                  className={`capitalize px-4 py-2 rounded-lg transition ${
+                    tab === t ? "bg-indigo-100 text-indigo-600" : "hover:bg-gray-100"
+                  }`}
+                  onClick={() => setTab(t)}
+                >
+                  {t.replace("info", " Info")}
+                </button>
+              ))}
+            </nav>
 
-                        <div className="flex-1 overflow-y-auto">
-                {tab === "Personal Info" && <InfoTab />}
-                {tab === "Salary Info" && <SalaryInfoTab />}
-              </div>
+            {/* 🔹 Render Tabs */}
+            <div className="flex-1 overflow-y-auto">
+              {tab === "Personal Info" && <InfoTab />}
+              {tab === "Salary Info" && <SalaryInfoTab />}
+              {tab === "Change Password" && <ChangePasswordTab />}
             </div>
           </div>
         </div>
+      </div>
     </div>
   );
 };
+
 
 const Profile = () =>{
   const {id}=useParams();      
@@ -376,6 +381,104 @@ function SalaryInfoTab() {
     </div>
   );
 }
+
+function ChangePasswordTab() {
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handlePasswordChange = async (e) => {
+    e.preventDefault();
+
+    // ✅ Validation
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      setMessage("⚠️ Please fill in all fields.");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setMessage("❌ New passwords do not match!");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setMessage("");
+
+      const token = localStorage.getItem("token");
+
+      const res = await fetch("https://attendance-and-payroll-management.onrender.com/api/change-password", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ currentPassword, newPassword }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.message || "Error changing password.");
+
+      setMessage("✅ Password updated successfully!");
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (err) {
+      setMessage(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-5">
+      <h3 className="text-xl font-semibold border-b pb-2">Change Your Password</h3>
+      
+      <form onSubmit={handlePasswordChange} className="space-y-4">
+        <input
+          type="password"
+          placeholder="Current Password"
+          className="w-full p-3 border rounded-lg"
+          value={currentPassword}
+          onChange={(e) => setCurrentPassword(e.target.value)}
+        />
+        <input
+          type="password"
+          placeholder="New Password"
+          className="w-full p-3 border rounded-lg"
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
+        />
+        <input
+          type="password"
+          placeholder="Confirm New Password"
+          className="w-full p-3 border rounded-lg"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+        />
+
+        <button
+          type="submit"
+          className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition w-full"
+          disabled={loading}
+        >
+          {loading ? "Updating..." : "Update Password"}
+        </button>
+      </form>
+
+      {message && (
+        <p className={`mt-3 text-sm font-medium ${
+          message.includes("✅") ? "text-green-600" : "text-red-600"
+        }`}>
+          {message}
+        </p>
+      )}
+    </div>
+  );
+}
+
 
 const ProfileModal = ({ mode = "update", employeeId, defaultData = {}, onClose }) => {
     const user = useSelector((state) => state.auth.user);
