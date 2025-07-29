@@ -1,5 +1,5 @@
 const { getDB } = require("../../config/db");
-
+const transporter = require("../mail/mailtransporter");
 const usersalarybyitsid = async(req,res) =>{
   const db=getDB();
 
@@ -187,6 +187,21 @@ const Updatesalaryinfo = async (req, res) => {
       last_update: nowIST,
       updated_by
     };
+    
+    const olddata= await db.collection('SalaryInfo').findOne({ employee_id });
+
+    const compareFields = Object.keys(updateFields).reduce((acc, key) => {
+      if (updateFields[key] !== olddata[key]) {
+        acc[key] = { old: olddata[key], new: updateFields[key] };
+      }
+      return acc;
+    }, {});
+    if (Object.keys(compareFields).length === 0) {
+      return res.status(400).json({ message: "No fields to update or no changes made." });
+    }
+
+
+    console.log("Updated fields:", compareFields);
 
     const result = await db.collection('SalaryInfo').updateOne(
       { employee_id },
