@@ -244,7 +244,7 @@ const Updatesalaryinfo = async (req, res) => {
       ${changesTable}
     </table>
 
-    <p>If you believe any of the above information is incorrect, please contact the HR team at <a href="mailto:${process.env.SMTP_EMAILL}">${process.env.SMTP_EMAILL}</a>.</p>
+    <p>If you believe any of the above information is incorrect, please contact the HR team at <a href="mailto:${process.env.SMTP_EMAIL}">${process.env.SMTP_EMAIL}</a>.</p>
 
     <p>Thank you!</p>
     <p>Best regards,<br>The HR Team</p>
