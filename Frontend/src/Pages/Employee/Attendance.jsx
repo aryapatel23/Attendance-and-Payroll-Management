@@ -141,6 +141,7 @@ const MainContent = () => {
           lat: position.coords.latitude,
           lng: position.coords.longitude,
         };
+        console.log("Location:", location);
 
         try {
           const res = await fetch("https://attendance-and-payroll-management.onrender.com/api/mark-attendance", {
