@@ -189,6 +189,8 @@ const Updatesalaryinfo = async (req, res) => {
     };
     
     const olddata= await db.collection('SalaryInfo').findOne({ employee_id });
+    const user= await db.collection('users').findOne({ user_id: employee_id });
+    console.log("Old data:", olddata);
 
     const compareFields = Object.keys(updateFields).reduce((acc, key) => {
       if (updateFields[key] !== olddata[key]) {
@@ -200,13 +202,56 @@ const Updatesalaryinfo = async (req, res) => {
       return res.status(400).json({ message: "No fields to update or no changes made." });
     }
 
-
     console.log("Updated fields:", compareFields);
 
     const result = await db.collection('SalaryInfo').updateOne(
       { employee_id },
       { $set: updateFields }
     );
+
+    const changedFieldsList = Object.keys(compareFields)
+    .map(key => key.replace(/_/g, ' ').toUpperCase())
+    .join(', '); 
+
+    const changesTable = Object.entries(compareFields).map(([key, value]) => {
+     return `
+     <tr>
+      <td><strong>${key.replace(/_/g, ' ').toUpperCase()}</strong></td>
+      <td>${value.old ?? "N/A"}</td>
+      <td>${value.new ?? "N/A"}</td>
+    </tr>
+     `;
+     }).join('');
+
+  await transporter.sendMail({
+  from: `"Payroll App" <${process.env.SMTP_EMAILL}>`,
+  to: user.email,
+  subject: "Salary Update Notification",
+  html: `
+    <p>Dear <strong>${olddata.employee_name}</strong>,</p>
+
+    <p>This is to inform you that the following fields were updated in your salary record on ${new Date().toLocaleDateString()}:</p>
+    <p><strong>${changedFieldsList}</strong></p>
+
+    <p>Please find the detailed breakdown below:</p>
+
+    <table border="1" cellpadding="10" cellspacing="0" style="border-collapse: collapse;">
+      <tr style="background-color: #f0f0f0;">
+        <th>Field</th>
+        <th>Old Value</th>
+        <th>New Value</th>
+      </tr>
+      ${changesTable}
+    </table>
+
+    <p>If you believe any of the above information is incorrect, please contact the HR team at <a href="mailto:${process.env.SMTP_EMAILL}">${process.env.SMTP_EMAILL}</a>.</p>
+
+    <p>Thank you!</p>
+    <p>Best regards,<br>The HR Team</p>
+  `,
+});
+
+
 
     if (result.matchedCount === 0) {
       return res.status(404).json({ message: "Employee not found." });
