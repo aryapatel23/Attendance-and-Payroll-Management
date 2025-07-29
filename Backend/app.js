@@ -11,13 +11,13 @@ const mailroutes = require('./modules/mail/mailroutes');
 
 const app = express();
 
-// ✅ Configure CORS for React frontend
+//  Configure CORS for React frontend
 app.use(cors({
-  origin: 'http://localhost:5173', // Allow only your React dev server
+  origin: 'http://localhost:5173' || 'https://attendance-and-payroll-management.vercel.app/', 
   credentials: true,              // Allow cookies/authorization headers
 }));
 
-// ✅ Body parser & cookies
+//  Body parser & cookies
 app.use(express.json());
 app.use(cookieParser());
 
