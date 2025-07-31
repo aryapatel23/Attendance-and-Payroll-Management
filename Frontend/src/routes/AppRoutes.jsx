@@ -18,6 +18,7 @@ import HRCalendar from "../Pages/Admin/HRCalendar";
 import EmployeeDashboard from '../Pages/Admin/EmployeePage'
 import PayrollPage from "../Pages/Admin/PayrollPage";
 import Hrprofile from "../Pages/Admin/HrProfile";
+import Query from "../Pages/Admin/Query";
 
 // Employee Pages
 import Dashboard from "../Pages/Employee/EmployeeHome";
@@ -69,6 +70,7 @@ const AppRoutes = () => {
           <Route path="hremployees/profile/:id" element={<EmployeeDashboard />} />
           <Route path="payrollsystem/profile/:id" element={<PayrollPage/>}/>
           <Route path="hrprofile/:id" element={<Hrprofile />} />
+          <Route path="hrquery" element={<Query />} />
         </Route>
       )}
       <Route path="/set-password" element={<SetPassword />} />  
