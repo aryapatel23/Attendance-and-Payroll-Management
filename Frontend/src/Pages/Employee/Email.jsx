@@ -61,7 +61,7 @@ const SetPassword = () => {
     formData.append("image", image);
 
     try {
-      const response = await axios.post("http://localhost:5000/api/upload-profile", formData);
+      const response = await axios.post("http://localhost:5000/api/upload-image", formData);
       setImageUrl(response.data.imageUrl);
       setUploadMessage("✅ Profile image uploaded successfully.");
     } catch (error) {
