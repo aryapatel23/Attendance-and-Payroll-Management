@@ -69,7 +69,7 @@ const AppRoutes = () => {
           <Route path="hrprofile/:id" element={<Hrprofile />} />
         </Route>
       )}
-      <Route path="/set-password" element={<SetPassword />} />  
+      <Route path="/:id/set-password" element={<SetPassword />} />
       {/* Common/Fallback Route */}
       <Route path="/add" element={<Add />} />
       {/* Optional 404 Page */}

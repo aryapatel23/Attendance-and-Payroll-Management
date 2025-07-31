@@ -6,7 +6,8 @@ const SetPassword = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const token = searchParams.get("token");
-  const [id] = searchParams.get("id") || ""; // Get user ID from URL if needed
+  const { id } = useParams(); 
+  console.log("id from url is", id);
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
