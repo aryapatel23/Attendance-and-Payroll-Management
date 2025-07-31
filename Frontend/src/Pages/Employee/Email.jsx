@@ -39,7 +39,7 @@ const SetPassword = () => {
 
       if (res.ok) {
         setMessage("✅ Password set successfully. Redirecting...");
-        setTimeout(() => navigate("/"), 2500);
+       
       } else {
         setMessage(`❌ ${data.message}`);
       }
@@ -76,6 +76,9 @@ const SetPassword = () => {
       setImage(selectedFile);
       setImagePreview(URL.createObjectURL(selectedFile));
     }
+  };
+  const handleSave = () => {
+    setTimeout(() => navigate("/"), 2500);
   };
 
   return (
@@ -132,8 +135,11 @@ const SetPassword = () => {
         <button type="submit" style={styles.button}>
           Upload Photo
         </button>
+        
       </form>
-
+        <button type="submit" style={styles.button} onClick={handleSave}>
+          Click here to save your data
+        </button>
       {uploadMessage && <p style={styles.success}>{uploadMessage}</p>}
       {imageUrl && (
         <div>
