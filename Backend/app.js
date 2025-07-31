@@ -14,7 +14,7 @@ const app = express();
 // ✅ Configure CORS for React frontend
 app.use(cors());
 
-// ✅ Body parser & cookies
+//  Body parser & cookies
 app.use(express.json());
 app.use(cookieParser());
 
