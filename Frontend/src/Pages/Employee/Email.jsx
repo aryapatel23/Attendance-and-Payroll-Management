@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+
 const SetPassword = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -8,21 +9,21 @@ const SetPassword = () => {
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [userId, setUserId] = useState(""); // user ID for image upload
+  const [image, setImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [uploadMessage, setUploadMessage] = useState("");
 
-  const handleSubmit = async (e) => {
+  // Handle password form submit
+  const handlePasswordSubmit = async (e) => {
     e.preventDefault();
 
-    if (!token) {
-      setMessage("Invalid or missing token.");
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setMessage("Passwords do not match.");
-      return;
-    }
+    if (!token) return setMessage("❌ Invalid or missing token.");
+    if (password !== confirmPassword)
+      return setMessage("❌ Passwords do not match.");
 
     setLoading(true);
     setMessage("");
@@ -37,22 +38,50 @@ const SetPassword = () => {
       const data = await res.json();
 
       if (res.ok) {
-        setMessage("✅ Password set successfully. Redirecting to login...");
-        setTimeout(() => navigate("/"), 2500); // adjust route
+        setMessage("✅ Password set successfully. Redirecting...");
+        setTimeout(() => navigate("/"), 2500);
       } else {
         setMessage(`❌ ${data.message}`);
       }
-    } catch (error) {
-      setMessage("Something went wrong. Please try again.");
+    } catch (err) {
+      setMessage("❌ Something went wrong. Try again.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Handle image upload
+  const handleUploadSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!userId || !image) return alert("Please enter User ID and select an image.");
+
+    const formData = new FormData();
+    formData.append("user_id", userId);
+    formData.append("image", image);
+
+    try {
+      const response = await axios.post("http://localhost:5000/api/upload-profile", formData);
+      setImageUrl(response.data.imageUrl);
+      setUploadMessage("✅ Profile image uploaded successfully.");
+    } catch (error) {
+      setUploadMessage("❌ Upload failed.");
+      console.error("Upload error:", error);
+    }
+  };
+
+  const handleImageChange = (e) => {
+    const selectedFile = e.target.files[0];
+    if (selectedFile) {
+      setImage(selectedFile);
+      setImagePreview(URL.createObjectURL(selectedFile));
     }
   };
 
   return (
     <div style={styles.container}>
       <h2>Set Your Password</h2>
-      <form onSubmit={handleSubmit} style={styles.form}>
+      <form onSubmit={handlePasswordSubmit} style={styles.form}>
         <input
           type="password"
           placeholder="New Password"
@@ -72,93 +101,68 @@ const SetPassword = () => {
         <button type="submit" style={styles.button} disabled={loading}>
           {loading ? "Setting..." : "Set Password"}
         </button>
-        {message && <p style={styles.message}>{message}</p>}
       </form>
-      <div>
-        <UploadProfilePic />
-      </div>
-    </div>
 
-  );
-};
+      <hr style={styles.divider} />
 
-const UploadProfilePic = () => {
-  const [image, setImage] = useState(null);
-  const [userId, setUserId] = useState("");
-  const [message, setMessage] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!image || !userId) {
-      return alert("Please enter User ID and select an image.");
-    }
-
-    const formData = new FormData();
-    formData.append("user_id", userId);
-    formData.append("image", image);
-
-    try {
-      const response = await axios.post(
-        "http://localhost:5000/api/upload-profile",
-        formData
-      );
-
-      setMessage(response.data.message);
-      setImageUrl(response.data.imageUrl);
-    } catch (error) {
-      console.error("Upload failed", error);
-      setMessage("❌ Upload failed");
-    }
-  };
-
-  return (
-    <div style={{ padding: "20px", maxWidth: "400px", margin: "auto" }}>
       <h2>Upload Profile Picture</h2>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleUploadSubmit} style={styles.form}>
         <input
           type="text"
           placeholder="Enter User ID"
           value={userId}
           onChange={(e) => setUserId(e.target.value)}
           required
+          style={styles.input}
         />
-        <br /><br />
         <input
           type="file"
           accept="image/*"
-          onChange={(e) => setImage(e.target.files[0])}
+          onChange={handleImageChange}
           required
+          style={styles.input}
         />
-        <br /><br />
-        <button type="submit">Upload</button>
+        {imagePreview && (
+          <img
+            src={imagePreview}
+            alt="Preview"
+            style={{ width: "150px", borderRadius: "8px", marginTop: "10px" }}
+          />
+        )}
+        <button type="submit" style={styles.button}>
+          Upload Photo
+        </button>
       </form>
 
-      {message && <p>{message}</p>}
+      {uploadMessage && <p style={styles.success}>{uploadMessage}</p>}
       {imageUrl && (
         <div>
           <h4>Uploaded Image:</h4>
-          <img src={imageUrl} alt="Profile" width="200" />
+          <img src={imageUrl} alt="Profile" width="150" style={{ borderRadius: "8px" }} />
         </div>
       )}
+
+      {message && <p style={styles.message}>{message}</p>}
     </div>
   );
 };
 
-
 const styles = {
   container: {
-    maxWidth: "400px",
+    maxWidth: "500px",
     margin: "auto",
     padding: "40px 20px",
     textAlign: "center",
-    fontFamily: "Arial",
+    fontFamily: "Arial, sans-serif",
+    background: "#f9f9f9",
+    borderRadius: "10px",
+    boxShadow: "0 0 10px rgba(0,0,0,0.1)",
   },
   form: {
     display: "flex",
     flexDirection: "column",
     gap: "15px",
+    marginBottom: "20px",
   },
   input: {
     padding: "10px",
@@ -176,8 +180,18 @@ const styles = {
     cursor: "pointer",
   },
   message: {
-    marginTop: "15px",
     color: "crimson",
+    marginTop: "10px",
+    fontWeight: "bold",
+  },
+  success: {
+    color: "green",
+    marginTop: "10px",
+    fontWeight: "bold",
+  },
+  divider: {
+    margin: "30px 0",
+    borderTop: "1px solid #ccc",
   },
 };
 
