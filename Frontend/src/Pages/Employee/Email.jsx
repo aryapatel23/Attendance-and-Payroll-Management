@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-
+import axios from "axios";
 const SetPassword = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -74,9 +74,78 @@ const SetPassword = () => {
         </button>
         {message && <p style={styles.message}>{message}</p>}
       </form>
+      <div>
+        <UploadProfilePic />
+      </div>
+    </div>
+
+  );
+};
+
+const UploadProfilePic = () => {
+  const [image, setImage] = useState(null);
+  const [userId, setUserId] = useState("");
+  const [message, setMessage] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!image || !userId) {
+      return alert("Please enter User ID and select an image.");
+    }
+
+    const formData = new FormData();
+    formData.append("user_id", userId);
+    formData.append("image", image);
+
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/upload-profile",
+        formData
+      );
+
+      setMessage(response.data.message);
+      setImageUrl(response.data.imageUrl);
+    } catch (error) {
+      console.error("Upload failed", error);
+      setMessage("❌ Upload failed");
+    }
+  };
+
+  return (
+    <div style={{ padding: "20px", maxWidth: "400px", margin: "auto" }}>
+      <h2>Upload Profile Picture</h2>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          placeholder="Enter User ID"
+          value={userId}
+          onChange={(e) => setUserId(e.target.value)}
+          required
+        />
+        <br /><br />
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) => setImage(e.target.files[0])}
+          required
+        />
+        <br /><br />
+        <button type="submit">Upload</button>
+      </form>
+
+      {message && <p>{message}</p>}
+      {imageUrl && (
+        <div>
+          <h4>Uploaded Image:</h4>
+          <img src={imageUrl} alt="Profile" width="200" />
+        </div>
+      )}
     </div>
   );
 };
+
 
 const styles = {
   container: {
