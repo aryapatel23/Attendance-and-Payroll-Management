@@ -10,6 +10,8 @@ import {
   Menu,
   X,
   LayoutDashboard,
+  NotepadText,
+  Phone,
 } from "lucide-react";
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -67,6 +69,7 @@ const Sidebar = () => {
               { label: 'Calendar', icon: <Calendar size={18} />, path: '/emcalendar' },
               { label: 'Profile', icon: <User size={18} />, path: `/emprofile/${user?.id}` },
               { label: 'Settings', icon: <Settings size={18} />, path: '/settings' },
+              { label: 'Contect With HR', icon: <Phone  dText  size={18} />, path: '/emcontect' },
             ].map(({ label, icon, path }) => (
               <button
                 key={path}

@@ -33,6 +33,7 @@ import Add from "../Pages/Add";
 //Not Found Page
 import NotFound from '../Components/NotFound'
 import SettingsPage from "../Pages/Employee/SettingsPage";
+import Contect from "../Pages/Employee/Contect";
 
 const AppRoutes = () => {
   const token = useSelector((state) => state.auth.token);
@@ -53,6 +54,7 @@ const AppRoutes = () => {
           <Route path="emcalendar" element={<Calendar />} />
           <Route path="attendance" element={<AttendanceNew />} />
           <Route path="emprofile/:id" element={<Emprofile />} />
+          <Route path="emcontect" element={<Contect />} />
         </Route>
       )}
 
