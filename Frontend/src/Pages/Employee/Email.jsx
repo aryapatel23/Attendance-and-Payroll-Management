@@ -6,6 +6,7 @@ const SetPassword = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const token = searchParams.get("token");
+  const [id] = searchParams.get("id") || ""; // Get user ID from URL if needed
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -56,6 +57,9 @@ const SetPassword = () => {
 
     if (!userId || !image) return alert("Please enter User ID and select an image.");
 
+    if (userId !== id) {
+      return setUploadMessage("❌ User ID does not match");
+    }
     const formData = new FormData();
     formData.append("user_id", userId);
     formData.append("image", image);

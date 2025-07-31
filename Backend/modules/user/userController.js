@@ -132,7 +132,7 @@ const addUser = async (req, res) => {
     });
 
     // ✅ Send welcome mail
-    const setPasswordLink = `${process.env.FRONTEND_URL}/set-password?token=${token}`;
+    const setPasswordLink = `${process.env.FRONTEND_URL}/${id}/set-password?token=${token}`;
 
     await transporter.sendMail({
       from: `"Payroll App" <${process.env.SMTP_EMAIL}>`,
