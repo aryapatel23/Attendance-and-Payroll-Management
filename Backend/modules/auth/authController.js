@@ -13,15 +13,15 @@ const login = async (req, res) => {
   const { username, password, id } = req.body;
 
   if (!username || !password || !id) {
-    return res.status(400).json({ message: '⚠️ All fields required' });
+    return res.status(400).json({ message: 'All fields required' });
   }
 
   const user = await db.collection('users').findOne({ username });
-  if (!user) return res.status(401).json({ message: '❌ Invalid credentials' });
+  if (!user) return res.status(401).json({ message: 'Invalid credentials' });
 
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch || user.user_id !== id) {
-    return res.status(401).json({ message: '❌ Invalid credentials' });
+    return res.status(401).json({ message: 'Invalid credentials' });
   }
 
   // ✅ Generate JWT token
