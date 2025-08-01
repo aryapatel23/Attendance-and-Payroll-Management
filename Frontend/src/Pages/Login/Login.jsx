@@ -48,6 +48,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from "react-redux";
 import { loginUser } from "../../Redux/Slice";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Login = () => {
   const [id, setId] = useState('');
@@ -68,7 +70,6 @@ const Login = () => {
     const userData = { username, password, id };
 
     try {
-      // ✅ Use localhost:5500 for development
       const response = await fetch("https://attendance-and-payroll-management.onrender.com/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -78,7 +79,9 @@ const Login = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        alert(data.message || "Login failed");
+        toast.error(data.message || "Login failed", {
+          position: "bottom-right",
+        });
         return;
       }
 
@@ -91,18 +94,24 @@ const Login = () => {
       localStorage.setItem("token", data.token);
       localStorage.setItem("role", role);
 
-      alert("Login successful by using JWT Token");
+      toast.success("Login successful!", {
+        position: "bottom-right",
+      });
 
       // ✅ Navigate after login
-      if (role === "employee") {
-        navigate("/emhome");
-      } else if (role === "hr") {
-        navigate("/hrhome");
-      }
+      setTimeout(() => {
+        if (role === "employee") {
+          navigate("/emhome");
+        } else if (role === "hr") {
+          navigate("/hrhome");
+        }
+      }, 1500); // wait for toast to show
 
     } catch (error) {
       console.error("Error during login:", error);
-      alert("An error occurred while logging in. Please try again.");
+      toast.error("An error occurred while logging in. Please try again.", {
+        position: "bottom-right",
+      });
     }
   };
 
@@ -163,6 +172,9 @@ const Login = () => {
       <div className="hidden md:flex md:order-2 w-3/5 h-full justify-center items-center bg-gray-100">
         <img src="https://res.cloudinary.com/doqzxuxb1/image/upload/v1748238957/Attendance%20And%20Payroll%20Managment/y45ltl4yfgxsksuetayk.png" alt="Login Image" />
       </div>
+
+      {/* ✅ Toast Notifications */}
+      <ToastContainer />
     </div>
   );
 };

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { FaPaperclip, FaExclamationCircle } from "react-icons/fa";
 
 const HRRequests = () => {
-  // 🏷️ Temporary Static Data
+
   const [requests] = useState([
     {
       id: 1,
@@ -49,19 +49,19 @@ const HRRequests = () => {
             {requests.map((req) => (
               <tr key={req.id} className="border-t border-gray-200 hover:bg-gray-50">
                 {/* Employee Name */}
-                <td className="p-3">
+                <td className="px-6 py-4">
                   <p className="font-semibold">{req.employeeName}</p>
                   <p className="text-xs text-gray-500">{req.employeeId}</p>
                 </td>
 
                 {/* Subject */}
-                <td className="p-3">{req.subject}</td>
+                <td className="px-6 py-4">{req.subject}</td>
 
                 {/* Category */}
-                <td className="p-3">{req.category}</td>
+                <td className="px-6 py-4">{req.category}</td>
 
                 {/* Priority Badge */}
-                <td className="p-3">
+                <td className="px-6 py-4">
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-semibold ${
                       req.priority === "High"
@@ -74,10 +74,10 @@ const HRRequests = () => {
                 </td>
 
                 {/* Date */}
-                <td className="p-3">{req.date}</td>
+                <td className="px-6 py-4">{req.date}</td>
 
                 {/* Attachment */}
-                <td className="p-3">
+                <td className="px-6 py-4">
                   {req.attachment ? (
                     <a
                       href={req.attachment}
@@ -93,7 +93,7 @@ const HRRequests = () => {
                 </td>
 
                 {/* Action Button */}
-                <td className="p-3">
+                <td className="px-6 py-4">
                   <button className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
                     View Details
                   </button>
