@@ -64,6 +64,7 @@ const Sidebar = () => {
               { label: 'Calendar', icon: <Calendar size={18} />, path: '/hrcalendar' },
               { label: 'Profile', icon: <User size={18} />, path: `/hrprofile/${user?.id}` },
               { label: 'Settings', icon: <Settings size={18} />, path: '/settings' },
+              { label: 'Employee Queries', icon: <Settings size={18} />, path: '/hrquery' },
             ].map(({ label, icon, path }) => (
               <button
                 key={path}
