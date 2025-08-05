@@ -68,7 +68,6 @@ const Sidebar = () => {
               { label: 'Salary', icon: <DollarSign size={18} />, path: '/emsalary' },
               { label: 'Calendar', icon: <Calendar size={18} />, path: '/emcalendar' },
               { label: 'Profile', icon: <User size={18} />, path: `/emprofile/${user?.id}` },
-              { label: 'Settings', icon: <Settings size={18} />, path: '/settings' },
               { label: 'Contect With HR', icon: <Phone  dText  size={18} />, path: '/emcontect' },
             ].map(({ label, icon, path }) => (
               <button
