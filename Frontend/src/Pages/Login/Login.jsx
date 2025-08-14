@@ -51,6 +51,7 @@ import { loginUser } from "../../Redux/Slice";
 
 const Login = () => {
   const [id, setId] = useState('');
+  const [loading, setLoading] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const dispatch = useDispatch();
@@ -65,6 +66,7 @@ const Login = () => {
 
   const handelLogin = async (e) => {
     e.preventDefault();
+    setLoading(true); 
     const userData = { username, password, id };
 
     try {
@@ -103,6 +105,8 @@ const Login = () => {
     } catch (error) {
       console.error("Error during login:", error);
       alert("An error occurred while logging in. Please try again.");
+    }finally {
+      setLoading(false);
     }
   };
 
@@ -146,9 +150,35 @@ const Login = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
-              <button type="submit" className="bg-blue-500 text-white p-2 rounded">
-                Login
-              </button>
+<button
+  type="submit"
+  className={`flex justify-center items-center gap-2 p-2 rounded text-white ${loading ? "bg-gray-400" : "bg-blue-500"}`}
+  disabled={loading} // ✅ disable while loading
+>
+  {loading && (
+    <svg
+      className="animate-spin h-5 w-5 text-white"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      <circle
+        className="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeWidth="4"
+      ></circle>
+      <path
+        className="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+      ></path>
+    </svg>
+  )}
+  {loading ? "Logging in..." : "Login"}
+</button>
             </form>
           </div>
         </div>

@@ -27,6 +27,7 @@ import Calendar from "../Pages/Employee/Calendar";
 import AttendanceNew from "../Components/attendance";
 import Emprofile from "../Pages/Employee/Emprofile";
 import SetPassword from "../Pages/Employee/Email";
+import Chatbot from "../Pages/Employee/chat";
 // Common / Temp
 import Add from "../Pages/Add";
 
@@ -53,6 +54,7 @@ const AppRoutes = () => {
           <Route path="emcalendar" element={<Calendar />} />
           <Route path="attendance" element={<AttendanceNew />} />
           <Route path="emprofile/:id" element={<Emprofile />} />
+          <Route path="emchat" element={<Chatbot />} />
         </Route>
       )}
 
