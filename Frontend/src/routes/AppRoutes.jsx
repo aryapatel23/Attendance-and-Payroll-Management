@@ -28,13 +28,13 @@ import Calendar from "../Pages/Employee/Calendar";
 import AttendanceNew from "../Components/attendance";
 import Emprofile from "../Pages/Employee/Emprofile";
 import SetPassword from "../Pages/Employee/Email";
-import Chatbot from "../Pages/Employee/chat";
+import Chatbot from "../Pages/Employee/Chat";
 // Common / Temp
 import Add from "../Pages/Add";
 
 //Not Found Page
 import NotFound from '../Components/NotFound'
-import SettingsPage from "../Pages/Employee/SettingsPage";
+// import SettingsPage from "../Pages/Employee/SettingsPage";
 import Contect from "../Pages/Employee/Contect";
 
 const AppRoutes = () => {
