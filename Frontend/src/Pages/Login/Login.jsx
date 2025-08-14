@@ -111,15 +111,12 @@ const Login = () => {
 
     } catch (error) {
       console.error("Error during login:", error);
-<<<<<<< HEAD
       alert("An error occurred while logging in. Please try again.");
     }finally {
       setLoading(false);
-=======
       toast.error("An error occurred while logging in. Please try again.", {
         position: "bottom-right",
       });
->>>>>>> 88b3c1658e4d8ec94910ae35b6c2fb03b3901b77
     }
   };
 
