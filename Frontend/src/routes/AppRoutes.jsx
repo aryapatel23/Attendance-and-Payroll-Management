@@ -18,6 +18,7 @@ import HRCalendar from "../Pages/Admin/HRCalendar";
 import EmployeeDashboard from '../Pages/Admin/EmployeePage'
 import PayrollPage from "../Pages/Admin/PayrollPage";
 import Hrprofile from "../Pages/Admin/HrProfile";
+import Query from "../Pages/Admin/Query";
 
 // Employee Pages
 import Dashboard from "../Pages/Employee/EmployeeHome";
@@ -34,6 +35,7 @@ import Add from "../Pages/Add";
 //Not Found Page
 import NotFound from '../Components/NotFound'
 import SettingsPage from "../Pages/Employee/SettingsPage";
+import Contect from "../Pages/Employee/Contect";
 
 const AppRoutes = () => {
   const token = useSelector((state) => state.auth.token);
@@ -55,6 +57,7 @@ const AppRoutes = () => {
           <Route path="attendance" element={<AttendanceNew />} />
           <Route path="emprofile/:id" element={<Emprofile />} />
           <Route path="emchat" element={<Chatbot />} />
+          <Route path="emcontect" element={<Contect />} />
         </Route>
       )}
 
@@ -69,6 +72,7 @@ const AppRoutes = () => {
           <Route path="hremployees/profile/:id" element={<EmployeeDashboard />} />
           <Route path="payrollsystem/profile/:id" element={<PayrollPage/>}/>
           <Route path="hrprofile/:id" element={<Hrprofile />} />
+          <Route path="hrquery" element={<Query />} />
         </Route>
       )}
       <Route path="/:id/set-password" element={<SetPassword />} />

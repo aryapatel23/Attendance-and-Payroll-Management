@@ -84,7 +84,7 @@ useEffect(() => {
           </div>
 
           {/* Table */}
-          <div className="bg-white rounded shadow overflow-x-auto">
+          <div className="bg-white shadow-md rounded-xl p-4">
             <table className="min-w-full text-sm">
               <thead className="bg-gray-100 text-gray-600">
                 <tr>
