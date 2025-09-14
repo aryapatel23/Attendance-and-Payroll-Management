@@ -45,7 +45,7 @@ This system provides separate dashboards for **HR/Admin** and **Employees**, ens
 ---
 
 ## 📂 Project Structure
-
+```
 attendance-payroll-system/
 │── backend/
 │ ├── controllers/
@@ -63,8 +63,7 @@ attendance-payroll-system/
 │
 │── README.md
 
-yaml
-Copy code
+```
 
 ---
 
