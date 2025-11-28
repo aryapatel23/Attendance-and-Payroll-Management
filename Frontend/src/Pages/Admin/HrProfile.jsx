@@ -302,7 +302,7 @@ function SalaryInfoTab() {
 
     const fetchSalaryInfo = async () => {
       try {
-        const response = await fetch(`http://localhost:5500/api/usersalaryinfo/${id}`);
+        const response = await fetch(`https://attendance-and-payroll-management.onrender.com/api/usersalaryinfo/${id}`);
 
         if (!response.ok) {
           setMessage("Salary data is not found for this user. Please add the user info.");
@@ -410,7 +410,7 @@ const ProfileModal = ({ mode = "update", employeeId, defaultData = {}, onClose }
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const url =`http://localhost:5500/api/update/${user.id}`;
+    const url =`https://attendance-and-payroll-management.onrender.com/api/update/${user.id}`;
 
     const method = "PUT";
 
