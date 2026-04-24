@@ -10,6 +10,7 @@ import {
   Menu,
   X,
   UserRoundPen,
+  Megaphone,
 } from "lucide-react";
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -66,6 +67,7 @@ const Sidebar = () => {
               { label: 'Profile', icon: <User size={18} />, path: `/hrprofile/${user?.id}` },
               { label: 'Settings', icon: <Settings size={18} />, path: '/settings' },
               { label: 'Employee Queries', icon: <UserRoundPen  size={18} />, path: '/hrquery' },
+              { label: 'Announcements', icon: <Megaphone size={18} />, path: '/hrannouncements' },
             ].map(({ label, icon, path }) => (
               <button
                 key={path}

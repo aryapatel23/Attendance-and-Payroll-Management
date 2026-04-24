@@ -21,6 +21,8 @@ const Dashboard = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [userId, setUserId] = useState("");
   const [status, setStatus] = useState(null);
+  const [announcements, setAnnouncements] = useState([]);
+  const [announcementsLoading, setAnnouncementsLoading] = useState(true);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [selectedRange, setSelectedRange] = useState("This Year");
@@ -59,6 +61,26 @@ const Dashboard = () => {
 
     fetchTodayStatus();
   }, [userId]);
+
+  useEffect(() => {
+    const fetchAnnouncements = async () => {
+      try {
+        setAnnouncementsLoading(true);
+        const res = await fetch(apiUrl("/api/announcements"));
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.message || "Failed to fetch announcements");
+        }
+        setAnnouncements(data.announcements || []);
+      } catch (err) {
+        console.error("Error fetching announcements:", err);
+      } finally {
+        setAnnouncementsLoading(false);
+      }
+    };
+
+    fetchAnnouncements();
+  }, []);
 
 
 
@@ -194,36 +216,26 @@ const Dashboard = () => {
                 </tr>
               </thead>
               <tbody>
-                {[
-                  {
-                    title: "Scrum Master",
-                    start: "Dec 4, 2019 21:42",
-                    end: "Dec 7, 2019 23:26",
-                    description: "Corrected item alignment",
-                  },
-                  {
-                    title: "Software Tester",
-                    start: "Dec 30, 2019 05:18",
-                    end: "Feb 2, 2020 19:28",
-                    description: "Embedded analytic scripts",
-                  },
-                  {
-                    title: "Software Developer",
-                    start: "Dec 30, 2019 07:52",
-                    end: "Dec 4, 2019 21:42",
-                    description: "High resolution imagery option",
-                  },
-                ].map((item, idx) => (
+                {announcementsLoading ? (
+                  <tr>
+                    <td className="px-4 py-3" colSpan="4">Loading announcements...</td>
+                  </tr>
+                ) : announcements.length === 0 ? (
+                  <tr>
+                    <td className="px-4 py-3" colSpan="4">No announcements available.</td>
+                  </tr>
+                ) : (
+                announcements.map((item, idx) => (
                   <tr
-                    key={idx}
+                    key={item._id || idx}
                     className="border-b hover:bg-gray-50 transition duration-200"
                   >
                     <td className="px-4 py-3 font-medium text-gray-800">{item.title}</td>
-                    <td className="px-4 py-3">{item.start}</td>
-                    <td className="px-4 py-3">{item.end}</td>
+                    <td className="px-4 py-3">{item.startDate}</td>
+                    <td className="px-4 py-3">{item.endDate}</td>
                     <td className="px-4 py-3">{item.description}</td>
                   </tr>
-                ))}
+                ))) }
               </tbody>
             </table>
           </div>

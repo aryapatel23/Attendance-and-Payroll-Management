@@ -161,9 +161,12 @@ import React, { useEffect, useState } from "react";
 import Header from "../../Components/Header";
 import Sidebar from "../../Components/HRSidebar";
 import { apiUrl } from "../../utils/api";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
   const [employees, setEmployees] = useState([]);
+  const [announcements, setAnnouncements] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchAttendance = async () => {
@@ -180,7 +183,32 @@ const Dashboard = () => {
 
     fetchAttendance();
   }, []);
+
+  const fetchAnnouncements = async () => {
+    try {
+      const response = await fetch(apiUrl("/api/announcements"));
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to fetch announcements");
+      }
+      setAnnouncements(data.announcements || []);
+    } catch (error) {
+      console.error("❌ Error fetching announcements:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchAnnouncements();
+  }, []);
+
 console.log("📊 Attendance data:", employees[0]?.username);
+
+  const tenDaysAgo = new Date();
+  tenDaysAgo.setDate(tenDaysAgo.getDate() - 10);
+  const recentAnnouncements = announcements.filter((item) => {
+    const createdAt = new Date(item.createdAt || item.startDate);
+    return createdAt >= tenDaysAgo;
+  });
 
 
   const getStatusColor = (status) => {
@@ -261,6 +289,50 @@ console.log("📊 Attendance data:", employees[0]?.username);
                 </table>
               </div>
             )}
+          </div>
+
+          {/* Recent Announcements (Last 10 Days) */}
+          <div className="bg-white shadow rounded p-4">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold">Recent Announcements (Last 10 Days)</h2>
+              <button
+                onClick={() => navigate("/hrannouncements")}
+                className="text-sm bg-indigo-600 text-white px-3 py-2 rounded hover:bg-indigo-700"
+              >
+                Manage Announcements
+              </button>
+            </div>
+
+            <div className="mt-6 overflow-x-auto">
+              <table className="min-w-full text-sm">
+                <thead className="bg-gray-100 text-gray-700">
+                  <tr>
+                    <th className="p-2 text-left">Title</th>
+                    <th className="p-2 text-left">Start Date</th>
+                    <th className="p-2 text-left">End Date</th>
+                    <th className="p-2 text-left">Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {recentAnnouncements.length === 0 ? (
+                    <tr>
+                      <td colSpan="4" className="p-3 text-center text-gray-500">
+                        No announcements in the last 10 days.
+                      </td>
+                    </tr>
+                  ) : (
+                    recentAnnouncements.map((item) => (
+                      <tr key={item._id} className="border-t">
+                        <td className="p-2">{item.title}</td>
+                        <td className="p-2">{item.startDate}</td>
+                        <td className="p-2">{item.endDate}</td>
+                        <td className="p-2">{item.description}</td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         </main>
 

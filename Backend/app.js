@@ -10,6 +10,7 @@ const calendar = require('./modules/calendar/holidayRoutes');
 const mailroutes = require('./modules/mail/mailroutes');
 const cloudinaryroutes = require('./modules/cloudinary/cloudinaryroutes');
 const contectHRRoutes = require('./modules/contactwithHR/contectHRRoutes');
+const announcementRoutes = require('./modules/announcements/announcements.routes');
 const app = express();
 
 // ✅ Configure CORS for React frontend
@@ -34,5 +35,6 @@ app.use('/api', calendar);
 app.use('/api', mailroutes);
 app.use('/api', cloudinaryroutes);
 app.use('/api/contact-hr', contectHRRoutes);
+app.use('/api', announcementRoutes);
 
 module.exports = app;
