@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import {cacheUser} from '../../Redux/Slice'
 import { FaDownload, FaEnvelope, FaPhone, FaGlobe, FaCalendarAlt,FaRupeeSign,FaRegClock } from "react-icons/fa";
 import { CgProfile } from "react-icons/cg";
+import { apiUrl } from "../../utils/api";
 
 const Hrprofile = () => {
   const [tab, setTab] = useState("Personal Info");
@@ -57,7 +58,7 @@ const FetchEmployee= async()=>{
   try{
   
     
-    const response= await fetch(`https://attendance-and-payroll-management.onrender.com/api/users/${id}`);
+    const response= await fetch(apiUrl(`/api/users/${id}`));
     
       if(!response.ok){
             throw new Error("Failed to fetch employees");
@@ -302,7 +303,7 @@ function SalaryInfoTab() {
 
     const fetchSalaryInfo = async () => {
       try {
-        const response = await fetch(`https://attendance-and-payroll-management.onrender.com/api/usersalaryinfo/${id}`);
+        const response = await fetch(apiUrl(`/api/usersalaryinfo/${id}`));
 
         if (!response.ok) {
           setMessage("Salary data is not found for this user. Please add the user info.");
@@ -410,7 +411,7 @@ const ProfileModal = ({ mode = "update", employeeId, defaultData = {}, onClose }
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const url =`https://attendance-and-payroll-management.onrender.com/api/update/${user.id}`;
+    const url = apiUrl(`/api/update/${user.id}`);
 
     const method = "PUT";
 

@@ -1,4 +1,5 @@
 import React, { useState,useEffect } from "react";
+import { apiUrl } from "../../utils/api";
 
 const AddEmployee = () => {
   const [formData, setFormData] = useState({
@@ -30,7 +31,7 @@ const AddEmployee = () => {
 
     try {
       const response = await fetch(
-        "https://attendance-and-payroll-management.onrender.com/api/add",
+        apiUrl("/api/add"),
         {
           method: "POST",
           headers: {

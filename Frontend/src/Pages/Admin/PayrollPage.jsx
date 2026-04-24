@@ -4,6 +4,7 @@ import "chart.js/auto";
 import { useParams } from "react-router-dom";
 import { useSelector, useDispatch } from 'react-redux';
 import {cacheUser} from '../../Redux/Slice'
+import { apiUrl } from "../../utils/api";
 
 
 const PayrollPage = () => {
@@ -57,7 +58,7 @@ const FetchEmployee = async()=>{
   try{
   
     
-    const response= await fetch(`https://attendance-and-payroll-management.onrender.com/api/users/${id}`);
+    const response= await fetch(apiUrl(`/api/users/${id}`));
     
       if(!response.ok){
             throw new Error("Failed to fetch employees");
@@ -176,7 +177,7 @@ function InfoTab() {
 
     const fetchSalaryInfo = async () => {
       try {
-        const response = await fetch(`http://localhost:5500/api/usersalaryinfo/${id}`);
+        const response = await fetch(apiUrl(`/api/usersalaryinfo/${id}`));
 
         if (!response.ok) {
           setMessage("Salary data is not found for this user. Please add the user info.");
@@ -323,8 +324,8 @@ const SalaryModal = ({ mode = "add", employeeId, defaultData = {}, onClose }) =>
 
     const url =
       mode === "add"
-        ? "http://localhost:5500/api/usersalaryinfo/add"
-        : "http://localhost:5500/api/usersalaryinfo/update";
+        ? apiUrl("/api/usersalaryinfo/add")
+        : apiUrl("/api/usersalaryinfo/update");
 
     const method = mode === "add" ? "POST" : "PUT";
 

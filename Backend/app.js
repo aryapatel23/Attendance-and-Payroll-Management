@@ -9,6 +9,7 @@ const payrollroutes = require('./modules/payroll/payrollroutes');
 const calendar = require('./modules/calendar/holidayRoutes');
 const mailroutes = require('./modules/mail/mailroutes');
 const cloudinaryroutes = require('./modules/cloudinary/cloudinaryroutes');
+const contectHRRoutes = require('./modules/contactwithHR/contectHRRoutes');
 const app = express();
 
 // ✅ Configure CORS for React frontend
@@ -32,5 +33,6 @@ app.use('/api', payrollroutes);
 app.use('/api', calendar);
 app.use('/api', mailroutes);
 app.use('/api', cloudinaryroutes);
+// app.use('/api/contact-hr', contectHRRoutes);
 
 module.exports = app;

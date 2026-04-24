@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useParams } from "react-router-dom";
+import { apiUrl } from "../../utils/api";
 
 const SetPassword = () => {
   const [searchParams] = useSearchParams();
@@ -32,7 +33,7 @@ const SetPassword = () => {
     setMessage("");
 
     try {
-      const res = await fetch("https://attendance-and-payroll-management.onrender.com/api/set-password", {
+      const res = await fetch(apiUrl("/api/set-password"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token, password }),
@@ -67,7 +68,7 @@ const SetPassword = () => {
     formData.append("image", image);
 
     try {
-      const response = await axios.post("https://attendance-and-payroll-management.onrender.com/api/upload-image", formData);
+      const response = await axios.post(apiUrl("/api/upload-image"), formData);
       setImageUrl(response.data.imageUrl);
       setUploadMessage("✅ Profile image uploaded successfully.");
     } catch (error) {

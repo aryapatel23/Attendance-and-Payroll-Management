@@ -146,6 +146,7 @@ import {
   Minus,
 } from "lucide-react";
 import { Transition } from "@headlessui/react";
+import { apiUrl } from "../../utils/api";
 
 const Salary = () => {
   const [openIndex, setOpenIndex] = useState(null);
@@ -166,7 +167,7 @@ useEffect(() => {
     }
 
     try {
-      const res = await fetch("https://attendance-and-payroll-management.onrender.com/api/Generate", {
+      const res = await fetch(apiUrl("/api/Generate"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

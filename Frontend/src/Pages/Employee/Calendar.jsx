@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import dayjs from 'dayjs';
 import Sidebar from '../../Components/Sidebar';
 import Header from '../../Components/Header';
+import { apiUrl } from '../../utils/api';
 
 const Calendar = () => {
   const [currentDate, setCurrentDate] = useState(dayjs());
@@ -10,7 +11,7 @@ const Calendar = () => {
   const [selectedDate, setSelectedDate] = useState(null);
 
   useEffect(() => {
-    fetch("https://attendance-and-payroll-management.onrender.com/api/holidays")
+    fetch(apiUrl("/api/holidays"))
       .then(res => res.json())
       .then(data => {
         const map = {};

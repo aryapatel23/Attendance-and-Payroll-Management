@@ -13,6 +13,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setAttendanceStatus } from "../../Redux/Slice.jsx";
 import Header from "../../Components/Header";
 import Sidebar from "../../Components/Sidebar";
+import { apiUrl } from "../../utils/api";
 
 
 
@@ -45,7 +46,7 @@ const Dashboard = () => {
 
     const fetchTodayStatus = async () => {
       try {
-        const res = await axios.get(`https://attendance-and-payroll-management.onrender.com/api/attendance/${userId}`);
+        const res = await axios.get(apiUrl(`/api/attendance/${userId}`));
         console.log("id sent to api is ", userId);
         setStatus(res.data.status);
         dispatch(setAttendanceStatus(res.data.status));

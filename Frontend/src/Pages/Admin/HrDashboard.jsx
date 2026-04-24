@@ -160,6 +160,7 @@
 import React, { useEffect, useState } from "react";
 import Header from "../../Components/Header";
 import Sidebar from "../../Components/HRSidebar";
+import { apiUrl } from "../../utils/api";
 
 const Dashboard = () => {
   const [employees, setEmployees] = useState([]);
@@ -168,7 +169,7 @@ const Dashboard = () => {
     const fetchAttendance = async () => {
       try {
 
-        const response = await fetch("https://attendance-and-payroll-management.onrender.com/api/all-attendance");
+        const response = await fetch(apiUrl("/api/all-attendance"));
         const data = await response.json();
         setEmployees(data.attendance || []);
         console.log("📊 Attendance data fetched successfully:", data);

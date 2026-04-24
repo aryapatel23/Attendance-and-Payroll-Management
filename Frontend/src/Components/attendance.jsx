@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { apiUrl } from "../utils/api";
 
 function AttendanceNew() {
   const [username, setUsername] = useState("");
@@ -23,7 +24,7 @@ function AttendanceNew() {
         };
 
         try {
-          const res = await fetch("http://localhost:6500/mark-attendance", {
+          const res = await fetch(apiUrl("/api/mark-attendance"), {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username, location }),

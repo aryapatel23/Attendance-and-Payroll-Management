@@ -16,6 +16,7 @@ import {
   Minus,
 } from "lucide-react";
 import { Transition } from "@headlessui/react";
+import { apiUrl } from "../../utils/api";
 import {
   ResponsiveContainer,
   BarChart,
@@ -101,7 +102,7 @@ const FetchEmployee= async()=>{
   try{
   
     
-    const response= await fetch(`https://attendance-and-payroll-management.onrender.com/api/users/${id}`);
+    const response= await fetch(apiUrl(`/api/users/${id}`));
     
       if(!response.ok){
             throw new Error("Failed to fetch employees");
@@ -307,7 +308,7 @@ useEffect(() => {
     }
 
     try {
-      const res = await fetch("https://attendance-and-payroll-management.onrender.com/api/Generate", {
+      const res = await fetch(apiUrl("/api/Generate"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -532,7 +533,7 @@ const Attendance=()=>{
     const fetchAttendanceData = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`https://attendance-and-payroll-management.onrender.com/api/getAllAttendanceByMonthofuser/${user_id}/${selectedMonth}`);
+        const res = await fetch(apiUrl(`/api/getAllAttendanceByMonthofuser/${user_id}/${selectedMonth}`));
         const attendanceRecords = await res.json();
 
         const presentDates = new Set(attendanceRecords.map(att => att.date));

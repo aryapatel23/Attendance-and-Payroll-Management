@@ -2,6 +2,7 @@ import {React,useState,useEffect} from "react";
 import Header from "../../Components/Header"; // Adjust if needed
 import Sidebar from "../../Components/HRSidebar"; // Adjust if needed
 import { useNavigate } from "react-router-dom";
+import { apiUrl } from "../../utils/api";
 
 const Employees = () => {
   // const employees = [
@@ -49,7 +50,7 @@ const Employees = () => {
 useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        const response = await fetch("https://attendance-and-payroll-management.onrender.com/api/all");
+        const response = await fetch(apiUrl("/api/all"));
         if (!response.ok) {
           throw new Error("Failed to fetch employees");
         }

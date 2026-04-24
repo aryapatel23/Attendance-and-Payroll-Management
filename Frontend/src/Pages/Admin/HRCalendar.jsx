@@ -122,6 +122,7 @@ import Header from '../../Components/Header';
 import Sidebar from '../../Components/HRSidebar';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import dayjs from 'dayjs';
+import { apiUrl } from '../../utils/api';
 
 const HRCalendar = () => {
   const [currentDate, setCurrentDate] = useState(dayjs());
@@ -129,7 +130,7 @@ const HRCalendar = () => {
   const [formData, setFormData] = useState({ dd: '', mm: '', yy: '', reason: '' });
 
   useEffect(() => {
-    fetch("https://attendance-and-payroll-management.onrender.com/api/holidays/")
+    fetch(apiUrl("/api/holidays/"))
       .then(res => res.json())
       .then(data => {
         const holidayMap = {};
@@ -163,7 +164,7 @@ const HRCalendar = () => {
     if (!dd || !mm || !yy || !reason) return alert("All fields are required");
 
     try {
-      const res = await fetch("https://attendance-and-payroll-management.onrender.com/api/holidays/add", {
+      const res = await fetch(apiUrl("/api/holidays/add"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ date, reason })
