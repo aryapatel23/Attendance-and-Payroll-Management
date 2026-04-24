@@ -57,3 +57,52 @@ exports.getRequestById = async (req, res) => {
     res.status(500).json({ success: false, message: "Error fetching request", error: error.message });
   }
 };
+
+// 📌 HR updates request status
+exports.updateRequestStatus = async (req, res) => {
+  try {
+    const db = getDB();
+    const { id } = req.params;
+    const { status } = req.body;
+    const allowedStatuses = ["Pending", "In Progress", "Resolved"];
+
+    if (!ObjectId.isValid(id)) {
+      return res.status(400).json({ success: false, message: "Invalid request ID" });
+    }
+
+    if (!allowedStatuses.includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid status. Allowed values: Pending, In Progress, Resolved",
+      });
+    }
+
+    const role = (req.user?.role || "").toLowerCase();
+    if (role !== "hr") {
+      return res.status(403).json({ success: false, message: "Only HR can update request status" });
+    }
+
+    const result = await db.collection("HRRequests").findOneAndUpdate(
+      { _id: new ObjectId(id) },
+      {
+        $set: {
+          status,
+          updatedAt: new Date(),
+        },
+      },
+      { returnDocument: "after" }
+    );
+
+    if (!result) {
+      return res.status(404).json({ success: false, message: "Request not found" });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Request status updated successfully",
+      request: result,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Error updating request status", error: error.message });
+  }
+};

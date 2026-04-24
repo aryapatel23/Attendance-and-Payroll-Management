@@ -6,6 +6,7 @@ const HRRequests = () => {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [updatingId, setUpdatingId] = useState("");
 
   useEffect(() => {
     const fetchRequests = async () => {
@@ -32,6 +33,40 @@ const HRRequests = () => {
     fetchRequests();
   }, []);
 
+  const handleStatusUpdate = async (requestId, nextStatus) => {
+    try {
+      setUpdatingId(requestId);
+      const token = localStorage.getItem("token");
+
+      const response = await fetch(apiUrl(`/api/contact-hr/${requestId}/status`), {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status: nextStatus }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to update status");
+      }
+
+      setRequests((prev) =>
+        prev.map((req) =>
+          (req._id === requestId || req.id === requestId)
+            ? { ...req, status: nextStatus, updatedAt: new Date().toISOString() }
+            : req
+        )
+      );
+    } catch (err) {
+      console.error("Error updating status:", err);
+      setError(err.message || "Unable to update request status.");
+    } finally {
+      setUpdatingId("");
+    }
+  };
+
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <h1 className="text-2xl font-bold mb-6">📩 Employee HR Requests</h1>
@@ -48,6 +83,7 @@ const HRRequests = () => {
               <th className="p-3">Category</th>
               <th className="p-3">Priority</th>
               <th className="p-3">Date</th>
+              <th className="p-3">Status</th>
               <th className="p-3">Attachment</th>
               <th className="p-3">Action</th>
             </tr>
@@ -55,7 +91,7 @@ const HRRequests = () => {
           <tbody>
             {!loading && requests.length === 0 ? (
               <tr>
-                <td colSpan="7" className="px-6 py-6 text-center text-gray-500">
+                <td colSpan="8" className="px-6 py-6 text-center text-gray-500">
                   No HR requests found.
                 </td>
               </tr>
@@ -92,6 +128,21 @@ const HRRequests = () => {
                 {/* Date */}
                 <td className="px-6 py-4">{(req.createdAt || req.date || "").toString().slice(0, 10)}</td>
 
+                {/* Status */}
+                <td className="px-6 py-4">
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                      req.status === "Resolved"
+                        ? "bg-green-100 text-green-700"
+                        : req.status === "In Progress"
+                        ? "bg-blue-100 text-blue-700"
+                        : "bg-yellow-100 text-yellow-700"
+                    }`}
+                  >
+                    {req.status || "Pending"}
+                  </span>
+                </td>
+
                 {/* Attachment */}
                 <td className="px-6 py-4">
                   {req.attachment ? (
@@ -110,7 +161,30 @@ const HRRequests = () => {
 
                 {/* Action Button */}
                 <td className="px-6 py-4">
-                  <span className="text-xs text-gray-600">{req.message}</span>
+                  <div className="flex flex-col gap-2 min-w-[170px]">
+                    <button
+                      className="px-2 py-1 text-xs rounded bg-yellow-100 text-yellow-700 hover:bg-yellow-200"
+                      onClick={() => handleStatusUpdate(req._id || req.id, "Pending")}
+                      disabled={updatingId === (req._id || req.id)}
+                    >
+                      Pending
+                    </button>
+                    <button
+                      className="px-2 py-1 text-xs rounded bg-blue-100 text-blue-700 hover:bg-blue-200"
+                      onClick={() => handleStatusUpdate(req._id || req.id, "In Progress")}
+                      disabled={updatingId === (req._id || req.id)}
+                    >
+                      In Progress
+                    </button>
+                    <button
+                      className="px-2 py-1 text-xs rounded bg-green-100 text-green-700 hover:bg-green-200"
+                      onClick={() => handleStatusUpdate(req._id || req.id, "Resolved")}
+                      disabled={updatingId === (req._id || req.id)}
+                    >
+                      Resolved
+                    </button>
+                    <span className="text-xs text-gray-600 pt-1">{req.message}</span>
+                  </div>
                 </td>
               </tr>
             ))) }
