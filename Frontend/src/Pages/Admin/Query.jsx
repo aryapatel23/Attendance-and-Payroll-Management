@@ -7,6 +7,9 @@ const HRRequests = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [updatingId, setUpdatingId] = useState("");
+  const [activeFilter, setActiveFilter] = useState("All");
+
+  const filters = ["All", "Pending", "In Progress", "Resolved"];
 
   useEffect(() => {
     const fetchRequests = async () => {
@@ -67,9 +70,30 @@ const HRRequests = () => {
     }
   };
 
+  const filteredRequests = requests.filter((req) => {
+    const currentStatus = req.status || "Pending";
+    return activeFilter === "All" ? true : currentStatus === activeFilter;
+  });
+
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <h1 className="text-2xl font-bold mb-6">📩 Employee HR Requests</h1>
+
+      <div className="flex flex-wrap gap-2 mb-4">
+        {filters.map((filter) => (
+          <button
+            key={filter}
+            onClick={() => setActiveFilter(filter)}
+            className={`px-3 py-1.5 rounded-full text-xs font-semibold transition ${
+              activeFilter === filter
+                ? "bg-indigo-600 text-white"
+                : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-100"
+            }`}
+          >
+            {filter}
+          </button>
+        ))}
+      </div>
 
       {loading && <p className="mb-4 text-sm text-gray-600">Loading requests...</p>}
       {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
@@ -89,14 +113,14 @@ const HRRequests = () => {
             </tr>
           </thead>
           <tbody>
-            {!loading && requests.length === 0 ? (
+            {!loading && filteredRequests.length === 0 ? (
               <tr>
                 <td colSpan="8" className="px-6 py-6 text-center text-gray-500">
-                  No HR requests found.
+                  No HR requests found for {activeFilter}.
                 </td>
               </tr>
             ) : (
-              requests.map((req) => (
+              filteredRequests.map((req) => (
               <tr key={req._id || req.id} className="border-t border-gray-200 hover:bg-gray-50">
                 {/* Employee Name */}
                 <td className="px-6 py-4">
@@ -162,28 +186,17 @@ const HRRequests = () => {
                 {/* Action Button */}
                 <td className="px-6 py-4">
                   <div className="flex flex-col gap-2 min-w-[170px]">
-                    <button
-                      className="px-2 py-1 text-xs rounded bg-yellow-100 text-yellow-700 hover:bg-yellow-200"
-                      onClick={() => handleStatusUpdate(req._id || req.id, "Pending")}
+                    <select
+                      value={req.status || "Pending"}
+                      onChange={(e) => handleStatusUpdate(req._id || req.id, e.target.value)}
                       disabled={updatingId === (req._id || req.id)}
+                      className="px-2 py-1.5 text-xs rounded border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400"
                     >
-                      Pending
-                    </button>
-                    <button
-                      className="px-2 py-1 text-xs rounded bg-blue-100 text-blue-700 hover:bg-blue-200"
-                      onClick={() => handleStatusUpdate(req._id || req.id, "In Progress")}
-                      disabled={updatingId === (req._id || req.id)}
-                    >
-                      In Progress
-                    </button>
-                    <button
-                      className="px-2 py-1 text-xs rounded bg-green-100 text-green-700 hover:bg-green-200"
-                      onClick={() => handleStatusUpdate(req._id || req.id, "Resolved")}
-                      disabled={updatingId === (req._id || req.id)}
-                    >
-                      Resolved
-                    </button>
-                    <span className="text-xs text-gray-600 pt-1">{req.message}</span>
+                      <option value="Pending">Pending</option>
+                      <option value="In Progress">In Progress</option>
+                      <option value="Resolved">Resolved</option>
+                    </select>
+                    <span className="text-xs text-gray-600 pt-1 line-clamp-2">{req.message}</span>
                   </div>
                 </td>
               </tr>
