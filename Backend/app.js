@@ -33,6 +33,6 @@ app.use('/api', payrollroutes);
 app.use('/api', calendar);
 app.use('/api', mailroutes);
 app.use('/api', cloudinaryroutes);
-// app.use('/api/contact-hr', contectHRRoutes);
+app.use('/api/contact-hr', contectHRRoutes);
 
 module.exports = app;

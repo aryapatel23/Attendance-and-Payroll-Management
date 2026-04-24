@@ -1,14 +1,19 @@
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
+import { apiUrl } from "../../utils/api";
 
 const ContactHR = () => {
   const [subject, setSubject] = useState("");
-  const [category, setCategory] = useState("general");
+  const [category, setCategory] = useState("General Inquiry");
   const [message, setMessage] = useState("");
-  const [priority, setPriority] = useState("normal");
+  const [priority, setPriority] = useState("Normal");
   const [attachment, setAttachment] = useState(null);
   const [status, setStatus] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (e) => {
+  const user = useSelector((state) => state.auth.user);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!subject || !message) {
@@ -16,20 +21,48 @@ const ContactHR = () => {
       return;
     }
 
-    console.log({
-      subject,
-      category,
-      message,
-      priority,
-      attachment,
-    });
+    if (!user?.id || !user?.username) {
+      setStatus("⚠️ Please login again before sending request.");
+      return;
+    }
 
-    setStatus("✅ Message sent to HR successfully!");
-    setSubject("");
-    setCategory("general");
-    setMessage("");
-    setPriority("normal");
-    setAttachment(null);
+    setSubmitting(true);
+
+    try {
+      const response = await fetch(apiUrl("/api/contact-hr"), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          employeeId: user.id,
+          employeeName: user.username,
+          subject,
+          category,
+          priority,
+          message,
+          attachment: attachment ? attachment.name : "",
+        }),
+      });
+
+      const result = await response.json();
+      if (!response.ok) {
+        setStatus(`❌ ${result.message || "Failed to submit request."}`);
+        return;
+      }
+
+      setStatus("✅ Message sent to HR successfully!");
+      setSubject("");
+      setCategory("General Inquiry");
+      setMessage("");
+      setPriority("Normal");
+      setAttachment(null);
+    } catch (error) {
+      console.error("Error submitting HR request:", error);
+      setStatus("❌ Unable to send request. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -63,10 +96,10 @@ const ContactHR = () => {
               onChange={(e) => setCategory(e.target.value)}
               className="p-3 border rounded-lg focus:ring focus:ring-blue-300"
             >
-              <option value="general">General Inquiry</option>
-              <option value="leave">Leave Request</option>
-              <option value="payroll">Payroll Issue</option>
-              <option value="technical">Technical Issue</option>
+              <option value="General Inquiry">General Inquiry</option>
+              <option value="Leave">Leave Request</option>
+              <option value="Payroll">Payroll Issue</option>
+              <option value="Other">Other</option>
             </select>
           </div>
 
@@ -90,8 +123,9 @@ const ContactHR = () => {
               onChange={(e) => setPriority(e.target.value)}
               className="p-3 border rounded-lg focus:ring focus:ring-blue-300"
             >
-              <option value="normal">Normal</option>
-              <option value="urgent">Urgent</option>
+              <option value="Low">Low</option>
+              <option value="Normal">Normal</option>
+              <option value="High">High</option>
             </select>
           </div>
 
@@ -115,9 +149,10 @@ const ContactHR = () => {
         <div className="mt-6">
           <button
             type="submit"
+            disabled={submitting}
             className="w-full md:w-auto px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition"
           >
-            Send Message
+            {submitting ? "Sending..." : "Send Message"}
           </button>
         </div>
 

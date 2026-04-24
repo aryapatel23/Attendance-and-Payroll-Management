@@ -1,36 +1,43 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaPaperclip, FaExclamationCircle } from "react-icons/fa";
+import { apiUrl } from "../../utils/api";
 
 const HRRequests = () => {
+  const [requests, setRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const [requests] = useState([
-    {
-      id: 1,
-      employeeName: "Arya Patel",
-      employeeId: "EMP001",
-      subject: "Salary clarification",
-      category: "Payroll",
-      priority: "High",
-      message: "I noticed a discrepancy in my February salary slip. Could you check?",
-      attachment: "https://example.com/salary-slip.pdf",
-      date: "2025-07-31",
-    },
-    {
-      id: 2,
-      employeeName: "Ravi Sharma",
-      employeeId: "EMP002",
-      subject: "Leave approval request",
-      category: "Leave",
-      priority: "Normal",
-      message: "I would like to request leave for 2 days in August.",
-      attachment: null,
-      date: "2025-07-30",
-    },
-  ]);
+  useEffect(() => {
+    const fetchRequests = async () => {
+      try {
+        setLoading(true);
+        setError("");
+        const response = await fetch(apiUrl("/api/contact-hr"));
+        const data = await response.json();
+        console.log("📩 HR requests fetched:", data);
+
+        if (!response.ok) {
+          throw new Error(data.message || "Failed to load requests");
+        }
+
+        setRequests(data.requests || []);
+      } catch (err) {
+        console.error("Error fetching HR requests:", err);
+        setError("Unable to load HR requests right now.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRequests();
+  }, []);
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <h1 className="text-2xl font-bold mb-6">📩 Employee HR Requests</h1>
+
+      {loading && <p className="mb-4 text-sm text-gray-600">Loading requests...</p>}
+      {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
 
       <div className="bg-white shadow-md rounded-xl p-4">
         <table className="min-w-full text-sm">
@@ -46,8 +53,15 @@ const HRRequests = () => {
             </tr>
           </thead>
           <tbody>
-            {requests.map((req) => (
-              <tr key={req.id} className="border-t border-gray-200 hover:bg-gray-50">
+            {!loading && requests.length === 0 ? (
+              <tr>
+                <td colSpan="7" className="px-6 py-6 text-center text-gray-500">
+                  No HR requests found.
+                </td>
+              </tr>
+            ) : (
+              requests.map((req) => (
+              <tr key={req._id || req.id} className="border-t border-gray-200 hover:bg-gray-50">
                 {/* Employee Name */}
                 <td className="px-6 py-4">
                   <p className="font-semibold">{req.employeeName}</p>
@@ -66,6 +80,8 @@ const HRRequests = () => {
                     className={`px-3 py-1 rounded-full text-xs font-semibold ${
                       req.priority === "High"
                         ? "bg-red-100 text-red-700"
+                        : req.priority === "Low"
+                        ? "bg-yellow-100 text-yellow-700"
                         : "bg-green-100 text-green-700"
                     }`}
                   >
@@ -74,7 +90,7 @@ const HRRequests = () => {
                 </td>
 
                 {/* Date */}
-                <td className="px-6 py-4">{req.date}</td>
+                <td className="px-6 py-4">{(req.createdAt || req.date || "").toString().slice(0, 10)}</td>
 
                 {/* Attachment */}
                 <td className="px-6 py-4">
@@ -94,12 +110,10 @@ const HRRequests = () => {
 
                 {/* Action Button */}
                 <td className="px-6 py-4">
-                  <button className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
-                    View Details
-                  </button>
+                  <span className="text-xs text-gray-600">{req.message}</span>
                 </td>
               </tr>
-            ))}
+            ))) }
           </tbody>
         </table>
       </div>
